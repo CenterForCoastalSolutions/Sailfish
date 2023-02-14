@@ -29,418 +29,131 @@
 # !                                                                      !
 # !=======================================================================
 
+import cupy as cp
+
+def precomputeBC(ng):
+    """ Precomputes indices (idx prefix) and weight coefficients (w prefix) for setting up the BC.
+        The main idea is that the complicated stuff (computing indices and coefficients
+        depending on the different BC choices and masks) is done at the beginning, leaving
+        a very simple operation for the actual BC call.
+    """
+
+    shpR = R.shape
+    # I use a method that is not very efficient but it is more clear. It consists in
+    # creating helper arrays (h prefix) that we initially fill with zeros and then with the indices of the
+    # nodes they depend on.
+    # These helper arrays are only used during this preprocessing stage and then disposed.
+    indices = cp.indices(shp)
+    flatIdx = cp.ravel_multi_index(indices. shp)  # This is an array to convert between flat and 3-D arrays.
+
+    hRZGradBC = cp.zeros(shp, np.int32) - 1
+
+
+    # Mask of BC nodes at each mesh side (E, W, N, S). If there are periodic boundary conditions in a pair of sides
+    # These take precedence, meaning that these mask will be all false in these sides.
+    maskLBCe = LBC_apply[ng].east [Jstr:Jend] & ~EWperiodic[ng]
+    maskLBCw = LBC_apply[ng].west [Jstr:Jend] & ~EWperiodic[ng]
+    maskLBCn = LBC_apply[ng].north[Istr:Iend] & ~NSperiodic[ng]
+    maskLBCs = LBC_apply[ng].south[Istr:Iend] & ~NSperiodic[ng]
+
+    hRZGradBC[Iend + 1, maskLBCe] = flatIdx[Iend, maskLBCe]
+    hRZGradBC[Istr - 1, maskLBCw] = flatIdx[Istr, maskLBCw]
+    hRZGradBC[maskLBCn, Jend + 1] = flatIdx[maskLBCn, Jend]
+    hRZGradBC[maskLBCs, Jstr - 1] = flatIdx[maskLBCs, Jstr]
+
+
+    # BC at the corners. In the original code they did an average of two cell that should
+    # have identical values, so we are just taking the one value.
+    if hRZGradBC[Istr - 1, Jstr - 1] >=0:
+        hRZGradBC[Istr - 1, Jstr - 1] = flatIdx[Istr, Jstr]
+
+    if hRZGradBC[Iend + 1, Jstr - 1] >= 0:
+        hRZGradBC[Iend - 1, Jstr - 1] = flatIdx[Iend, Jstr]
+
+    if hRZGradBC[Istr - 1, Jend + 1] >=0:
+        hRZGradBC[Istr - 1, Jend + 1] = flatIdx[Istr, Jend]
+
+    if hRZGradBC[Iend - 1, Jend + 1] >=0:
+        hRZGradBC[Iend - 1, Jend + 1] = flatIdx[Iend, Jend]
+
+
+    # U-Points
+
+
+    # This masks for Zero flow conditions are all True or all False.
+    maskZe    = np.full(Jend-Jstr,  LBC[ieast,  isBu2d, ng].closed and not EWperiodic[ng]
+    maskZw    = np.full(Jend-Jstr,  LBC[iwest,  isBu2d, ng].closed and not EWperiodic[ng]
+    maskZn    = np.full(Iend-Istr,  LBC[inorth, isBu2d, ng].closed and not NWperiodic[ng]
+    maskZs    = np.full(Iend-Istr,  LBC[isouth, isBu2d, ng].closed and not NWperiodic[ng]
+
+    maskGrade = np.full(Jend-Jstr, ~LBC[ieast,  isBu2d, ng].closed and not EWperiodic[ng]
+    maskGradw = np.full(Jend-Jstr, ~LBC[iwest,  isBu2d, ng].closed and not EWperiodic[ng]
+    maskGradn = np.full(Iend-Istr, ~LBC[inorth, isBu2d, ng].closed and not NWperiodic[ng]
+    maskGrads = np.full(Iend-Istr, ~LBC[isouth, isBu2d, ng].closed and not NWperiodic[ng]
+
+    hUClosedBC[Iend+1, maskZe & maskLBCe ] = flatIdx[Iend,   maskZe & maskLBCe]
+    hUClosedBC[Istr,   maskZw & maskLBCw ] = flatIdx[Istr-1, maskZw & maskLBCw]
+    hUClosedBC[maskZn & maskLBCn, jend+1 ] = flatIdx[maskZn & maskLBCn, Jend  ]
+    hUClosedBC[maskZs & maskLBCn, jstr   ] = flatIdx[maskZs & maskLBCs, Jstr-1]
+
+    hUGradBC[Iend+1, maskZe & maskGrade  ] = flatIdx[Iend,   maskGrade & maskLBCe]
+    hUGradBC[Istr,   maskZw & maskGradw  ] = flatIdx[Istr-1, maskGradw & maskLBCw]
+    hUGradBC[maskGradn & maskLBCn, jend+1] = flatIdx[maskGradn & maskLBCn, Jend  ]
+    hUGradBC[maskGrads & maskLBCn, jstr  ] = flatIdx[maskGrads & maskLBCs, Jstr-1]
+    if (EWperiodic(ng)):
+        Imin = IstrU
+        Imax = Iend
+        ELSE
+        Imin = Istr
+        Imax = IendR
+
+    SORT Indices
+
+
 
 
 def bc_r2d_tile(ng, tile, LBi, UBi, LBj, UBj, vars):
+    """ BC for rho-type cells: Boundary conditions are "imposed" by setting values to ghost  nodes"""
 
-    # Sets zero-gradient boundary conditions.
+    for var in vars:
+        # Sets zero-gradient boundary conditions.
+        var.flat[idxDstZGradBCR] = A.flat[idSrcZGradBCR]
 
-    if not EWperiodic[ng]:
-        maskLBC = LBC_apply[ng].east[Jstr:Jend]
-        A[Iend+1, maskLBC] = A[Iend, maskLBC]
-
-
-        maskLBC = LBC_apply[ng].west[Jstr:Jend]
-        A[Istr-1, maskLBC] = A[Istr, maskLBC]
-
-    if not NSperiodic[ng]:
-        maskLBC = LBC_apply[ng].north[Istr:Iend]
-        A[maskLBC, Jend+1] = A[maskLBC, Jend]
-
-
-        maskLBC = LBC_apply[ng].south[Istr:Iend]
-        A[maskLBC, Jstr-1] = A[maskLBC, Jstr]
-
-
-
-#     # Boundary corners.
-#       IF (.not.(EWperiodic(ng).or.NSperiodic(ng))) THEN
-#           IF (LBC_apply(ng)%south(Istr-1).and.                          &
-#      &        LBC_apply(ng)%west (Jstr-1)) THEN
-#             A(Istr-1,Jstr-1)=0.5_r8*(A(Istr  ,Jstr-1)+                  &
-#      &                               A(Istr-1,Jstr  ))
-#           END IF
-#         END IF
-#         IF (DOMAIN(ng)%SouthEast_Corner(tile)) THEN
-#           IF (LBC_apply(ng)%south(Iend+1).and.                          &
-#      &        LBC_apply(ng)%east (Jstr-1)) THEN
-#             A(Iend+1,Jstr-1)=0.5_r8*(A(Iend  ,Jstr-1)+                  &
-#      &                               A(Iend+1,Jstr  ))
-#           END IF
-#         END IF
-#         IF (DOMAIN(ng)%NorthWest_Corner(tile)) THEN
-#           IF (LBC_apply(ng)%north(Istr-1).and.                          &
-#      &        LBC_apply(ng)%west (Jend+1)) THEN
-#             A(Istr-1,Jend+1)=0.5_r8*(A(Istr-1,Jend  )+                  &
-#      &                               A(Istr  ,Jend+1))
-#           END IF
-#         END IF
-#         IF (DOMAIN(ng)%NorthEast_Corner(tile)) THEN
-#           IF (LBC_apply(ng)%north(Iend+1).and.                          &
-#      &        LBC_apply(ng)%east (Jend+1)) THEN
-#             A(Iend+1,Jend+1)=0.5_r8*(A(Iend+1,Jend  )+                  &
-#      &                               A(Iend  ,Jend+1))
-#           END IF
-#         END IF
-#       END IF
-# !
-# !-----------------------------------------------------------------------
-# !  Apply periodic boundary conditions.
-# !-----------------------------------------------------------------------
-# !
-#       IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
-#         CALL exchange_r2d_tile (ng, tile,                               &
-#      &                          LBi, UBi, LBj, UBj,                     &
-#      &                          A)
-#       END IF
-#
-#       RETURN
-#       END SUBROUTINE bc_r2d_tile
+        # Sets periodic boundary conditions.
+        var.flat[idxDstPeriodicBCR] = A.flat[idxSrcPeriodicBCR]
 
 
 
 def bc_u2d_tile(ng, tile, LBi, UBi, LBj, UBj, vars):
+    """ BC for U-type cells:  Boundary conditions are "imposed" by setting values to ghost  nodes"""
 
-    # Sets closed or zero-gradient boundary conditions.
+    for var in vars:
+        # Sets zero-gradient boundary conditions.
+        var.flat[idxDstZGradBCU] = A.flat[idSrcZGradBCR]
 
-    if not EWperiodic[ng]:
-        if LBC[ieast, isBu2d, ng].closed:
-            A[Iend + 1, maskLBC] = 0.0
-        else:
-            maskLBC = LBC_apply[ng].east[Jstr:Jend]
-            A[Iend + 1, maskLBC] = A[Iend, maskLBC]
+        # Sets free-slip boundary conditions.
+        var.flat[idxDstZGradBCU] = gamma2*A.flat[idSrcZGradBCU]
 
-        if LBC[iwest, isBu2d, ng].closed:
-            A[Istr - 1, maskLBC] = 0.0
-        else:
-            maskLBC = LBC_apply[ng].west[Jstr:Jend]
-            A[Istr-1, maskLBC] = A[Istr, maskLBC]
+        # Sets no-slip boundary conditions.
+        var.flat[idxDstClosedBCU] = 0.0
 
-    if not NSperiodic[ng]:
-        maskLBC = LBC_apply[ng].north[Istr:Iend]
-        A[maskLBC, Jend+1] = A[maskLBC, Jend]
+        # Sets periodic boundary conditions.
+        var.flat[idxDstPeriodicBCU] = A.flat[idxSrcPeriodicBCU]
 
 
-        maskLBC = LBC_apply[ng].south[Istr:Iend]
-        A[maskLBC, Jstr-1] = A[maskLBC, Jstr]
+def bc_u2d_tile(ng, tile, LBi, UBi, LBj, UBj, vars):
+    """ BC for U-type cells:  Boundary conditions are "imposed" by setting values to ghost  nodes"""
 
+    for var in vars:
+        # Sets zero-gradient boundary conditions.
+        var.flat[idxDstZGradBCV] = A.flat[idSrcZGradBCV]
 
-      IF (.not.EWperiodic(ng)) THEN
-        IF (DOMAIN(ng)%Eastern_Edge(tile)) THEN
-          IF (LBC(ieast,isBu2d,ng)%closed) THEN
-            DO j=Jstr,Jend
-              IF (LBC_apply(ng)%east(j)) THEN
-                A(Iend+1,j)=0.0_r8
-              END IF
-            END DO
-          ELSE
-            DO j=Jstr,Jend
-              IF (LBC_apply(ng)%east(j)) THEN
-                A(Iend+1,j)=A(Iend,j)
-              END IF
-            END DO
-          END IF
-        END IF
+        # Sets free-slip boundary conditions.
+        var.flat[idxDstZGradBCV] = gamma2*A.flat[idSrcZGradBCV]
 
-        IF (DOMAIN(ng)%Western_Edge(tile)) THEN
-          IF (LBC(iwest,isBu2d,ng)%closed) THEN
-            DO j=Jstr,Jend
-              IF (LBC_apply(ng)%west(j)) THEN
-                A(Istr,j)=0.0_r8
-              END IF
-            END DO
-          ELSE
-            DO j=Jstr,Jend
-              IF (LBC_apply(ng)%west(j)) THEN
-                A(Istr,j)=A(Istr+1,j)
-              END IF
-            END DO
-          END IF
-        END IF
-      END IF
-!
-!-----------------------------------------------------------------------
-!  North-South boundary conditions: Closed (free-slip/no-slip) or
-!  gradient.
-!-----------------------------------------------------------------------
-!
-      IF (.not.NSperiodic(ng)) THEN
-        IF (DOMAIN(ng)%Northern_Edge(tile)) THEN
-          IF (LBC(inorth,isBu2d,ng)%closed) THEN
-            IF (EWperiodic(ng)) THEN
-              Imin=IstrU
-              Imax=Iend
-            ELSE
-              Imin=Istr
-              Imax=IendR
-            END IF
-            DO i=Imin,Imax
-              IF (LBC_apply(ng)%north(i)) THEN
-                A(i,Jend+1)=gamma2(ng)*A(i,Jend)
-#ifdef MASKING
-                A(i,Jend+1)=A(i,Jend+1)*GRID(ng)%umask(i,Jend+1)
-#endif
-              END IF
-            END DO
-          ELSE
-            DO i=IstrU,Iend
-              IF (LBC_apply(ng)%north(i)) THEN
-                A(i,Jend+1)=A(i,Jend)
-              END IF
-            END DO
-          END IF
-        END IF
+        # Sets no-slip boundary conditions.
+        var.flat[idxDstClosedBCV] = 0.0
 
-        IF (DOMAIN(ng)%Southern_Edge(tile)) THEN
-          IF (LBC(isouth,isBu2d,ng)%closed) THEN
-            IF (EWperiodic(ng)) THEN
-              Imin=IstrU
-              Imax=Iend
-            ELSE
-              Imin=Istr
-              Imax=IendR
-            END IF
-            DO i=Imin,Imax
-              IF (LBC_apply(ng)%south(i)) THEN
-                A(i,Jstr-1)=gamma2(ng)*A(i,Jstr)
-#ifdef MASKING
-                A(i,Jstr-1)=A(i,Jstr-1)*GRID(ng)%umask(i,Jstr-1)
-#endif
-              END IF
-            END DO
-          ELSE
-            DO i=IstrU,Iend
-              IF (LBC_apply(ng)%south(i)) THEN
-                A(i,Jstr-1)=A(i,Jstr)
-              END IF
-            END DO
-          END IF
-        END IF
-      END IF
-!
-!-----------------------------------------------------------------------
-!  Boundary corners.
-!-----------------------------------------------------------------------
-!
-      IF (.not.(EWperiodic(ng).or.NSperiodic(ng))) THEN
-        IF (DOMAIN(ng)%SouthWest_Corner(tile)) THEN
-          IF (LBC_apply(ng)%south(Istr  ).and.                          &
-     &        LBC_apply(ng)%west (Jstr-1)) THEN
-            A(Istr  ,Jstr-1)=0.5_r8*(A(Istr+1,Jstr-1)+                  &
-     &                               A(Istr  ,Jstr  ))
-          END IF
-        END IF
-        IF (DOMAIN(ng)%SouthEast_Corner(tile)) THEN
-          IF (LBC_apply(ng)%south(Iend+1).and.                          &
-     &        LBC_apply(ng)%east (Jstr-1)) THEN
-            A(Iend+1,Jstr-1)=0.5_r8*(A(Iend  ,Jstr-1)+                  &
-     &                               A(Iend+1,Jstr  ))
-          END IF
-        END IF
-        IF (DOMAIN(ng)%NorthWest_Corner(tile)) THEN
-          IF (LBC_apply(ng)%north(Istr  ).and.                          &
-     &        LBC_apply(ng)%west (Jend+1)) THEN
-            A(Istr  ,Jend+1)=0.5_r8*(A(Istr  ,Jend  )+                  &
-     &                               A(Istr+1,Jend+1))
-          END IF
-        END IF
-        IF (DOMAIN(ng)%NorthEast_Corner(tile)) THEN
-          IF (LBC_apply(ng)%north(Iend+1).and.                          &
-     &        LBC_apply(ng)%east (Jend+1)) THEN
-            A(Iend+1,Jend+1)=0.5_r8*(A(Iend+1,Jend  )+                  &
-     &                               A(Iend  ,Jend+1))
-          END IF
-        END IF
-      END IF
-!
-!-----------------------------------------------------------------------
-!  Apply periodic boundary conditions.
-!-----------------------------------------------------------------------
-!
-      IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
-        CALL exchange_u2d_tile (ng, tile,                               &
-     &                          LBi, UBi, LBj, UBj,                     &
-     &                          A)
-      END IF
-
-      RETURN
-      END SUBROUTINE bc_u2d_tile
-
-!
-!***********************************************************************
-      SUBROUTINE bc_v2d_tile (ng, tile,                                 &
-     &                        LBi, UBi, LBj, UBj,                       &
-     &                        A)
-!***********************************************************************
-!
-      USE mod_param
-      USE mod_boundary
-      USE mod_grid
-      USE mod_ncparam
-      USE mod_scalars
-!
-      USE exchange_2d_mod, ONLY : exchange_v2d_tile
-!
-!  Imported variable declarations.
-!
-      integer, intent(in) :: ng, tile
-      integer, intent(in) :: LBi, UBi, LBj, UBj
-
-#ifdef ASSUMED_SHAPE
-      real(r8), intent(inout) :: A(LBi:,LBj:)
-#else
-      real(r8), intent(inout) :: A(LBi:UBi,LBj:UBj)
-#endif
-!
-!  Local variable declarations.
-!
-      integer :: Jmin, Jmax
-      integer :: i, j
-
-#include "set_bounds.h"
-!
-!-----------------------------------------------------------------------
-!  East-West boundary conditions: Closed (free-slip/no-slip) or
-!  gradient.
-!-----------------------------------------------------------------------
-!
-      IF (.not.EWperiodic(ng)) THEN
-        IF (DOMAIN(ng)%Eastern_Edge(tile)) THEN
-          IF (LBC(ieast,isBv2d,ng)%closed) THEN
-            IF (NSperiodic(ng)) THEN
-              Jmin=JstrV
-              Jmax=Jend
-            ELSE
-              Jmin=Jstr
-              Jmax=JendR
-            END IF
-            DO j=Jmin,Jmax
-              IF (LBC_apply(ng)%east(j)) THEN
-                A(Iend+1,j)=gamma2(ng)*A(Iend,j)
-#ifdef MASKING
-                A(Iend+1,j)=A(Iend+1,j)*GRID(ng)%vmask(Iend+1,j)
-#endif
-              END IF
-            END DO
-          ELSE
-            DO j=JstrV,Jend
-              IF (LBC_apply(ng)%east(j)) THEN
-                A(Iend+1,j)=A(Iend,j)
-              END IF
-            END DO
-          END IF
-        END IF
-
-        IF (DOMAIN(ng)%Western_Edge(tile)) THEN
-          IF (LBC(iwest,isBv2d,ng)%closed) THEN
-            IF (NSperiodic(ng)) THEN
-              Jmin=JstrV
-              Jmax=Jend
-            ELSE
-              Jmin=Jstr
-              Jmax=JendR
-            END IF
-            DO j=Jmin,Jmax
-              IF (LBC_apply(ng)%west(j)) THEN
-                A(Istr-1,j)=gamma2(ng)*A(Istr,j)
-#ifdef MASKING
-                A(Istr-1,j)=A(Istr-1,j)*GRID(ng)%vmask(Istr-1,j)
-#endif
-              END IF
-            END DO
-          ELSE
-            DO j=JstrV,Jend
-              IF (LBC_apply(ng)%west(j)) THEN
-                A(Istr-1,j)=A(Istr,j)
-              END IF
-            END DO
-          END IF
-        END IF
-      END IF
-!
-!-----------------------------------------------------------------------
-!  North-South boundary conditions: Closed or Gradient.
-!-----------------------------------------------------------------------
-!
-      IF (.not.NSperiodic(ng)) THEN
-        IF (DOMAIN(ng)%Northern_Edge(tile)) THEN
-          IF (LBC(inorth,isBv2d,ng)%closed) THEN
-            DO i=Istr,Iend
-              IF (LBC_apply(ng)%north(i)) THEN
-                A(i,Jend+1)=0.0_r8
-              END IF
-            END DO
-          ELSE
-            DO i=Istr,Iend
-              IF (LBC_apply(ng)%north(i)) THEN
-                A(i,Jend+1)=A(i,Jend)
-              END IF
-            END DO
-          END IF
-        END IF
-
-        IF (DOMAIN(ng)%Southern_Edge(tile)) THEN
-          IF (LBC(isouth,isBv2d,ng)%closed) THEN
-            DO i=Istr,Iend
-              IF (LBC_apply(ng)%south(i)) THEN
-                A(i,Jstr)=0.0_r8
-              END IF
-            END DO
-          ELSE
-            DO i=Istr,Iend
-              IF (LBC_apply(ng)%south(i)) THEN
-                A(i,Jstr)=A(i,Jstr+1)
-              END IF
-            END DO
-          END IF
-        END IF
-      END IF
-!
-!-----------------------------------------------------------------------
-!  Boundary corners.
-!-----------------------------------------------------------------------
-!
-      IF (.not.(EWperiodic(ng).or.NSperiodic(ng))) THEN
-        IF (DOMAIN(ng)%SouthWest_Corner(tile)) THEN
-          IF (LBC_apply(ng)%south(Istr-1).and.                          &
-     &        LBC_apply(ng)%west (Jstr  )) THEN
-            A(Istr-1,Jstr  )=0.5_r8*(A(Istr  ,Jstr  )+                  &
-     &                               A(Istr-1,Jstr+1))
-          END IF
-        END IF
-        IF (DOMAIN(ng)%SouthEast_Corner(tile)) THEN
-          IF (LBC_apply(ng)%south(Iend+1).and.                          &
-     &        LBC_apply(ng)%east (Jstr  )) THEN
-            A(Iend+1,Jstr  )=0.5_r8*(A(Iend  ,Jstr  )+                  &
-     &                               A(Iend+1,Jstr+1))
-          END IF
-        END IF
-        IF (DOMAIN(ng)%NorthWest_Corner(tile)) THEN
-          IF (LBC_apply(ng)%north(Istr-1).and.                          &
-     &        LBC_apply(ng)%west (Jend+1)) THEN
-            A(Istr-1,Jend+1)=0.5_r8*(A(Istr-1,Jend  )+                  &
-     &                               A(Istr  ,Jend+1))
-          END IF
-        END IF
-        IF (DOMAIN(ng)%NorthEast_Corner(tile)) THEN
-          IF (LBC_apply(ng)%north(Iend+1).and.                          &
-     &        LBC_apply(ng)%east (Jend+1)) THEN
-            A(Iend+1,Jend+1)=0.5_r8*(A(Iend+1,Jend  )+                  &
-     &                               A(Iend  ,Jend+1))
-          END IF
-        END IF
-      END IF
-!
-!-----------------------------------------------------------------------
-!  Apply periodic boundary conditions.
-!-----------------------------------------------------------------------
-!
-      IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
-        CALL exchange_v2d_tile (ng, tile,                               &
-     &                          LBi, UBi, LBj, UBj,                     &
-     &                          A)
-      END IF
-
-      RETURN
-      END SUBROUTINE bc_v2d_tile
+        # Sets periodic boundary conditions.
+        var.flat[idxDstPeriodicBCV] = A.flat[idxSrcPeriodicBCV]
 

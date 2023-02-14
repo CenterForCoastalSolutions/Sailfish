@@ -452,27 +452,26 @@ def exchange_p2d_tile (ng, tile, LBi, UBi, LBj, UBj, vars):
           Imax=IendR
         END IF
 !
-        IF (NS_exchange) THEN
-          IF (DOMAIN(ng)%Southern_Edge(tile)) THEN
-            DO i=Imin,Imax
-              A(i,Mm(ng)+1)=A(i,1)
-              A(i,Mm(ng)+2)=A(i,2)
-            END DO
-            IF (NghostPoints.eq.3) THEN
-              DO i=Imin,Imax
-                A(i,Mm(ng)+3)=A(i,3)
-              END DO
-            END IF
-          END IF
-          IF (DOMAIN(ng)%Northern_Edge(tile)) THEN
-            DO i=Imin,Imax
-              A(i,-2)=A(i,Mm(ng)-2)
-              A(i,-1)=A(i,Mm(ng)-1)
-              A(i, 0)=A(i,Mm(ng)  )
-            END DO
-          END IF
+      IF (DOMAIN(ng)%Southern_Edge(tile)) THEN
+        DO i=Imin,Imax
+          A(i,Mm(ng)+1)=A(i,1)
+          A(i,Mm(ng)+2)=A(i,2)
+        END DO
+        IF (NghostPoints.eq.3) THEN
+          DO i=Imin,Imax
+            A(i,Mm(ng)+3)=A(i,3)
+          END DO
         END IF
       END IF
+      IF (DOMAIN(ng)%Northern_Edge(tile)) THEN
+        DO i=Imin,Imax
+          A(i,-2)=A(i,Mm(ng)-2)
+          A(i,-1)=A(i,Mm(ng)-1)
+          A(i, 0)=A(i,Mm(ng)  )
+        END DO
+      END IF
+    END IF
+
 !
 !-----------------------------------------------------------------------
 !  Boundary corners.

@@ -37,30 +37,6 @@ def gls_prestep(ng, tile):
      &                       MIXING(ng) % tke)
 # ifdef PROFILE
       CALL wclock_off (ng, iNLM, 19, __LINE__, MyFile)
-# endif
-!
-      RETURN
-      END SUBROUTINE gls_prestep
-!
-!***********************************************************************
-def gls_prestep_tile(ng):
-
-#  ifdef MASKING
-      real(r8), intent(in) :: umask(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: vmask(LBi:UBi,LBj:UBj)
-#  endif
-      real(r8), intent(in) :: Huon(LBi:UBi,LBj:UBj,N(ng))
-      real(r8), intent(in) :: Hvom(LBi:UBi,LBj:UBj,N(ng))
-      real(r8), intent(in) :: Hz(LBi:UBi,LBj:UBj,N(ng))
-      real(r8), intent(in) :: pm(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: pn(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: W(LBi:UBi,LBj:UBj,0:N(ng))
-# ifdef WEC_VF
-      real(r8), intent(in) :: W_stokes(LBi:UBi,LBj:UBj,0:N(ng))
-# endif
-      real(r8), intent(inout) :: gls(LBi:UBi,LBj:UBj,0:N(ng),3)
-      real(r8), intent(inout) :: tke(LBi:UBi,LBj:UBj,0:N(ng),3)
-# endif
 
 
       Gamma = 1.0/6.0
@@ -105,34 +81,27 @@ def gls_prestep_tile(ng):
 # ! the old-time-step Hz will be no longer awailable.
 # !
 
-      DO k=1,N(ng)-1
 
     if K_C2ADVECTION:
 
 # !
 # !  Second-order, centered differences advection.
-!
-        DO j=Jstr,Jend
-          DO i=Istr,Iend+1
-            XF(i,j)=0.5_r8*(Huon(i,j,k)+Huon(i,j,k+1))
-            FX (i,j)=XF(i,j)*0.5_r8*(tke(i,j,k,nstp)+tke(i-1,j,k,nstp))
-            FXL(i,j)=XF(i,j)*0.5_r8*(gls(i,j,k,nstp)+gls(i-1,j,k,nstp))
-          END DO
-        END DO
+# !
 
-        DO j=Jstr,Jend+1
-          DO i=Istr,Iend
-            EF(i,j)=0.5*(Hvom(i,j,k)+Hvom(i,j,k+1))
-            FE (i,j)=EF(i,j)*0.5*(tke(i,j,k,nstp)+tke(i,j-1,k,nstp))
-            FEL(i,j)=EF(i,j)*0.5*(gls(i,j,k,nstp)+gls(i,j-1,k,nstp))
-          END DO
-        END DO
-# else
-!
-!  Fourth-order, centered differences advection.
-!
-        DO j=Jstr,Jend
-          DO i=Istrm1,Iendp2
+            XF  = WtoR(Huon)
+            FX  = XF*RtoU(tke[:,:,:,nspt])
+            FXL = XF*RtoU(gls[:,:,:,nspt])
+
+            EF  = WtoR(Hvom)
+            FE  = EF*RtoV(tke[:,:,:,nspt])
+            FEL = EF*RtoV(gls[:,:,:,nspt])
+
+    else
+# !
+# !  Fourth-order, centered differences advection.
+# !
+#         DO j=Jstr,Jend
+#           DO i=Istrm1,Iendp2
             grad (i,j)=(tke(i,j,k,nstp)-tke(i-1,j,k,nstp))
 #  ifdef MASKING
             grad (i,j)=grad (i,j)*umask(i,j)
@@ -141,8 +110,11 @@ def gls_prestep_tile(ng):
 #  ifdef MASKING
             gradL(i,j)=gradL(i,j)*umask(i,j)
 #  endif
-          END DO
-        END DO
+#           END DO
+#         END DO
+
+
+        # BOUNDARY THINGS
         IF (.not.(CompositeGrid(iwest,ng).or.EWperiodic(ng))) THEN
           IF (DOMAIN(ng)%Western_Edge(tile)) THEN
             DO j=Jstr,Jend
@@ -159,6 +131,9 @@ def gls_prestep_tile(ng):
             END DO
           END IF
         END IF
+
+
+
         cff=1.0_r8/6.0_r8
         DO j=Jstr,Jend
           DO i=Istr,Iend+1
@@ -171,7 +146,7 @@ def gls_prestep_tile(ng):
      &                       cff*(gradL(i+1,j)-gradL(i-1,j)))
           END DO
         END DO
-!
+
         DO j=Jstrm1,Jendp2
           DO i=Istr,Iend
             grad (i,j)=(tke(i,j,k,nstp)-tke(i,j-1,k,nstp))
@@ -184,6 +159,7 @@ def gls_prestep_tile(ng):
 #  endif
           END DO
         END DO
+
 
         IF (.not.(CompositeGrid(isouth,ng).or.NSperiodic(ng))) THEN
           IF (DOMAIN(ng)%Southern_Edge(tile)) THEN
@@ -201,6 +177,7 @@ def gls_prestep_tile(ng):
             END DO
           END IF
         END IF
+
 
         cff=1.0_r8/6.0_r8
         DO j=Jstr,Jend+1
