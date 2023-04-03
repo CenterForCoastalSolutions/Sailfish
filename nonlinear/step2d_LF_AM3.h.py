@@ -1,5 +1,5 @@
 
-def step2d(ng, tile)
+def step2d(ng)
 """
  Nonlinear shallow-water primitive equations predictor (Leap-frog)   
  and corrector (Adams-Moulton) time-stepping engine.                
@@ -696,7 +696,7 @@ def step2d(ng, tile)
         END DO
       END DO
 
-    Drhs[:,:] = zeta[:,:,krsh] + h[:,:]
+Drhs[:,:] = zeta[krsh,:,:] + h[:,:]
 
 
       DO j=JstrVm2-1,Jendp2
@@ -716,6 +716,22 @@ def step2d(ng, tile)
 #  endif
         END DO
       END DO
+
+cff1 = on_u*RtoU(Drhs)
+DUon = ubar[krhs,:,:]*cff1
+if WEC:
+    if WET_DRY:
+
+        cff5 = cp.abs(cp.abs(umask_wet)-1.0)    # CCCCCC
+        cff6 = 0.5 + 0.5*cp.sign(ubar_stokes)*umask_wet
+        cff7 = 0.5*umask_wet*cff5 + cff6*(1.0 - cff5)
+        cff1 = cff1*cff7
+
+    DUSon = ubar_stokes*cff1
+    DUon = DUon + DUSon
+
+DUSon =ubar_stokes*cff1
+
       DO j=JstrVm2,Jendp2
         DO i=IstrUm2-1,Iendp2
           cff=0.5_r8*om_v(i,j)
@@ -734,22 +750,9 @@ def step2d(ng, tile)
         END DO
       END DO
 # endif
-# ifdef DISTRIBUTE
-!
-      IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
-        CALL exchange_u2d_tile (ng, tile,                               &
-     &                          IminS, ImaxS, JminS, JmaxS,             &
-     &                          DUon)
-        CALL exchange_v2d_tile (ng, tile,                               &
-     &                          IminS, ImaxS, JminS, JmaxS,             &
-     &                          DVom)
-      END IF
-      CALL mp_exchange2d (ng, tile, iNLM, 2,                            &
-     &                    IminS, ImaxS, JminS, JmaxS,                   &
-     &                    NghostPoints,                                 &
-     &                    EWperiodic(ng), NSperiodic(ng),               &
-     &                    DUon, DVom)
-# endif
+
+
+
 !
 !  Set vertically integrated mass fluxes DUon and DVom along the open
 !  boundaries in such a way that the integral volume is conserved.
@@ -841,16 +844,16 @@ def step2d(ng, tile)
           END DO
         END DO
       END IF
-!
-!  After all fast time steps are completed, apply boundary conditions
-!  to time averaged fields.
+# !
+# !  After all fast time steps are completed, apply boundary conditions
+# !  to time averaged fields.
 #  ifdef NESTING
-!  In nesting applications with refinement grids, we need to exchange
-!  the DU_avg2 and DV_avg2 fluxes boundary information for the case
-!  that a contact point is at a tile partition. Notice that in such
-!  cases, we need i+1 and j+1 values for spatial/temporal interpolation.
-#  endif
-!
+# !  In nesting applications with refinement grids, we need to exchange
+# !  the DU_avg2 and DV_avg2 fluxes boundary information for the case
+# !  that a contact point is at a tile partition. Notice that in such
+# !  cases, we need i+1 and j+1 values for spatial/temporal interpolation.
+# #  endif
+# !
       IF ((iif(ng).eq.(nfast(ng)+1)).and.PREDICTOR_2D_STEP(ng)) THEN
         IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
           CALL exchange_r2d_tile (ng, tile,                             &
