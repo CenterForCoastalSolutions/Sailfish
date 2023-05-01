@@ -39,7 +39,7 @@ def bc_r2d_tile(ng, vars):
 
 
 
-def bc_u2d_tile(ng, vars, gamma2):
+def bc_u2d_tile(vars, gamma2):
     """ BC for U-type cells:  Boundary conditions are "imposed" by setting values to ghost  nodes"""
 
     for var in vars:
@@ -47,19 +47,19 @@ def bc_u2d_tile(ng, vars, gamma2):
         var = var.ravel()
 
         # Sets zero-gradient boundary conditions.
-        var[idxDstZGradBCU[ng]] = var[idxSrcZGradBCR[ng]]
+        var[idxDstZGradBCU] = var[idxSrcZGradBCR]
 
         # Sets free-slip boundary conditions.
-        var[idxDstZGradBCU[ng]] = gamma2*var[idxSrcZGradBCU[ng]]
+        var[idxDstZGradBCU] = gamma2*var[idxSrcZGradBCU]
 
         # Sets no-slip boundary conditions.
-        var[idxDstClosedBCU[ng]] = 0.0
+        var[idxDstClosedBCU] = 0.0
 
         # Sets periodic boundary conditions.
-        var[idxDstPeriodicBCU[ng]] = var[idxSrcPeriodicBCU[ng]]
+        var[idxDstPeriodicBCU] = var[idxSrcPeriodicBCU]
 
 
-def bc_v2d_tile(ng, vars, gamma2):
+def bc_v2d_tile(vars, gamma2):
     """ BC for U-type cells:  Boundary conditions are "imposed" by setting values to ghost  nodes"""
 
     for var in vars:
@@ -67,13 +67,13 @@ def bc_v2d_tile(ng, vars, gamma2):
         var = var.ravel()
 
         # Sets zero-gradient boundary conditions.
-        var[idxDstZGradBCV[ng]] = var[idxSrcZGradBCV[ng]]
+        var[idxDstZGradBCV] = var[idxSrcZGradBCV]
 
         # Sets free-slip boundary conditions.
-        var[idxDstZGradBCV[ng]] = gamma2*var[idxSrcZGradBCV[ng]]
+        var[idxDstZGradBCV] = gamma2*var[idxSrcZGradBCV]
 
         # Sets no-slip boundary conditions.
-        var[idxDstClosedBCV[ng]] = 0.0
+        var[idxDstClosedBCV] = 0.0
 
         # Sets periodic boundary conditions.
         var[idxDstPeriodicBCV] = var[idxSrcPeriodicBCV]

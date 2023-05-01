@@ -1,12 +1,4 @@
-#
-# !=======================================================================
-# !  Copyright (c) 2002-2021 The ROMS/TOMS Group                         !
-# !    Licensed under a MIT/X style license                              !
-# !    See License_ROMS.txt                           Hernan G. Arango   !
-# !========================================== Alexander F. Shchepetkin ===
-# !                                                                      !
-# !  These routines apply periodic boundary conditions to generic        !
-# !  2D fields.                                                          !
+# These routines apply periodic boundary conditions to generic 2D fields.                                                          !
 # !                                                                      !
 # !  On Input:                                                           !
 # !                                                                      !
@@ -29,13 +21,14 @@
 # !     exchange_u2d_tile       periodic conditions at U-points          !
 # !     exchange_v2d_tile       periodic conditions at V-points          !
 # !                                                                      !
-# !=======================================================================
-# !
 
 
-def exchange_p2d_tile (ng, tile, LBi, UBi, LBj, UBj, vars):
+def buildPeriodicBCIndicesR(ng):
 
     for var in vars:
+
+        zeroGradBCIdx = []
+        zeroGradBCIdxSrc = []
 
         # East-West periodic boundary conditions.
         if EWperiodic[ng]:
@@ -50,8 +43,8 @@ def exchange_p2d_tile (ng, tile, LBi, UBi, LBj, UBj, vars):
                 A[Lm[ng] + 1, Jmin:Jmax] = A[1, Jmin:Jmax]
                 A[Lm[ng] + 2, Jmin:Jmax] = A[2, Jmin:Jmax]
 
-            if NghostPoints == 3:
-                A[Lm[ng]+3, Jmin:Jmax] = A[3, Jmin:Jmax]
+                if NghostPoints == 3:
+                    A[Lm[ng]+3, Jmin:Jmax] = A[3, Jmin:Jmax]
 
             if (DOMAIN[ng].Eastern_Edge[tile]:
                 # A[Lm[ng] + 1, Jmin:Jmax] = A[1, Jmin:Jmax]
