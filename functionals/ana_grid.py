@@ -15,12 +15,8 @@ def ana_grid(analiticalCase):
        h        Bathymetry (meters; positive) at RHO-points.
        hmin     Minimum depth of bathymetry (m).
        hmax     Maximum depth of bathymetry (m).
-       pm       Coordinate transformation metric "m" (1/meters)
-                associated with the differential distances in XI
-                at RHO-points.
-       pn       Coordinate transformation metric "n" (1/meters)
-                associated with the differential distances in ETA.
-                at RHO-points.
+       pm       Coordinate transformation metric "m" (1/meters) associated with the differential distances in XI at RHO-points.
+       pn       Coordinate transformation metric "n" (1/meters) associated with the differential distances in ETA at RHO-points.
        xp       XI-coordinates (m) at PSI-points.
        xr       XI-coordinates (m) at RHO-points.
        yp       ETA-coordinates (m) at PSI-points.

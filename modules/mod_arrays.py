@@ -10,12 +10,12 @@ def mod_arrays():
 #  This routine routine allocates and initializes model state arrays
 
 
-    LBi =BOUNDS.LBi
-    UBi =BOUNDS.UBi
-    LBj =BOUNDS.LBj
-    UBj =BOUNDS.UBj
-    LBij=BOUNDS.LBij
-    UBij=BOUNDS.UBij
+    # LBi =BOUNDS.LBi
+    # UBi =BOUNDS.UBi
+    # LBj =BOUNDS.LBj
+    # UBj =BOUNDS.UBj
+    # LBij=BOUNDS.LBij
+    # UBij=BOUNDS.UBij
 
 
     # Intialize variables

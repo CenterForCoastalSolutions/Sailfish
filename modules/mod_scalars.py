@@ -1,20 +1,6 @@
 import mod_param
 
-# Multiple grid structure.
-# -----------------------------------------------------------------------
 
-# Cs_r          Set of S-curves used to stretch the vertical grid that follows the bathymetry at vertical RHO-points.
-# Cs_w          Set of S-curves used to stretch the vertical grid that follows the bathymetry at vertical W-points.
-# sc_r          S-coordinate independent variable, [-1 < sc < 0] at vertical RHO-points.
-# sc_w          S-coordinate independent variable, [-1 < sc < 0] at  vertical W-points.
-!
-class Scalars:
-        Fstate = cp.zeros(3, cp.bool)
-
-        real(dp), pointer :: Cs_r(:)
-        real(dp), pointer :: Cs_w(:)
-        real(dp), pointer :: sc_r(:)
-        real(dp), pointer :: sc_w(:)
 
 
 
@@ -50,212 +36,123 @@ class Scalars:
 #
 #                   'time-units since 2002-01-15 12:00:00'
 #
-        real(dp) :: time_ref = 0.0_dp                    ! YYYYMMDD.dd
 
-class Clock
-        integer :: yday                ! day of the year
-        integer :: year                ! year including century (YYYY)
-        integer :: month               ! month of the year (1,...,12)
-        integer :: day                 ! day of the month
-        integer :: hour                ! hour of the day (1,...,23)
-        integer :: minutes             ! minutes of the hour
-
-        real(dp) :: seconds            ! frational seconds of the minute
-        real(dp) :: base               ! reference date (YYYYMMDD.dd)
-        real(dp) :: DateNumber(2)      ! date number, [1]: days
-                                       !              [2]: seconds
-        real(dp) :: tide_DateNumber(2) ! tide reference date number,
-                                       !   [1]: days  [2]: seconds
-        character (len=22) :: string   ! YYYY-MM-DD hh:mm:ss.ss
-        character (len=25) :: calendar ! date calendar
-
-
-Rclock = Clock()       ! reference/base date
+time_ref = 0.0                    ! YYYYMMDD.dd
 
 
 
-# Time stepping indices, variables, and clocks.
+class Clock:
+        __init__(self):
+                self.tide_DateNumber[None, None]   # tide reference date number, [1]: days  [2]: seconds
+                string = ''                        # YYYY-MM-DD hh:mm:ss.ss
+                calendar = ''                      # date calendar
+
+
+Rclock = Clock()       # reference/base date
+
+
+
+# Data about computational times.
 # -----------------------------------------------------------------------
+class CompTimes:
+        def __init__(self):
 
-class TIMES:
+                ntimes = getInputVal('NTIMES',  dtype = int)            # Total number timesteps in current run. In 3D configurations, "ntimes"
+                                                                        # is the total of baroclinic timesteps. In 2D configuration, "ntimes"
+                                                                        # is the total of barotropic timesteps.
+                dt      = getInputVal('DT',      dtype = float)         # Baroclinic timestep (s)
+                ndtfast = getInputVal('NDTFAST', dtype = int)           # Number of barotropic timesteps between each baroclinic timestep.
+                dtfast  = dt/ndtfast                                    # Barotropic timestep (s)
 
-!    indx1         2D timestep rolling counter.
-!    iic           Timestep counter for 3D primitive equations.
-!    iif           Timestep counter for 2D primitive equations.
-!    ndtfast       Number of barotropic timesteps between each
-!                    baroclinic timestep.
-!    nfast         Number of barotropic timesteps needed to compute
-!                    time-averaged barotropic variables centered at
-!                    time level n+1.
-!    dt            Size baroclinic timestep (s).
-!    dtfast        Size barotropic timestep (s).
-!    dtau          Size of age increment
-!    run_time      Total run time for all nested grids (s), it is
-!                    set in Masters/ocean.h
-!    MyRunInterval Total run time for all nested grids (s), it is
-!                    set in Drivers/nl_ocean.h (coupling window)
-!    io_time       Current I/O time (s) processed in "get_state".
-!    tdays         Model time clock (days).
-!    time          Model time clock (s).
-!    time_code     Model time clock (string, YYYY-MM-DD hh:mm:ss.ss)
-!    AVGtime       Model time clock for averages output (s).
-!    AVG2time      Model time clock for averages output (s).
-!    DIAtime       Model time clock for diagnostics output (s).
-!    F_code        Final time string for simulation
-!    I_code        Initial time string for simulation
-!    INItime       Nonlinear model initial conditions time (s).
-!    IMPtime       Impulse forcing time (s) to process.
-!    ObsTime       Observation time (s) to process.
-!    FrcTime       Adjoint or tangent linear Impulse forcing time (s).
-!    dstart        Time stamp assigned to model initialization (usually
-!                    a Calendar day, like modified Julian Day).
-!    tide_start    Reference time for tidal forcing (days).
-!
-        logical, allocatable :: PerfectRST(:)
-        logical, allocatable :: PREDICTOR_2D_STEP(:)
-
-        integer, allocatable :: indx1(:)
-        integer, allocatable :: iic(:)
-        integer, allocatable :: iif(:)
-
-        integer, allocatable :: ndtfast(:)
-        integer, allocatable :: nfast(:)
-
-        real(dp), allocatable :: tdays(:)                ! days
-        real(dp), allocatable :: time(:)                 ! seconds
-
-        real(dp), allocatable :: dt(:)                   ! seconds
-        real(dp), allocatable :: dtfast(:)               ! seconds
-
-        real(dp), allocatable :: TimeEnd(:)              ! seconds
-        real(dp), allocatable :: AVGtime(:)              ! seconds
-        real(dp), allocatable :: DIAtime(:)              ! seconds
-        real(dp), allocatable :: IMPtime(:)              ! seconds
-        real(dp), allocatable :: INItime(:)              ! seconds
-        real(dp), allocatable :: INItimeS(:)             ! seconds
-        real(dp), allocatable :: ObsTime(:)              ! seconds
-        real(dp), allocatable :: FrcTime(:)              ! seconds
+                LastRec = (getInputVal('NRREC', dtype = int) < 0)
 
 
-        real(dp) :: dstart = 0.0_dp                      ! days
-        real(dp) :: io_time = 0.0_dp                     ! seconds
-        real(dp) :: run_time = 0.0_dp                    ! seconds
-        real(dp) :: MyRunInterval = 0.0_dp               ! seconds
-        real(dp) :: tide_start = 0.0_dp                  ! days
 
-        character (len=22) :: F_code, I_code
+                PerfectRST        = False
+                PREDICTOR_2D_STEP = False
 
-        character (len=22), allocatable :: time_code(:)  ! date string
+                indx1 = 0       # 2D timestep rolling counter.
+                iic   = 0       # Timestep counter for 3D primitive equations
+                iif   = 0       # Timestep counter for 2D primitive equations
 
+                nfast   = 0     # Number of barotropic timesteps needed to compute time-averaged barotropic variables centered at time level n+1.
 
-!
-!  Total number timesteps in current run. In 3D configurations, "ntimes"
-!  is the total of baroclinic timesteps. In 2D configuration, "ntimes"
-!  is the total of barotropic timesteps.
-!
-        integer, allocatable :: ntimes(:)
-!
-!  Time-step counter for current execution time-window.
-!
-        integer, allocatable :: step_counter(:)
+                tdays = 0.0     # (days)    Model time clock.
+                time  = 0.0     # (seconds) Model time clock
+
+                dtfast = 0.0
+
+                TimeEnd   =0    # (s)
+                IMPtime   =0    # (s) Impulse forcing time to process.
+                INItime   =0    # (s) Nonlinear model initial conditions time.
+                INItimeS  =0    # (s)
+
+                dstart        = getInputVal('DSTART',    dtype=float)     # (days)    Time stamp assigned to model initialization (usually a Calendar day, like modified Julian Day).
+                tide_start    = getInputVal('TIDE_START', dtype=float)    # (days)    Reference time for tidal forcing
+
+                F_code = ''     # Final time string for simulation.
+                I_code = ''     # Initial time string for simulation.
+
+                time_code = ''  # Model time clock (string, YYYY-MM-DD hh:mm:ss.ss).
 
 
 
 
-# Starting, current, and ending ensemble run parameters.
-
-        integer :: ERstr = 1                    ! Starting value
-        integer :: ERend = 1                    ! Ending value
-        integer :: Ninner = 1                   ! number of inner loops
-        integer :: Nouter = 1                   ! number of outer loops
-        integer :: Nrun = 1                     ! Current counter
-
-        integer :: OuterLoop = 0                ! split outer loop
-        integer :: inner = 0                    ! inner loop counter
-        integer :: outer = 0                    ! outer loop counter
+                # Time-step counter for current execution time-window.
+                step_counter = 0.0
 
 
-# First, starting, and ending timestepping parameters
-        integer, allocatable :: ntfirst(:)      ! Forward-Euler step
-        integer, allocatable :: ntstart(:)      ! Start step
-        integer, allocatable :: ntend(:)        ! End step
-
-
-        integer, allocatable :: NrecFrc(:)
-
-# HSIMT tracer advection coefficients for the TVD limiter (Wu and Zhu, 2010).
-        real(r8) :: cc1 = 0.25_r8
-        real(r8) :: cc2 = 0.5_r8
-        real(r8) :: cc3 = 1.0_r8/12.0_r8
-
-
-# Control switches.
-# -----------------------------------------------------------------------
-
-# Switch to use three ghost-points in the halo region.
-        logical :: ThreeGhostPoints = .FALSE.
-
-!  Switch to set-up application grid, metrics, and associated variables
-!  and parameters.
-!
-        logical, allocatable :: SetGridConfig(:)
-!
-!  Switch to proccess nudging coefficients for radiation open boundary
-!  conditions.
-!
-        logical, allocatable :: NudgingCoeff(:)
-!
-!  Switch to proccess input boundary data.
-!
-        logical, allocatable :: ObcData(:)
-!
-!  These switches are designed to control computational options within
-!  nested and/or multiple connected grids.  They are .TRUE. by default.
-!  They can turned off for a particular grind in input scripts.
-!
-        logical, allocatable :: Lbiology(:)
-        logical, allocatable :: Lfloats(:)
-        logical, allocatable :: Lsediment(:)
-        logical, allocatable :: Lstations(:)
-!
-!  If equilibrium tides, switch to apply the 18.6-year lunar nodal
-!  cycle correction.
-!
-        logical :: Lnodal = .TRUE.
-!
-!-----------------------------------------------------------------------
-!  Physical constants.
-!-----------------------------------------------------------------------
-!
-
-        Cp = 3985.0             # Specific heat for seawater (Joules/Kg/degC).
-        Csolar = 1353.0         # Solar irradiantion constant, 1360-1380 (W/m2).
-        Eradius = 6371315.0     # Earth equatorial radius (m).
-        StefBo = 5.67E-8        # Stefan-Boltzmann constant (W/m2/K4).
-        emmiss = 0.97           # Infrared emissivity (non dimensional)
-        rhow = 1000.0           # fresh water density (kg/m3).
-        g = 9.81                # Acceleration due to gravity (m/s2).
-        gorho0 = gorho0         # gravity divided by mean density anomaly. m4/s2/kg
-        vonKar = 0.41           # von Karman constant (non dimensional)
-
-
-# Various model parameters.  Some of these parameters are overwritten
-# with the values provided from model standard input script.
-# -----------------------------------------------------------------------
-!
-!  Switch for spherical grid (lon,lat) configurations.
-!
-        logical :: spherical = .FALSE.
-!
-!  Switch to compute the grid stiffness.
-!
-        logical :: Lstiffness = .TRUE.
+                # First, starting, and ending timestepping parameters
+                ntfirst = 0      # Forward-Euler step
+                ntstart = 0      # Start step
+                ntend   = 0      # End step
 
 
 
-!  Lateral open boundary edges volume conservation switches.
-!
-        logical, allocatable :: VolCons(:,:)
+
+
+
+
+
+
+        # HSIMT tracer advection coefficients for the TVD limiter (Wu and Zhu, 2010).
+        cc1 = 1.0/4.0
+        cc2 = 1.0/2.0
+        cc3 = 1.0/12.0
+
+
+        # Control switches.
+        # -----------------------------------------------------------------------
+
+
+        # If equilibrium tides, switch to apply the 18.6-year lunar nodal cycle correction.
+        Lnodal = True
+
+
+        # Physical constants.
+        # -----------------------------------------------------------------------
+        Cp      = 3985.0         # Specific heat for seawater (Joules/Kg/degC).
+        Csolar  = 1353.0         # Solar irradiantion constant, 1360-1380 (W/m2).
+        Eradius = 6371315.0      # Earth equatorial radius (m).
+        StefBo  = 5.67E-8        # Stefan-Boltzmann constant (W/m2/K4).
+        emmiss  = 0.97           # Infrared emissivity (non dimensional)
+        rhow    = 1000.0         # fresh water density (kg/m3).
+        g       = 9.81           # Acceleration due to gravity (m/s2).
+        gorho0  = gorho0         # gravity divided by mean density anomaly. m4/s2/kg
+        vonKar  = 0.41           # von Karman constant (non dimensional)
+
+
+        # Various model parameters.  Some of these parameters are overwritten
+        # with the values provided from model standard input script.
+        # -----------------------------------------------------------------------
+
+        spherical  = False       # Switch for spherical grid (lon,lat) configurations.
+
+        Lstiffness = True   # Switch to compute the grid stiffness.
+
+
+
+        VolCons = None   # Lateral open boundary edges volume conservation switches.
 !
 !  Switches to read and process climatology fields.
 !
@@ -265,14 +162,8 @@ class TIMES:
         logical, allocatable :: Lm2CLM(:)            ! 2D momentum
         logical, allocatable :: Lm3CLM(:)            ! 3D momentum
         logical, allocatable :: LtracerCLM(:,:)      ! tracers
-!
-!  Switched to nudge to climatology fields.
-!
-        logical, allocatable :: Lnudging(:)          ! any field
-        logical, allocatable :: LnudgeM2CLM(:)       ! 2D momentum
-        logical, allocatable :: LnudgeM3CLM(:)       ! 3D momentum
-        logical, allocatable :: LnudgeTCLM(:,:)      ! tracers
-!
+
+
 !  Switches to activate point Source/Sinks in an application:
 !    * Horizontal momentum transport (u or v)
 !    * Vertical mass transport (w)
@@ -281,33 +172,18 @@ class TIMES:
         logical, allocatable :: LuvSrc(:)            ! momentum
         logical, allocatable :: LwSrc(:)             ! mass
         logical, allocatable :: LtracerSrc(:,:)      ! tracers
-!
-!  Execution termination flag.
-!
-!    exit_flag = 0   No error
-!    exit_flag = 1   Blows up
-!    exit_flag = 2   Input error
-!    exit_flag = 3   Output error
-!    exit_flag = 4   IO error
-!    exit_flag = 5   Configuration error
-!    exit_flag = 6   Partition error
-!    exit_flag = 7   Illegal input parameter
-!    exit_flag = 8   Fatal algorithm result
-!    exit_flag = 9   coupling error
-!
-        integer :: exit_flag = 0
-        integer :: blowup = 0
-        integer :: NoError = 0
-!
-!  Blow-up string.
-!
-        character (len=80) :: blowup_string
-!
-!  Set threshold maximum speed (m/s) and density anomaly (kg/m3) to
-!  test if the model is blowing-up.
-!
-        real(dp) :: max_speed = 20.0_dp         ! m/s
-        real(dp) :: max_rho = 200.0_dp          ! kg/m3
+
+        # Execution termination errors.
+        exit_flag = {0: 'No error', 1: 'Blows up', 2: 'Input error', 3: 'Output error', 4: 'IO error',
+                     5: 'Configuration error', 6: 'Partition error', 7: 'Illegal input parameter',
+                     8: 'Fatal algorith result', 9: 'Coupling error'}
+        blowup = 0
+        NoError = 0
+        blowup_string = ''
+
+        # thresholds maximum speed (m/s) and density anomaly (kg/m3) to test if the model is blowing-up.
+        max_speed = 20.0        # m/s
+        max_rho   = 200.0       # kg/m3
 
 
         # Interpolation scheme.
@@ -315,12 +191,11 @@ class TIMES:
         InterpFlag = linear
 
 
-        !  Shallowest and Deepest levels to apply bottom momentum stresses as
-        !  a bodyforce
-        !
-        levsfrc(:)
-        levbfrc(:)
-        !
+        # Shallowest and Deepest levels to apply bottom momentum stresses as a bodyforce
+        levsfrc = 0.0
+        levbfrc = 0.0
+
+
 
 !  Vertical coordinates transform.  Currently, there are two vertical
 !  transformation equations (see set_scoord.F for details):
@@ -512,56 +387,31 @@ class TIMES:
 !  Horizontal and vertical constant mixing coefficients.
 !-----------------------------------------------------------------------
 !
-!    Akk_bak       Background vertical mixing coefficient (m2/s) for
-!                    turbulent energy.
-!    Akp_bak       Background vertical mixing coefficient (m2/s) for
-!                    generic statistical field "psi".
-!    Akt_bak       Background vertical mixing coefficient (m2/s) for
-!                    tracers.
-!    Akv_bak       Background vertical mixing coefficient (m2/s) for
-!                    momentum.
-!    Akt_limit     Upper threshold vertical mixing coefficient (m2/s)
-!                    for tracers.
-!    Akv_limit     Upper threshold vertical mixing coefficient (m2/s)
-!                    for momentum.
-!    Kdiff         Isopycnal mixing thickness diffusivity (m2/s) for
-!                    tracers.
-!    ad_visc2      ADM lateral harmonic constant mixing coefficient
-!                    (m2/s) for momentum.
-!    nl_visc2      NLM lateral harmonic constant mixing coefficient
-!                    (m2/s) for momentum.
-!    tl_visc2      TLM lateral harmonic constant mixing coefficient
-!                    (m2/s) for momentum.
-!    visc2         Current lateral harmonic constant mixing coefficient
-!                    (m2/s) for momentum.
-!    ad_visc4      ADM lateral biharmonic (squared root) constant
-!                     mixing coefficient (m2 s^-1/2) for momentum.
-!    nl_visc4      NLM lateral biharmonic (squared root) constant
-!                     mixing coefficient (m2 s^-1/2) for momentum.
-!    tl_visc4      TLM lateral biharmonic (squared root) constant
-!                     mixing coefficient (m2 s^-1/2) for momentum.
-!    visc4         Current lateral biharmonic (squared root) constant
-!                     mixing coefficient (m2 s^-1/2) for momentum.
-!    ad_tnu2       ADM lateral harmonic constant mixing coefficient
-!                    (m2/s) for tracer type variables.
-!    nl_tnu2       NLM lateral harmonic constant mixing coefficient
-!                    (m2/s) for tracer type variables.
-!    tl_tnu2       TLM lateral harmonic constant mixing coefficient
-!                    (m2/s) for tracer type variables.
-!    tnu2          Current lateral harmonic constant mixing coefficient
-!                    (m2/s) for tracer type variables.
-!    ad_tnu4       ADM lateral biharmonic (squared root) constant
-!                     mixing coefficient (m2 s^-1/2) for tracers.
-!    nl_tnu4       NLM lateral biharmonic (squared root) constant
-!                     mixing coefficient (m2 s^-1/2) for tracers.
-!    tl_tnu4       TLM lateral biharmonic (squared root) constant
-!                     mixing coefficient (m2 s^-1/2) for tracers.
-!    tnu4          Current lateral biharmonic (squared root) constant
-!                     mixing coefficient (m2 s^-1/2) for tracers.
-!    tkenu2        Lateral harmonic constant mixing coefficient
-!                    (m2/s) for turbulent energy.
-!    tkenu4        Lateral biharmonic (squared root) constant mixing
-!                    coefficient (m2 s^-1/2) for turbulent energy.
+!    Akk_bak       Background vertical mixing coefficient (m2/s) for turbulent energy.
+!    Akp_bak       Background vertical mixing coefficient (m2/s) for generic statistical field "psi".
+!    Akt_bak       Background vertical mixing coefficient (m2/s) for tracers.
+!    Akv_bak       Background vertical mixing coefficient (m2/s) for momentum.
+!    Akt_limit     Upper threshold vertical mixing coefficient (m2/s) for tracers.
+!    Akv_limit     Upper threshold vertical mixing coefficient (m2/s) for momentum.
+!    Kdiff         Isopycnal mixing thickness diffusivity (m2/s) for tracers.
+!    ad_visc2      ADM lateral harmonic constant mixing coefficient (m2/s) for momentum.
+!    nl_visc2      NLM lateral harmonic constant mixing coefficient (m2/s) for momentum.
+!    tl_visc2      TLM lateral harmonic constant mixing coefficient (m2/s) for momentum.
+!    visc2         Current lateral harmonic constant mixing coefficient (m2/s) for momentum.
+!    ad_visc4      ADM lateral biharmonic (squared root) constant mixing coefficient (m2 s^-1/2) for momentum.
+!    nl_visc4      NLM lateral biharmonic (squared root) constant mixing coefficient (m2 s^-1/2) for momentum.
+!    tl_visc4      TLM lateral biharmonic (squared root) constant mixing coefficient (m2 s^-1/2) for momentum.
+!    visc4         Current lateral biharmonic (squared root) constant mixing coefficient (m2 s^-1/2) for momentum.
+!    ad_tnu2       ADM lateral harmonic constant mixing coefficient (m2/s) for tracer type variables.
+!    nl_tnu2       NLM lateral harmonic constant mixing coefficient (m2/s) for tracer type variables.
+!    tl_tnu2       TLM lateral harmonic constant mixing coefficient (m2/s) for tracer type variables.
+!    tnu2          Current lateral harmonic constant mixing coefficient (m2/s) for tracer type variables.
+!    ad_tnu4       ADM lateral biharmonic (squared root) constant mixing coefficient (m2 s^-1/2) for tracers.
+!    nl_tnu4       NLM lateral biharmonic (squared root) constant mixing coefficient (m2 s^-1/2) for tracers.
+!    tl_tnu4       TLM lateral biharmonic (squared root) constant mixing coefficient (m2 s^-1/2) for tracers.
+!    tnu4          Current lateral biharmonic (squared root) constant mixing coefficient (m2 s^-1/2) for tracers.
+!    tkenu2        Lateral harmonic constant mixing coefficient (m2/s) for turbulent energy.
+!    tkenu4        Lateral biharmonic (squared root) constant mixing coefficient (m2 s^-1/2) for turbulent energy.
 !
         real(r8), allocatable :: Akk_bak(:)          ! m2/s
         real(r8), allocatable :: Akp_bak(:)          ! m2/s
@@ -594,43 +444,20 @@ class TIMES:
         real(r8), allocatable :: nl_tnu4(:,:)        ! m2 s-1/2
         real(r8), allocatable :: tl_tnu4(:,:)        ! m2 s-1/2
         real(r8), allocatable :: tnu4(:,:)           ! m2 s-1/2
-!
-!  Horizontal diffusive relaxation coefficients (m2/s) used to smooth
-!  representer tangent linear solution during Picard iterations to
-!  improve stability and convergence.
-!
-        real(r8), allocatable :: tl_M2diff(:)        ! 2D momentum
-        real(r8), allocatable :: tl_M3diff(:)        ! 3D momentum
 
-        real(r8), allocatable :: tl_Tdiff(:,:)       ! tracers
-!
-!  Basic state vertical mixing coefficient scale factors for adjoint
-!  based algorithms. In some applications, a smaller/larger values of
-!  vertical mixing are necessary for stability.
-!
-        real(r8), allocatable :: ad_Akv_fac(:)       ! ADM momentum
-        real(r8), allocatable :: tl_Akv_fac(:)       ! TLM momentum
 
-        real(r8), allocatable :: ad_Akt_fac(:,:)     ! ADM tracers
-        real(r8), allocatable :: tl_Akt_fac(:,:)     ! TLM tracers
-
-!
-!  Switches to increase/decrease horizontal viscosity and/or diffusion
-!  in specific areas of the application domain (like sponge areas).
-!
+        # Switches to increase/decrease horizontal viscosity and/or diffusion
+        # in specific areas of the application domain (like sponge areas).
         logical, allocatable :: Lsponge(:)
         logical, allocatable :: LuvSponge(:)         ! viscosity
         logical, allocatable :: LtracerSponge(:,:)   ! diffusion
-!
-!-----------------------------------------------------------------------
-!  IO parameters.
-!-----------------------------------------------------------------------
-!
-!  Switches to activate creation and writing of output NetCDF files.
-!
+
+
+        # IO parameters.
+        # -----------------------------------------------------------------------
+
+        # Switches to activate creation and writing of output NetCDF files.
         logical, allocatable :: LdefAVG(:)       ! Average file
-        logical, allocatable :: LdefDAI(:)       ! DA initial/restart
-        logical, allocatable :: LdefFLT(:)       ! Floats file
         logical, allocatable :: LdefHIS(:)       ! History file
         logical, allocatable :: LdefHSS(:)       ! Hessian file
         logical, allocatable :: LdefINI(:)       ! Initial file
@@ -638,13 +465,11 @@ class TIMES:
         logical, allocatable :: LdefITL(:)       ! Initial TLM file
         logical, allocatable :: LdefLCZ(:)       ! Lanczos Vectors file
         logical, allocatable :: LdefLZE(:)       ! Evolved Lanczos file
-        logical, allocatable :: LdefMOD(:)       ! 4DVAR file
         logical, allocatable :: LdefQCK(:)       ! Quicksave file
         logical, allocatable :: LdefRST(:)       ! Restart file
 
         logical, allocatable :: LdefSTA(:)       ! Stations file
         logical, allocatable :: LdefTIDE(:)      ! tide forcing file
-        logical, allocatable :: LdefTLM(:)       ! Tangent linear file
         logical, allocatable :: LdefTLF(:)       ! TLM/RPM impulse file
 
         logical, allocatable :: LreadADM(:)      ! Read ADM multi-files
@@ -737,13 +562,7 @@ class TIMES:
 !  (restart/history) NetCDF file.
 !
         logical, allocatable :: LastRec(:)
-!
-!  Generalized Statbility Theory (GST) parameters.
-!
-        logical :: LmultiGST          ! multiple eigenvector file switch
-        logical :: LrstGST            ! restart switch
-        integer :: MaxIterGST         ! Number of iterations
-        integer :: nGST               ! check pointing interval
+
 !
 !  Switches used to recycle time records in some output file. If TRUE,
 !  only the latest two time records are maintained.  If FALSE, all
@@ -832,13 +651,12 @@ class TIMES:
 !                                                                      !
 !=======================================================================
 
-      IniVal = 0.0
+        IniVal = 0.0
 
 
 
         # Tracer identification indices.
         # ---------------------------------------------------------------------
-
         itemp, isalt = (1,2)
 
 
@@ -847,7 +665,6 @@ class TIMES:
 
         # Activate all computation control switches.
         # -----------------------------------------------------------------------
-
         CompositeGrid[0:3] = False
         LastRec      = False
         RefinedGrid  = False
@@ -864,8 +681,6 @@ class TIMES:
 
         # Initialize several scalar variables.
         # -----------------------------------------------------------------------
-
-
         Co = 1.0/(2.0 + cp.sqrt(2.0))
         gorho0 = g/rho0
 
@@ -964,22 +779,21 @@ class TIMES:
         END DO
       END DO
 
-!
-!  Initialize blowup string.
-!
-      DO i=1,LEN(blowup_string)
-        blowup_string(i:i)=' '
-      END DO
-!
-!  Initialize thread private variables.
-!
 
-      synchro_flag=.FALSE.
+        # Initialize blowup string.
+        DO i=1,LEN(blowup_string)
+                blowup_string(i:i)=' '
+        END DO
 
-      ntfirst=1
-      ntstart=1
-      ntend=0
-      step_counter=0
+
+
+        # Initialize thread private variables.
+        synchro_flag=.FALSE.
+
+        ntfirst=1
+        ntstart=1
+        ntend=0
+        step_counter=0
 
 
 !
@@ -1039,10 +853,10 @@ class TIMES:
       END DO
 
 
-# Initialize the NLM initial conditions time to a negative number to
-# check if its value was assigned elsewhere.  It can be used during
-# the initialization of the adjoint model when DSTART is not the
-# same as the start of the simulation.
+        # Initialize the NLM initial conditions time to a negative number to
+        # check if its value was assigned elsewhere.  It can be used during
+        # the initialization of the adjoint model when DSTART is not the
+        # same as the start of the simulation.
 
         INItime  = -1.0
         INItimeS = -1.0

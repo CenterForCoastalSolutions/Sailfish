@@ -10,19 +10,6 @@ import mod_scalars
 #   ubarBC: 2D u-momentum (m/s) boundary conditions. Substitutes old ubar_east, ubar_west...
 #   vbarBC: 2D v-momentum (m/s) boundary conditions. Substitutes old vbar_east, vbar_west...
 
-#
-#
-# -----------------------------------------------------------------------
-#   Lateral boundary condition apply switches.
-# -----------------------------------------------------------------------
-#
-#   The following switches are used to control which grid points are
-#   processed by the lateral boundary conditions. These switches are
-#   set to TRUE by default.  However in composite grids, the points
-#   processed by nesting are set to FALSE to allow mixed boundary
-#   conditions along the grid edges.
-
-
 
 # Lateral boundary conditions structure.
 # --------------------------------------
@@ -30,13 +17,30 @@ import mod_scalars
 class Boundary:
     def __init__(self):
 
-        # self.LBi = BOUNDS.LBi
-        # self.UBi = BOUNDS.UBi
-        # self.LBj = BOUNDS.LBj
-        # self.UBj = BOUNDS.UBj
-        #
-        # self.Xsize = UBi - LBi
-        # self.Ysize = UBj - LBj
+        self.zetaFSBCIdx = decodeLBC(getInputVal('LBC(isFsur)'))
+        self.ubarBCIdx   = decodeLBC(getInputVal('LBC(isUbar)'))
+        self.vbarBCIdx   = decodeLBC(getInputVal('LBC(isVbar)'))
+
+        self.VolCons     = decodeVolCon(west  = getInputVal('VolCons(west)'), east  = getInputVal('VolCons(east)'),
+                                        north = getInputVal('VolCons(west)'), south = getInputVal('VolCons(west)'))
+
+
+        self.nBCfiles    = getInputVal('NBCFILES', dtype = int, minVal = 0)
+        self.max_Ffiles  = self.nBCfiles
+
+
+        self.BRYids      = cp.zeros(self.max_Ffiles) - 1
+        self.NBCcount    = cp.zeros(self.max_Ffiles)
+
+
+        XXXXX # REWRITE IN PYTHON
+        line = getInputVal('NBCFILES')
+        label='BRY - lateral open boundary conditions'
+        BRY =load_s2d(Nval, Cval, Cdim, line, label, ibcfile, igrid, nBCfiles, NBCcount, max_Ffiles)
+
+
+
+
 
         self.countBCNodes = 1000  # Total number of 2D boundary nodes.
 
@@ -45,12 +49,12 @@ class Boundary:
         # FALSE elsewhere, if the boundary point is assigned by a nested grid.
         LBC_apply = cp.ones(self.countBCNodes, dtype = cp.Bool)
 
-
-
 # WARNING:
 #     We have to compute: zetaFSBCIdx, ubarBCIdx, vbarBCIdx, tBCIdx
 #####################
-    def initialize_boundary():
+#####################
+#####################
+
 
         IniVal = 0.0
 
@@ -73,11 +77,6 @@ class Boundary:
 
 
 
-        # Defines aliases, using the original code's naming.
-        BOUNDARY.zeta_west, BOUNDARY.zeta_east, BOUNDARY.zeta_north, BOUNDARY.zeta_south = BOUNDARY.zetaFSBC
-        BOUNDARY.ubar_west, BOUNDARY.ubar_east, BOUNDARY.ubar_north, BOUNDARY.ubar_south = BOUNDARY.ubarBC
-        BOUNDARY.vbar_west, BOUNDARY.vbar_east, BOUNDARY.vbar_north, BOUNDARY.vbar_south = BOUNDARY.vbarBC
-        BOUNDARY.t_west,    BOUNDARY.t_east,    BOUNDARY.t_north,    BOUNDARY.t_south    = BOUNDARY.tBC
 
 
 

@@ -1,32 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1447012b-a5d7-4617-8595-bf18be6f6cc2" name="Changes" comment="Some tests">
-      <change afterPath="$PROJECT_DIR$/functionals/anaBASE.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/functionals/anaBasin.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/functionals/ana_grid.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modules/mod_arrays.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modules/mod_boundary.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modules/mod_forces.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modules/mod_grid.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modules/mod_ocean.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modules/mod_param.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modules/mod_scalars.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nonlinear/bc_2d_index_builder.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nonlinear/get_bounds.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nonlinear/lmd_bkpp.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nonlinear/lmd_skpp.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nonlinear/lmd_swfrac.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nonlinear/obc_volcons.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nonlinear/zetabc.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/ana_grid.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/stencils.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utility/stats.py" afterDir="false" />
+    <list default="true" id="1447012b-a5d7-4617-8595-bf18be6f6cc2" name="Changes" comment="...">
+      <change afterPath="$PROJECT_DIR$/modules/input_vars.dat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modules/mod_io.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tmp/testProgram.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utility/io_utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utility/misc.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utility/read_phypar.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utility/test.in" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/bc_2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/bc_2d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/exchange_2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/exchange_2d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/v2dbc_im.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/v2dbc_im.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/wvelocity.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/wvelocity.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functionals/anaBASE.py" beforeDir="false" afterPath="$PROJECT_DIR$/functionals/anaBASE.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functionals/ana_grid.py" beforeDir="false" afterPath="$PROJECT_DIR$/functionals/ana_grid.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_arrays.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_arrays.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_boundary.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_boundary.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_grid.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_grid.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_ocean.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_ocean.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_param.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_param.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_scalars.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_scalars.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/bc_2d_index_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/bc_2d_index_builder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,14 +49,14 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "D:/projects/src/oceangpu/functionals",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/projects/src/oceangpu/functionals&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\projects\src\oceangpu\functionals" />
@@ -78,7 +70,28 @@
       <recent name="D:\projects\src\oceangpu\nonlinear" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.testProgram">
+    <configuration name="testProgram" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="oceangpu" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tmp" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tmp/testProgram.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="testSpline" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="oceangpu" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -102,6 +115,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.testProgram" />
         <item itemvalue="Python.testSpline" />
       </list>
     </recent_temporary>
@@ -143,7 +157,14 @@
       <option name="project" value="LOCAL" />
       <updated>1676385086068</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="...">
+      <created>1682950262877</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1682950262877</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -158,10 +179,10 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="..." />
     <MESSAGE value="First commit" />
     <MESSAGE value="Some tests" />
-    <option name="LAST_COMMIT_MESSAGE" value="Some tests" />
+    <MESSAGE value="..." />
+    <option name="LAST_COMMIT_MESSAGE" value="..." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -170,6 +191,11 @@
           <url>file://$PROJECT_DIR$/tests/testSpline.py</url>
           <line>27</line>
           <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tmp/testProgram.py</url>
+          <line>16</line>
+          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

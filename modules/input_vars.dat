@@ -1,0 +1,935 @@
+
+
+! var name          Description
+
+TITLE               Application title.
+MyAppCPP            C-preprocessing Flag.
+VARNAME             Input variable information file name. @ This file needs to be processed first so all information arrays can be initialized properly.
+*Ngrids             Number of nested grids.
+*NestLayers         Number of grid nesting layers. @ This parameter is used to allow refinement and composite grid combinations.
+*GridsInLayer       Number of grids in each nesting layer
+
+
+
+
+! Grid dimension parameters. See notes below in the Glossary for how to set these parameters correctly.
+
+Lm                  Number of I-direction INTERIOR RHO-points
+Mm                  Number of J-direction INTERIOR RHO-points
+N                   Number of vertical levels
+
+Nbed                Number of sediment bed layers
+
+NAT                 Number of active tracers (usually, 2)
+NPT                 Number of inactive passive tracers
+NCS                 Number of cohesive (mud) sediment tracers
+NNS                 Number of non-cohesive (sand) sediment tracers
+
+
+
+
+! Domain decomposition parameters for serial, distributed-memory or shared-memory configurations used to determine tile horizontal range indices (Istr,Iend) and (Jstr,Jend), [1:Ngrids].
+
+*NtileI             I-direction partition
+*NtileJ             J-direction partition
+
+
+
+
+! Horizontal and vertical advection schemes for active and inert tracers. A different advection scheme is allowed for each tracer.
+! For example, a positive-definite (monotonic) algorithm can be activated ! for salinity and inert tracers, while a different one is set for
+! temperature. [1:NAT+NPT,Ngrids] values are expected.
+!
+!   Keyword    Advection Algorithm
+! A4 or AKIMA4                  4th-order Akima @ (horizontal/vertical)
+! C2 or CENTERED2               2nd-order centered differences @ (horizontal/vertical)
+! C4 or CENTERED4               4th-order centered differences @ (horizontal/vertical)
+! HS or HSIMT                   3th-order HSIMT-TVD @ (horizontal/vertical)
+! MP or MPDATA                  recursive flux corrected MPDATA @ (horizontal/vertical)
+! SP or SPLINES                 parabolic splines @ (only vertical)
+! SU or SU3 or SPLIT_U3         split third-order upstream @ (horizontal/vertical)
+! U3 or UPSTREAM3               3rd-order upstream-biased @ (only horizontal)
+!
+! The user has the option of specifying the full Keyword or the first two letters, regardless if using uppercase or lowercase.
+
+Hadvection          Horizontal advection scheme
+Vadvection          Vertical advection scheme
+
+
+
+
+
+! Lateral boundary conditions keyword. Notice that a value is expected for each boundary segment per nested grid for each state variable.
+! Each tracer variable requires [0:3,0:NAT+NPT] values. Otherwise, [0:3] values are expected for other variables. The boundary
+! order is: 1=west, 2=south, 3=east, and 4=north. That is, anticlockwise starting at the western boundary.
+!
+! The keyword is case insensitive and usually has three characters. However, it is possible to have compound keywords, if applicable. For example, the
+! keyword "RadNud" implies radiation boundary condition with nudging. This combination is usually used in active/passive radiation conditions.
+!
+!   Keyword    Lateral Boundary Condition Type
+!
+!   Cha        Chapman_implicit (free-surface)
+!   Che        Chapman_explicit (free-surface)
+!   Cla        Clamped
+!   Clo        Closed
+!   Fla        Flather (2D momentum)                  _____N_____     j=Mm
+!   Gra        Gradient                              |     4     |
+!   Nes        Nested (refinement)                   |           |
+!   Nud        Nudging                             1 W           E 3
+!   Per        Periodic                              |           |
+!   Rad        Radiation                             |_____S_____|
+!   Red        Reduced Physics (2D momentum)               2          j=1
+!   Shc        Shchepetkin (2D momentum)            i=1         i=Lm
+!
+!                   W       S       E       N
+!                   e       o       a       o
+!                   s       u       s       r
+!                   t       t       t       t
+!                           h               h
+!
+!                   1       2       3       4
+
+LBC(isFsur)         Lateral boundary conditions for free-surface
+LBC(isUbar)         Lateral boundary conditions for 2D U-momentum
+LBC(isVbar)         Lateral boundary conditions for 2D V-momentum
+LBC(isUvel)         Lateral boundary conditions for 3D U-momentum
+LBC(isVvel)         Lateral boundary conditions for 3D V-momentum
+LBC(isMtke)         Lateral boundary conditions for mixing TKE
+LBC(isTvar)         Lateral boundary conditions for tracers
+
+
+
+
+
+! Lateral open boundary edge volume conservation switch for nonlinear model and adjoint-based algorithms. Usually activated
+! with radiation boundary conditions to enforce global mass conservation, except if tidal forcing is enabled.
+
+VolCons(west)       Volume conservation for western boundary
+VolCons(east)       Volume conservation for eastern boundary
+VolCons(south)      Volume conservation for southern boundary
+VolCons(north)      Volume conservation for northern boundary
+
+
+
+
+
+! Time-Stepping parameters.
+
+NTIMES              Total number of timesteps in current run. @ If 3D configuration,  NTIMES is the total of baroclinic timesteps.  If only 2Dconfiguration, NTIMES is the total of barotropic timesteps.
+DT                  TimeStep size in seconds. @ If 3D configuration, DT is the size of the baroclinic timestep.  If only 2D configuration, DT is the size of the barotropic timestep.
+NDTFAST             Number of barotropic timesteps between each baroclinic time step. @ If only 2D configuration, NDTFAST should be unity since there is no need to split timestepping.
+
+
+
+
+
+! Input/Output parameters.
+
+NRREC               Switch to indicate re-start from a previous solution. @ Use NRREC=0 for new solutions. In a re-start solution, NRREC is the time index of the re-start NetCDF file assigned for initialization.  If NRREC is negative (say NRREC=-1), the model will re-start from the most recent time record. That is, the initialization record is assigned internally. Notice that it is also possible to re-start from a history or time-averaged NetCDF file.  If a history file is used for re-start, it must contains all the necessary primitive variables at all levels.
+LcycleRST           Logical switch (T/F) used to recycle time records in output restart file. @ If TRUE,  only the latest two re-start time records are maintained.  If FALSE, all re-start fields are saved every NRST timesteps without recycling.  The restart fields are written at all levels in double precision.
+NRST                Number of timesteps between the writing of re-start fields. @ Set NRST=0 to suppress writing of RESTART file.
+NSTA                Number of timesteps between writing data into STATIONS file. @ Station data is written at all levels.
+NFLT                Number of timesteps between writing data into FLOATS file.
+NINFO               Number of timesteps between the print of single line information to standard output. @ It also determines the interval between computation of global energy diagnostics.
+
+
+
+
+
+!------------------------------------------------------------------------------
+!  Output HISTORY, QUICKSAVE, AVERAGE and DIAGNOSTIC files parameters.
+!------------------------------------------------------------------------------
+!
+!  Notice that it is possible to have two types of output NetCDF files for instantaneous fields: HISTORY and QUICKSAVE. The QUICKSAVE file can be used
+!  for writing fewer fields at shorter time intervals. For example, the User may just write 2D and surface fields frequently (hourly) to reduce file
+!  size and to time resolve fast dynamics. In conjunction, the User may write full HISTORY fields infrequently (daily, weekly, etc) to avoid creating
+!  large output files. This gives a lot of flexibility to manage ROMS output.
+
+LDEFOUT             Logical switch (T/F) used to create new output files when initializing from a re-start file @, abs(NRREC) > 0.  If TRUE and applicable, a new HISTORY, QUICKSAVE, AVERAGE, DIAGNOSTIC and STATIONS files are created during the initialization stage. If FALSE and applicable, data is appended to existing HISTORY, QUICKSAVE, AVERAGE, DIAGNOSTIC and STATIONS files. See also parameters NDEFHIS, NDEFQCK, NDEFAVG and NDEFDIA below.
+NHIS                Number of timesteps between writing fields into the HISTORY file. @ Set NHIS=0 to suppress writing of HISTORY file.
+NDEFHIS             Number of timesteps between the creation of new HISTORY file. @ If NDEFHIS=0, the model will only process one HISTORY file. This feature is useful for extended simulations when HISTORY file get too large; it creates a new file every NDEFHIS timesteps.
+NQCK                Number of timesteps between writing fields into QUICKSAVE file. @ Set NQCK=0 to suppress writing of QUICKSAVE file.
+NDEFQCK             Number of timesteps between the creation of new QUICKSAVE file. @ If NDEFQCK=0, the model will only process one QUICKSAVE file. This feature is useful for extended simulations when QUICKSAVE file get too large; it creates a new file every NDEFQCK timesteps.
+NTSAVG              Starting timestep for the accumulation of output time-averaged data.
+NAVG                Number of timesteps between writing time-averaged data into AVERAGE file. @ Averaged date is written for all fields. Set NAVG=0 to suppress writing of AVERAGE file.
+NDEFAVG             Number of timesteps between the creation of new AVERAGE file. @ If NDEFAVG=0, the model will only process one AVERAGE file.  This feature is useful for extended simulations when AVERAGE file get too large; it creates a new file every NDEFAVG timesteps.
+
+
+
+*NTSDIA             ROMS Diagnostic files are no longer used.
+*NDIA               ROMS Diagnostic files are no longer used.
+*NDEFDIA            ROMS Diagnostic files are no longer used.
+
+
+
+
+!Harmonic/Biharmonic horizontal diffusion for active tracers and viscosity for momentum.
+
+TNU2                m2/s, Nonlinear model lateral, harmonic, constant, mixing coefficient for tracers @active (NAT) and inert (NPT) tracer variables. If variable horizontal diffusion is activated, TNU2 is the mixing coefficient for the largest grid-cell in the domain.
+TNU4                m4/s, Nonlinear model lateral, biharmonic, constant, mixing coefficient for tracers @ active (NAT) and inert (NPT) tracer variables. If variable horizontal diffusion is activated, TNU4 is the mixing coefficient for the largest grid-cell in the domain.
+
+
+VISC2               m2/s, Nonlinear model lateral, harmonic, constant, mixing coefficient for momentum.@ If variable horizontal viscosity is activated, UVNU2 is the mixing coefficient for the largest grid-cell in the domain.
+VISC4               m4/s, Nonlinear model lateral, biharmonic, constant mixing coefficient for momentum.@ If variable horizontal viscosity is activated, UVNU4 is the mixing coefficient for the largest grid-cell in the domain.
+
+
+
+
+
+! Logical switches (TRUE/FALSE) to increase/decrease horizontal viscosity and/or diffusivity in specific areas of the application domain (like
+! sponge areas) for the desired application grid.
+
+LuvSponge           Logical switch (TRUE/FALSE) to increase/decrease horizontal viscosity @ in specific areas of the domain. It can be used to specify sponge areas with larger horizontal mixing coefficients for damping of high frequency noise due to open boundary conditions or nesting. The CPP option SPONGE is now deprecated and replaced with this switch to facilitate or not sponge areas over a particular nested grid.@The horizontal mixing distribution is specified in "ini_hmixcoef.F" as:@@visc2_r(i,j) = visc_factor(i,j) * visc2_r(i,j)@visc4_r(i,j) = visc_factor(i,j) * visc4_r(i,j)@@ The variable "visc_factor" can be read from the grid NetCDF file. Alternately, the horizontal viscosity in the sponge area can be set-up with analytical functions in "ana_sponge.h" using CPP ANA_SPONGE when the switch "LuvSponge" is turned ON for a particular grid.
+LtracerSponge       Logical switch (TRUE/FALSE) to increase/decrease horizontal diffusivity in specific areas of the domain. It can be used to specify sponge areas with larger horizontal mixing coefficients for damping of high frequency noise due to open boundary conditions or nesting. The CPP option SPONGE is now deprecated and replaced with this switch to facilitate or not sponge areas over a particular nested grid.@@ The horizontal mixing distribution is specified in "ini_hmixcoef.F" as:@@ diff2(i,j,itrc) = diff_factor(i,j) * diff2(i,j,itrc)@ diff4(i,j,itrc) = diff_factor(i,j) * diff4(i,j,itrc)@@ The variable "diff_factor" can be read from the grid NetCDF file. Alternately, the horizontal viscosity in the sponge area can be set-up with analytical functions in "ana_sponge.h" using CPP ANA_SPONGE when the switch "LuvSponge" is turned ON for a particular grid.
+
+
+
+! Vertical mixing coefficients for tracers [0:NAT+NPT]
+
+AKT_BAK             m2/s, Background vertical mixing coefficient@ for active (NAT) and inert (NPT) tracer variables.
+AKT_LIMIT           Nondimensional, Upper threshold values to limit vertical diffusion coefficients@ computed from vertical mixing parameterizations (GLS_MIXING, LMD_MIXING, MY25_MIXING). Sometimes, these parameterizations yield high mixing values and the threshold values are used as upper limiter when LIMIT_VDIFF is activated.
+
+
+
+
+! Vertical mixing coefficient for momentum.
+
+AKV_BAK             m2/s, Background vertical mixing coefficient for momentum.
+AKV_LIMIT           Upper threshold value to limit vertical viscosity coefficient@ computed from vertical mixing parameterizations (GLS_MIXING, LMD_MIXING, MY25_MIXING). Sometimes, these parameterizations yield a high mixing value and the threshold value is used as upper limiter when LIMIT_VVISC is activated.
+
+
+
+
+! Turbulent closure parameters.
+
+AKK_BAK             m2/s, Background vertical mixing coefficient for turbulent kinetic energy.
+AKP_BAK             m2/s, Background vertical mixing coefficient for turbulent generic statistical field, "psi".
+TKENU2              m2/s, Lateral, harmonic, constant, mixing coefficient for turbulent closure variables.
+TKENU4              m4/s, Lateral, biharmonic, constant mixing coefficient (m4/s) for turbulent closure variables.
+
+
+
+
+!!! Generic length-scale turbulence closure parameters.
+!!
+!!       GLS_P == 3.0d0                           ! K-epsilon
+!!       GLS_M == 1.5d0
+!!       GLS_N == -1.0d0
+!!    GLS_Kmin == 7.6d-6
+!!    GLS_Pmin == 1.0d-12
+!!
+!!    GLS_CMU0 == 0.5477d0
+!!      GLS_C1 == 1.44d0
+!!      GLS_C2 == 1.92d0
+!!     GLS_C3M == -0.4d0
+!!     GLS_C3P == 1.0d0
+!!    GLS_SIGK == 1.0d0
+!!    GLS_SIGP == 1.30d0
+!!
+!!! Constants used in surface turbulent kinetic energy flux computation.
+!!
+!!  CHARNOK_ALPHA == 1400.0d0         ! Charnok surface roughness
+!! ZOS_HSIG_ALPHA == 0.5d0            ! roughness from wave amplitude
+!!       SZ_ALPHA == 0.25d0           ! roughness from wave dissipation
+!!      CRGBAN_CW == 100.0d0          ! Craig and Banner wave breaking
+!!
+!!! Constants used in momentum stress computation.
+!!
+!!        RDRG == 3.0d-04                    ! m/s
+!!       RDRG2 == 3.0d-03                    ! nondimensional
+!!         Zob == 0.02d0                     ! m
+!!         Zos == 0.02d0                     ! m
+!!
+!!! Height (m) of atmospheric measurements for Bulk fluxes parameterization.
+!!
+!!      BLK_ZQ == 10.0d0                     ! air humidity
+!!      BLK_ZT == 10.0d0                     ! air temperature
+!!      BLK_ZW == 10.0d0                     ! winds
+
+
+
+
+! Minimum depth for wetting and drying.
+
+DCRIT                   m, Minimum depth for wetting and drying.
+
+
+
+
+! Jerlov Water type.
+!------------------------------------------------------------------------------
+!
+! WTYPE        Jerlov water type array index used to model the light absorption
+!                with a double exponential function (Paulson and Simpson,
+!                1977).  The classification ranges from clear open ocean
+!                waters (type I) to dark turbulent coastal waters (type 7).
+!
+!              Array     Jerlov
+!              Index   Water Type   Examples
+!              -----   ----------   --------
+!
+!                1         I        Open Pacific
+!                2         IA       Eastern Mediterranean, Indian Ocean
+!                3         IB       Western Mediterranean, Open Atlantic
+!                4         II       Coastal waters, Azores
+!                5         III      Coastal waters, North Sea
+!                6         1        Skagerrak Strait
+!                7         3        Baltic
+!                8         5        Black Sea
+!                9         7        Dark coastal water
+!
+!------------------------------------------------------------------------------
+! Body-force parameters. Used when option BODYFORCE is activated.
+!------------------------------------------------------------------------------
+
+LEVSFRC                 Deepest level to apply surface momentum stress as a body-force.
+LEVBFRC                 Shallowest level to apply bottom momentum stress as a body-force.
+
+
+
+
+
+! Vertical S-coordinates parameters.
+!------------------------------------------------------------------------------
+!
+! The parameters below must be consistent in all input fields associated with the vertical grid.  The same vertical grid transformation (depths) needs to
+! be used when preparing initial conditions, boundary conditions, climatology, observations, and so on. Please check:
+!
+!   https://www.myroms.org/wiki/index.php/Vertical_S-coordinate
+!
+! for details, rules and examples.!
+!
+! Vtransform   Vertical transformation equation:
+!
+!                (1) Original formulation (Shchepetkin and McWilliams, 2005),
+!                    Vtransform=1 (In ROMS since 1999)
+!
+!                      z(x,y,s,t)=Zo(x,y,s)+zeta(x,y,t)*[1+Zo(x,y,s)/h(x,y)]
+!
+!                    where
+!
+!                      Zo(x,y,s)=hc*s+[h(x,y)-hc]*C(s)
+!
+!                (2) Improved formulation (A. Shchepetkin, 2005),
+!                    Vtransform=2
+!
+!                      z(x,y,s,t)=zeta(x,y,t)*[zeta(x,y,t)+h(x,y)]*Zo(x,y,s)
+!
+!                    where
+!
+!                      Zo(x,y,s)=[hc*s(k)+h(x,y)*C(k)]/[hc+h(x,y)]
+!
+!                    The true sigma-coordinate system is recovered as hc goes
+!                    to INFINITY. This is useful when configuring applications
+!                    with flat bathymetry and uniform level thickness.
+!                    Practically, you can achieve this by setting:
+!
+!                      THETA_S = 0.0d0
+!                      THETA_B = 0.0d0
+!                      TCLINE  = 1.0d+17       (a large number)
+!
+!
+! Vstretching  Vertical stretching function, C(s):
+!
+!                (1) Original function (Song and Haidvogel, 1994),
+!                    Vstretching=1
+!
+!                    C(s)=(1-theta_b)*[SINH(s*theta_s)/SINH(theta_s)]+
+!                         theta_b*[-0.5+0.5*TANH(theta_s*(s+0.5))/
+!                                           TANH(0.5*theta_s)]
+!
+!                (2) A. Shchepetkin (2005) function,
+!                    Vstretching=2
+!
+!                      C(s)=Cweight*Csur(s)+(1-Cweight)*Cbot(s)
+!
+!                    where
+!
+!                      Csur(s)=[1-COSH(theta_s*s)]/[COSH(theta_s)-1]
+!
+!                      Cbot(s)=-1+[1-SINH(theta_b*(s+1))]/SINH(theta_b)
+!
+!                      Cweight=(s+1)**alpha*
+!                              (1+(alpha/beta)*(1-(s+1)**beta))
+!
+!                (3) R. Geyer function for shallow sediment applications,
+!                    Vstretching=3
+!
+!                      C(s)=Cweight*Cbot(s)+(1-Cweight)*Csur(s)
+!
+!                    where
+!
+!                      Csur(s)=-LOG(COSH(Hscale*ABS(s)** alpha))/
+!                               LOG(COSH(Hscale))
+!
+!                      Cbot(s)= LOG(COSH(Hscale*(s+1)** beta))/
+!                               LOG(COSH(Hscale))-1
+!
+!                      Cweight=0.5*(1-TANH(Hscale*(s+0.5))
+!
+!                (4) A. Shchepetkin (2010) improved double stretching function,
+!                    Vstretching=4
+!
+!                      C(s)=[1-COSH(theta_s*s)]/[COSH(theta_s)-1]
+!
+!                    with bottom refinement
+!
+!                      C(s)=[EXP(theta_b*C(s))-1]/[1-EXP(-theta_b)]
+!
+!                    The resulting double transformation is continuous with
+!                    respect control parameters theta_s and theta_b with a
+!                    meaningful range of:
+!
+!                      0 <  theta_s <= 10.0
+!                      0 <= theta_b <=  4.0
+!
+!                 (5) Souza et al. (2015) quadratic Legendre polynomial function
+!                     that allows higher resolution near the surface,
+!                     Vstretching=5. It is similar to Vstretching=4, but the
+!                     fractional stretched vertical coordinate (s) is re-defined
+!                     as:
+!
+!                       s(k)=- [(k*k - 2*k*N + k + N*N - N) / (N*N - N)]
+!                            - weight * [(k*k - k*N) / (1 - N)]
+!
+!                     at vertical W-points, k=0,...,N and weight=0.01. To get
+!                     the equation at vertical RHO-points, replace k with k-0.5.
+!
+!              Many other stretching functions (Vstretching>5) are possible
+!              provided that:
+!
+!                * C(s) is a dimensionless, nonlinear, monotonic function.
+!                * C(s) is a continuous differentiable function, or
+!                  a differentiable piecewise function with smooth transition.
+!                * The stretching vertical coordinate ,s, is constrained
+!                  between -1 <= s <= 0, with s=0 corresponding to the
+!                  free-surface and s=-1 corresponding to the bathymetry.
+!                * Similarly, the stretching function, C(s), is constrained
+!                  between -1 <= C(s) <= 0, with C(0)=0 corresponding to the
+!                  free-surface and C(-1)=-1 corresponding to the bathymetry.
+!
+!              These functions are coded in routine "Utility/set_scoord.F".
+!
+! Due to its functionality and properties, the default and recommended vertical
+! coordinates transformation is:
+!
+!              Vtransform  = 2
+!              Vstretching = 4
+
+Vtransform              transformation equation
+Vstretching             stretching function
+
+
+
+
+! Vertical S-coordinates parameters (see below for details).
+
+THETA_S                 S-coordinate surface control parameter.@The range of optimal values depends on the vertical stretching function, C(s).
+THETA_B                 S-coordinate bottom  control parameter.@The range of optimal values depends on the vertical stretching function, C(s).
+TCLINE                  m, Critical depth (hc) in meters@ (positive) controlling the stretching. It can be interpreted as the width of surface or bottom boundary layer in which higher vertical resolution (levels) is required during stretching.
+
+
+
+
+! Mean Density and background Brunt-Vaisala frequency.
+
+RHO0                    kg/m3, Mean density used when the Boussinesq approximation is inferred.
+BVF_BAK                 1/s2, Background Brunt-Vaisala frequency squared.@ Typical values for the ocean range (as a function of depth) from 1.0E-4 to 1.0E-6.
+
+
+
+
+! Time Stamps.
+
+DSTART                  days, Time stamp assigned to model initialization.@Usually a Calendar linear coordinate, like modified Julian Day.  For Example:@@Julian Day    = 1      for  Nov 25, 00:00:00 4713 BCE@modified Julian Day    = 1      for  May 24, 00:00:00 1968 GMT@Days since Jan 1, 2000 = 988.5  for  Sep 15, 12:00:00 2002@@It is called truncated or modified Julian day because an offset of 2440000 needs to be added.
+TIDE_START              days, Reference time origin for tidal forcing.@ This is the time used when processing input tidal model data. It is needed in routine "set_tides" to compute the correct phase lag with respect ROMS/TOMS initialization time.
+TIME_REF                Reference time (yyyymmdd.f)@ used to compute relative time:@ elapsed time interval since reference-time.  The "units" attribute takes the form "time-unit since reference-time".@This parameter also provides information about the calendar used:@@If TIME_REF = -2, model time and DSTART are in modified Julian days units.  The "units" attribute is:@@'time-units since 1968-05-23 00:00:00 GMT'    (May 23, 1968)@@If TIME_REF = -1, model time and DSTART are in a calendar with 360 days in every year (30 days each month).  The "units" attribute is:@@'time-units since 0000-12-30 00:00:00'        (Dec 30, 0000)@@If TIME_REF = 0, model time and DSTART are in a common year@@calendar with 365.25 days.  The "units" attribute is:@@'time-units since 0001-01-01 00:00:00'        (Jan  1, 0001)@@If TIME_REF > 0, model time and DSTART are the elapsed time units since specified reference time.  For example, TIME_REF=20020115.5 will yield the following attribute:@@'time-units since 2002-01-15 12:00:00'        (Jan 15, 2002)
+
+
+
+
+Linear equation of State parameters.
+!------------------------------------------------------------------------------
+!
+! Ignoring pressure, the linear equation of state is:
+!
+!              rho(:,:,:) = R0 - R0 * TCOEF * (t(:,:,:,:,itemp) - T0)
+!                              + R0 * SCOEF * (t(:,:,:,:,isalt) - S0)
+!
+!              Typical values:     R0 = 1027.0  kg/m3
+!                                  T0 = 10.0    Celsius
+!                                  S0 = 35.0    nondimensional
+!                               TCOEF = 1.7d-4  1/Celsius
+!                               SCOEF = 7.6d-4  1/nondimensional
+!
+!              Notice that salinity has NO UNITS, it is nondimensional. Many
+!              people use PSU (Practical Salinity Unit).  However, salinity
+!              has always been defined as a conductivity ratio and does not
+!              have physical units. For details, check the following forum
+!              post:  www.myroms.org/forum/viewtopic.php?f=30&t=294
+
+R0                  kg/m3, Background density@ value used in Linear Equation of State.
+T0                  Celsius, Background potential temperature constant.
+S0                  Nondimensional, Background salinity constant.
+TCOEF               1/Celsius, Thermal expansion coefficient in Linear Equation of State.
+SCOEF               Nondimensional, Saline contraction coefficient in Linear Equation of State.
+
+
+
+
+! Slipperiness parameter:
+
+GAMMA2              Slipperiness parameter, either 1.0 (free slip) or -1.0 (no slip)
+
+
+
+
+
+! Logical switches (TRUE/FALSE) to activate horizontal momentum transport point Sources/Sinks (like river runoff transport) and mass point
+! Sources/Sinks (like volume vertical influx)
+
+LuvSrc              Switch to activate momentum horizontal transport points Sources/Sinks.@ Usually it is used to turn on/off river runoff transport (u or v variables) in an application
+LwSrc               Switch to activate mass points Sources/Sinks.@ Usually, it is used to turn on/off volume vertical influx (w) in an application.
+
+
+
+
+! Logical switches (T/F) to activate tracer variables point Sources/Sinks. Only NAT active tracers (temperature, salinity)
+!                and NPT inert tracers are activated here:
+!
+!                 LtracerSrc(itemp)     for temperature (itemp=1)
+!                 LtracerSrc(isalt)     for salinity    (isalt=2)
+!                 LtracerSrc(NAT+1)     for inert tracer 1
+!                 ...                      ...
+!                 LtracerSrc(NAT+NPT)   for inert tracer NPT
+!
+!                Other biological and sediment tracers switches are activated in their respective input scripts.
+!
+!                Recall that switches are usually activated to add river runoff as a point source. At minimum, it is necessary to specify both
+!                temperature and salinity for all rivers.  The other tracers are optional.
+!
+!                This logical switch REPLACES and ELIMINATES the need to have or read the variable "river_flag(river)" in the input rivers
+!                forcing NetCDF file:
+!
+!                 double river_flag(river)
+!                        river_flag:long_name = "river runoff tracer flag"
+!                        river_flag:option_0 = "all tracers are off"
+!                        river_flag:option_1 = "only temperature"
+!                        river_flag:option_2 = "only salinity"
+!                        river_flag:option_3 = "both temperature and salinity"
+!                        river_flag:units = "nondimensional"
+!
+!                The above variable was too cumbersome and complicated when additional tracers are considered. However, this change is
+!                backward compatible.
+!
+!                The LtracerSrc switch will be used to activate the reading of respective tracer variable from input river forcing NetCDF
+!                file. If you want to add other tracer variables (other than temperature and salinity) as a source for a particular
+!                river(s), you just need to specify such values on those river(s). Then, set the values to ZERO on the other river(s)
+!                that do NOT require such river forcing for that tracer. Recall that you need to specify the tracer values for all
+!                rivers, even if their values are zero.
+
+
+LtracerSrc              Switch to activate tracer variables point Sources/Sinks
+
+
+
+!!! Logical switches (TRUE/FALSE) to read and process climatology fields.
+!!! See glossary below for details.
+!!
+!!     LsshCLM == F                          ! sea-surface height
+!!      Lm2CLM == F                          ! 2D momentum
+!!      Lm3CLM == F                          ! 3D momentum
+!!
+!!  LtracerCLM == F F                        ! temperature, salinity, inert
+!!
+!!! Logical switches (TRUE/FALSE) to nudge the desired climatology field(s).
+!!! If not analytical climatology fields, users need to turn ON the logical
+!!! switches above to process the fields from the climatology NetCDF file
+!!! that are needed for nudging. See glossary below for details.
+!!
+!! LnudgeM2CLM == F                          ! 2D momentum
+!! LnudgeM3CLM == F                          ! 3D momentum
+!!
+!!  LnudgeTCLM == F F                        ! temperature, salinity, inert
+
+
+
+
+! Logical switches (TRUE/FALSE) to activate writing of fields into HISTORY output file.
+
+Hout(idUvel)                3D U-velocity
+Hout(idVvel)                3D V-velocity
+Hout(idu3dE)                3D U-eastward  at RHO-points
+Hout(idv3dN)                3D V-northward at RHO-points
+Hout(idWvel)                3D W-velocity
+Hout(idOvel)                omega vertical velocity
+Hout(idUbar)                2D U-velocity
+Hout(idVbar)                2D V-velocity
+Hout(idu2dE)                2D U-eastward  at RHO-points
+Hout(idv2dN)                2D V-northward at RHO-points
+Hout(idFsur)                free-surface
+Hout(idBath)                time-dependent bathymetry
+
+Hout(idTvar)                temperature and salinity
+
+Hout(idpthR)                time-varying depths of RHO-points
+Hout(idpthU)                time-varying depths of U-points
+Hout(idpthV)                time-varying depths of V-points
+Hout(idpthW)                time-varying depths of W-points
+
+Hout(idUsms)                surface U-stress
+Hout(idVsms)                surface V-stress
+Hout(idUbms)                bottom U-stress
+Hout(idVbms)                bottom V-stress
+
+Hout(idUbrs)                bottom U-current stress
+Hout(idVbrs)                bottom V-current stress
+Hout(idUbws)                bottom U-wave stress
+Hout(idVbws)                bottom V-wave stress
+Hout(idUbcs)                bottom max wave-current U-stress
+Hout(idVbcs)                bottom max wave-current V-stress
+
+Hout(idUbot)                bed wave orbital U-velocity
+Hout(idVbot)                bed wave orbital V-velocity
+Hout(idUbur)                bottom U-velocity above bed
+Hout(idVbvr)                bottom V-velocity above bed
+
+Hout(idW2xx)                2D radiation stress, Sxx component
+Hout(idW2xy)                2D radiation stress, Sxy component
+Hout(idW2yy)                2D radiation stress, Syy component
+Hout(idU2rs)                2D radiation U-stress
+Hout(idV2rs)                2D radiation V-stress
+Hout(idU2Sd)                2D U-Stokes velocity
+Hout(idV2Sd)                2D V-Stokes velocity
+
+Hout(idW3xx)                3D radiation stress, Sxx component
+Hout(idW3xy)                3D radiation stress, Sxy component
+Hout(idW3yy)                3D radiation stress, Syy component
+Hout(idW3zx)                3D radiation stress, Szx component
+Hout(idW3zy)                3D radiation stress, Szy component
+Hout(idU3rs)                3D U-radiation stress
+Hout(idV3rs)                3D V-radiation stress
+Hout(idU3Sd)                3D U-Stokes velocity
+Hout(idV3Sd)                3D V-Stokes velocity
+
+Hout(idWamp)                wave height
+Hout(idWlen)                wave length
+Hout(idWdir)                wave direction
+Hout(idWptp)                wave surface period
+Hout(idWpbt)                wave bottom period
+Hout(idWorb)                wave bottom orbital velocity
+Hout(idWdis)                wave dissipation
+
+Hout(idPair)                surface air pressure
+Hout(idTair)                surface air temperature
+Hout(idUair)                surface U-wind component
+Hout(idVair)                surface V-wind component
+
+Hout(idTsur)                surface net heat and salt flux
+Hout(idLhea)                latent heat flux
+Hout(idShea)                sensible heat flux
+Hout(idLrad)                longwave radiation flux
+Hout(idSrad)                shortwave radiation flux
+Hout(idEmPf)                E-P flux
+Hout(idevap)                evaporation rate
+Hout(idrain)                precipitation rate
+
+Hout(idDano)                density anomaly
+Hout(idVvis)                vertical viscosity
+Hout(idTdif)                vertical T-diffusion
+Hout(idSdif)                vertical Salinity diffusion
+Hout(idHsbl)                depth of surface boundary layer
+Hout(idHbbl)                depth of bottom boundary layer
+Hout(idMtke)                turbulent kinetic energy
+Hout(idMtls)                turbulent length scale
+
+Hout(inert)                 Write out extra inert passive tracers.
+
+
+
+! Logical switches (TRUE/FALSE) to activate writing of fields into QUICKSAVE output file.
+
+Qout(idUvel)                3D U-velocity
+Qout(idVvel)                3D V-velocity
+Qout(idu3dE)                3D U-eastward  at RHO-points
+Qout(idv3dN)                3D V-northward at RHO-points
+Qout(idWvel)                3D W-velocity
+Qout(idOvel)                omega vertical velocity
+Qout(idUbar)                2D U-velocity
+Qout(idVbar)                2D V-velocity
+Qout(idu2dE)                2D U-eastward  at RHO-points
+Qout(idv2dN)                2D V-northward at RHO-points
+Qout(idFsur)                free-surface
+Qout(idBath)                time-dependent bathymetry
+
+Qout(idTvar)                temperature and salinity
+
+Qout(idUsur)                surface U-velocity
+Qout(idVsur)                surface V-velocity
+Qout(idUsuE)                surface U-eastward  velocity
+Qout(idVsuN)                surface V-northward velocity
+
+Qout(idsurT)                surface temperature and salinity
+
+Qout(idpthR)                time-varying depths of RHO-points
+Qout(idpthU)                time-varying depths of U-points
+Qout(idpthV)                time-varying depths of V-points
+Qout(idpthW)                time-varying depths of W-points
+
+Qout(idUsms)                surface U-stress
+Qout(idVsms)                surface V-stress
+Qout(idUbms)                bottom U-stress
+Qout(idVbms)                bottom V-stress
+
+Qout(idUbrs)                bottom U-current stress
+Qout(idVbrs)                bottom V-current stress
+Qout(idUbws)                bottom U-wave stress
+Qout(idVbws)                bottom V-wave stress
+Qout(idUbcs)                bottom max wave-current U-stress
+Qout(idVbcs)                bottom max wave-current V-stress
+
+Qout(idUbot)                bed wave orbital U-velocity
+Qout(idVbot)                bed wave orbital V-velocity
+Qout(idUbur)                bottom U-velocity above bed
+Qout(idVbvr)                bottom V-velocity above bed
+
+Qout(idW2xx)                2D radiation stress, Sxx component
+Qout(idW2xy)                2D radiation stress, Sxy component
+Qout(idW2yy)                2D radiation stress, Syy component
+Qout(idU2rs)                2D radiation U-stress
+Qout(idV2rs)                2D radiation V-stress
+Qout(idU2Sd)                2D U-Stokes velocity
+Qout(idV2Sd)                2D V-Stokes velocity
+
+Qout(idW3xx)                3D radiation stress, Sxx component
+Qout(idW3xy)                3D radiation stress, Sxy component
+Qout(idW3yy)                3D radiation stress, Syy component
+Qout(idW3zx)                3D radiation stress, Szx component
+Qout(idW3zy)                3D radiation stress, Szy component
+Qout(idU3rs)                3D U-radiation stress
+Qout(idV3rs)                3D V-radiation stress
+Qout(idU3Sd)                3D U-Stokes velocity
+Qout(idV3Sd)                3D V-Stokes velocity
+
+Qout(idWamp)                wave height
+Qout(idWlen)                wave length
+Qout(idWdir)                wave direction
+Qout(idWptp)                wave surface period
+Qout(idWpbt)                wave bottom period
+Qout(idWorb)                wave bottom orbital velocity
+Qout(idWdis)                wave dissipation
+
+Qout(idPair)                surface air pressure
+Qout(idTair)                surface air temperature
+Qout(idUair)                surface U-wind component
+Qout(idVair)                surface V-wind component
+
+Qout(idTsur)                surface net heat and salt flux
+Qout(idLhea)                latent heat flux
+Qout(idShea)                sensible heat flux
+Qout(idLrad)                longwave radiation flux
+Qout(idSrad)                shortwave radiation flux
+Qout(idEmPf)                E-P flux
+Qout(idevap)                evaporation rate
+Qout(idrain)                precipitation rate
+
+Qout(idDano)                density anomaly
+Qout(idVvis)                vertical viscosity
+Qout(idTdif)                vertical T-diffusion
+Qout(idSdif)                vertical Salinity diffusion
+Qout(idHsbl)                depth of surface boundary layer
+Qout(idHbbl)                depth of bottom boundary layer
+Qout(idMtke)                turbulent kinetic energy
+Qout(idMtls)                turbulent length scale
+
+Qout(inert)                 addiitonal inert passive tracers
+Qout(Snert)                 surface inert passive tracers
+
+
+
+! Logical switches (TRUE/FALSE) to activate writing of time-averaged fields into AVERAGE output file.
+
+Aout(idUvel)                3D U-velocity
+Aout(idVvel)                3D V-velocity
+Aout(idu3dE)                3D U-eastward  at RHO-points
+Aout(idv3dN)                3D V-northward at RHO-points
+Aout(idWvel)                3D W-velocity
+Aout(idOvel)                omega vertical velocity
+Aout(idUbar)                2D U-velocity
+Aout(idVbar)                2D V-velocity
+Aout(idu2dE)                2D U-eastward  at RHO-points
+Aout(idv2dN)                2D V-northward at RHO-points
+Aout(idFsur)                free-surface
+
+Aout(idTvar)                temperature and salinity
+
+Aout(idUsms)                surface U-stress
+Aout(idVsms)                surface V-stress
+Aout(idUbms)                bottom U-stress
+Aout(idVbms)                bottom V-stress
+
+Aout(idW2xx)                2D radiation stress, Sxx component
+Aout(idW2xy)                2D radiation stress, Sxy component
+Aout(idW2yy)                2D radiation stress, Syy component
+Aout(idU2rs)                2D radiation U-stress
+Aout(idV2rs)                2D radiation V-stress
+Aout(idU2Sd)                2D U-Stokes velocity
+Aout(idV2Sd)                2D V-Stokes velocity
+
+Aout(idW3xx)                3D radiation stress, Sxx component
+Aout(idW3xy)                3D radiation stress, Sxy component
+Aout(idW3yy)                3D radiation stress, Syy component
+Aout(idW3zx)                3D radiation stress, Szx component
+Aout(idW3zy)                3D radiation stress, Szy component
+Aout(idU3rs)                3D U-radiation stress
+Aout(idV3rs)                3D V-radiation stress
+Aout(idU3Sd)                3D U-Stokes velocity
+Aout(idV3Sd)                3D V-Stokes velocity
+
+Aout(idPair)                surface air pressure
+Aout(idTair)                surface air temperature
+Aout(idUair)                surface U-wind component
+Aout(idVair)                surface V-wind component
+
+Aout(idTsur)                surface net heat and salt flux
+Aout(idLhea)                latent heat flux
+Aout(idShea)                sensible heat flux
+Aout(idLrad)                longwave radiation flux
+Aout(idSrad)                shortwave radiation flux
+Aout(idevap)                evaporation rate
+Aout(idrain)                precipitation rate
+
+Aout(idDano)                density anomaly
+Aout(idVvis)                vertical viscosity
+Aout(idTdif)                vertical T-diffusion
+Aout(idSdif)                vertical Salinity diffusion
+Aout(idHsbl)                depth of surface boundary layer
+Aout(idHbbl)                depth of bottom boundary layer
+
+Aout(id2dRV)                2D relative vorticity
+Aout(id3dRV)                3D relative vorticity
+Aout(id2dPV)                2D potential vorticity
+Aout(id3dPV)                3D potential vorticity
+
+Aout(idu3dD)                detided 3D U-velocity
+Aout(idv3dD)                detided 3D V-velocity
+Aout(idu2dD)                detided 2D U-velocity
+Aout(idv2dD)                detided 2D V-velocity
+Aout(idFsuD)                detided free-surface
+
+Aout(idTrcD)                detided temperature and salinity
+
+Aout(idHUav)                u-volume flux, Huon
+Aout(idHVav)                v-volume flux, Hvom
+Aout(idUUav)                quadratic <u*u> term
+Aout(idUVav)                quadratic <u*v> term
+Aout(idVVav)                quadratic <v*v> term
+Aout(idU2av)                quadratic <ubar*ubar> term
+Aout(idV2av)                quadratic <vbar*vbar> term
+Aout(idZZav)                quadratic <zeta*zeta> term
+
+Aout(idTTav)                quadratic <t*t> tracer terms
+Aout(idUTav)                quadratic <u*t> tracer terms
+Aout(idVTav)                quadratic <v*t> tracer terms
+Aout(iHUTav)                tracer volume flux, <Huon*t>
+Aout(iHVTav)                tracer volume flux, <Hvom*t>
+Aout(inert)                 Additional inert passive tracers
+
+
+
+
+
+! NetCDF-4/HDF5 compression parameters for output files.
+
+NC_SHUFFLE                  Shuffle filter integer flag.@ If non-zero, turn on shuffle filter.
+NC_DEFLATE                  Deflate filter integer flag.@ If non-zero, turn on deflate filter at the level specified by the NC_DLEVEL parameter.
+NC_DLEVEL
+
+
+
+
+! Input NetCDF file names, [1:Ngrids].
+
+GRDNAME                     Input grid filename.
+ININAME                     Input nonlinear initial conditions filename.@ It can be a re-start file.
+
+
+
+
+
+! Input lateral boundary conditions file names. The USER has the option to separate the required lateral boundary variables into individual
+! NetCDF files (NBCFILES > 1), as in the input surface forcing.  Also, the USER may split input data time records into several NetCDF files
+! (monthly, seasonal, or annual). See prologue instructions above. Use a single line per entry with a continuation (\) or a vertical bar (|)
+! symbol after each entry, except the last one.
+
+NBCFILES                    number of boundary files
+BRYNAME                     Input open boundary data filename(s)
+
+
+
+
+
+!!! Input climatology file names. The USER has the option to separate the
+!!! climatology variables into individual NetCDF files (NCLMFILES > 1),
+!!! as in the input surface forcing.  Also, the USER may split input data
+!!! time records into several NetCDF files (monthly, seasonal, or annual).
+!!! See prologue instructions above. Use a single line per entry with a
+!!! continuation (\) or a vertical bar (|) symbol after each entry, except
+!!! the last one.
+!!
+!!   NCLMFILES == 1                          ! number of climatology files
+!!
+!!     CLMNAME == roms_clm.nc
+!!
+!!! Input climatology nudging coefficients file name.
+!!
+!!     NUDNAME == roms_nud.nc
+!!
+!!! Input Sources/Sinks forcing (like river runoff) file name.
+!!
+!!     NSSFFILES == 1
+!!     SSFNAME == roms_rivers.nc
+!!
+!!! Input tidal forcing file name.
+!!
+!!    TIDENAME == roms_tides.nc
+!!
+!!! Input forcing NetCDF file name(s).
+!!!
+!!! The USER has the option to enter several sets of file names for each
+!!! nested grid. For example, the USER may have different data for the
+!!! wind products, heat fluxes, etc. Alternatively, if the all the forcing
+!!! files are the same for nesting and the data is in its native resolution,
+!!! we could enter only one set of files names and ROMS will replicate those
+!!! files internally to the remaining grids using the plural KEYWORD protocol.
+!!!
+!!! The model will scan the files and will read the needed data from the first
+!!! file in the list containing the forcing field. Therefore, the order of the
+!!! filenames is critical. If using multiple forcing files per grid, first
+!!! enter all the file names for grid one followed by two, and so on.  It is
+!!! also possible to split input data time records into several NetCDF files
+!!! (see Prolog instructions above). Use a single line per entry with a
+!!! continuation (\) or a vertical bar (|) symbol after each entry, except
+!!! the last one.
+!!
+!!     NFFILES == 1                          ! number of unique forcing files
+!!
+!!     FRCNAME == roms_frc.nc               ! forcing file 1, grid 1
+!!
+!!! Output NetCDF file names, [1:Ngrids].
+!!
+!!     RSTNAME == roms_rst.nc
+!!     HISNAME == roms_his.nc
+!!     QCKNAME == roms_qck.nc
+!!     TLMNAME == roms_tlm.nc
+!!     TLFNAME == roms_tlf.nc
+!!     AVGNAME == roms_avg.nc
+!!     HARNAME == roms_har.nc
+!!     DIANAME == roms_dia.nc
+!!     STANAME == roms_sta.nc
+!!     FLTNAME == roms_flt.nc
+!!
+!!
+!!     USRNAME =  ROMS/External/MyFile.dat
+!!
+!!

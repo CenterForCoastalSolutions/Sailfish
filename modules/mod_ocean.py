@@ -15,23 +15,23 @@ import cupy as cp
 class T_OCEAN:
     def __init__(self, Ni, Nj):
         # Nonlinear model state.
-        rubar = cp.zeros(Ni, Nj, 2)
-        rvbar = cp.zeros(Ni, Nj, 2)
-        rzeta = cp.zeros(Ni, Nj, 2)
-        ubar  = cp.zeros(Ni, Nj, 3)
-        vbar  = cp.zeros(Ni, Nj, 3)
-        zeta  = cp.zeros(Ni, Nj, 3)
+        rubar = cp.zeros(2, Nj, Ni)
+        rvbar = cp.zeros(2, Nj, Ni)
+        rzeta = cp.zeros(2, Nj, Ni)
+        ubar  = cp.zeros(3, Nj, Ni)
+        vbar  = cp.zeros(3, Nj, Ni)
+        zeta  = cp.zeros(3, Nj, Ni)
 
 
 
-def allocate_ocean(LBi, UBi, LBj, UBj):
+def allocate_ocean(0, L, 0, M):
 # This routine allocates all variables in the module for all nested grids.                                                              !
 
 
 # Allocate and initialize module variables.
 # -----------------------------------------------------------------------
 
-    OCEAN = T_OCEAN(UBi - LBi,UBj - LBj)
+    OCEAN = T_OCEAN(M, L)
 
     # Set horizontal array size.
     size2d=REAL((UBi-LBi+1)*(UBj-LBj+1),r8)

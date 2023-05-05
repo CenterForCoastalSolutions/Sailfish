@@ -9,7 +9,7 @@ def computeCoordinates(Xsize, Esize):
     # are special in periodic boundary conditons since periodicity cannot
     # be imposed in the grid coordinates.
 
-    I, J = cp.meshgrid(cp.arange(0, Mm + 1), cp.arange(0, Lm + 1))
+    I, J = cp.meshgrid(cp.arange(0, M+1), cp.arange(0, L+1))
 
     dx = Xsize/Lm
     dy = Esize/Mm

@@ -54,8 +54,8 @@ def buildBCIndices(Istr, Iend, Jstr, Jend, mask):
     # Build indices for periodic boundary conditions.
     # -----------------------------------------------
 
-    L = Lm[ng]
-    M = Mm[ng]
+    L = Lm + 1
+    M = Mm + 1       xxxxxxx
 
     periodicBCIdx = []
     periodicBCIdxSrc = []

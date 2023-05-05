@@ -152,6 +152,8 @@ def initialize_param():
     #       U-type variables:  [1:L, 0:M]     u(i,j)  r(i,j)  u(i+1,j)
     #       V-type variables:  [0:L, 1:M]        |              |
     #                                            -----v(i,j)-----
+    #
+    # Number of interior points.
     #  Lm = L - 1
     #  Mm = M - 1
 
