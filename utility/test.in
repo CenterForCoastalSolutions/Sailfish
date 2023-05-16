@@ -73,7 +73,7 @@
 ! Input variable information file name.  This file needs to be processed
 ! first so all information arrays can be initialized properly.
 
-     VARNAME = ROMS/External/varinfo.dat
+     VARNAME = ../tmp/varinfo.dat
 
 ! Number of nested grids.
 
@@ -181,28 +181,28 @@ ad_Vadvection == C4       \                     ! temperature
 !
 !                   1       2       3       4
 
-   LBC(isFsur) ==   Per     Clo     Per     Clo         ! free-surface
-   LBC(isUbar) ==   Per     Clo     Per     Clo         ! 2D U-momentum
-   LBC(isVbar) ==   Per     Clo     Per     Clo         ! 2D V-momentum
-   LBC(isUvel) ==   Per     Clo     Per     Clo         ! 3D U-momentum
-   LBC(isVvel) ==   Per     Clo     Per     Clo         ! 3D V-momentum
-   LBC(isMtke) ==   Per     Clo     Per     Clo         ! mixing TKE
+   LBC(isFsur) ==   Cla     Gra     Cla     Clo         ! free-surface
+   LBC(isUbar) ==   Cla     Clo     Cla     Clo         ! 2D U-momentum
+   LBC(isVbar) ==   Cla     Clo     Fla     Clo         ! 2D V-momentum
+   LBC(isUvel) ==   Cla     Clo     Cla     Clo         ! 3D U-momentum
+   LBC(isVvel) ==   Cla     Clo     Cla     Clo         ! 3D V-momentum
+   LBC(isMtke) ==   Cla     Clo     Cla     Clo         ! mixing TKE
 
-   LBC(isTvar) ==   Per     Clo     Per     Clo \       ! temperature
-                    Per     Clo     Per     Clo         ! salinity
+   LBC(isTvar) ==   Cla     Clo     Cla     Clo \       ! temperature
+                    Cla     Clo     Cla     Clo         ! salinity
 
 ! Adjoint-based algorithms can have different lateral boundary
 ! conditions keywords.
 
-ad_LBC(isFsur) ==   Per     Clo     Per     Clo         ! free-surface
-ad_LBC(isUbar) ==   Per     Clo     Per     Clo         ! 2D U-momentum
-ad_LBC(isVbar) ==   Per     Clo     Per     Clo         ! 2D V-momentum
-ad_LBC(isUvel) ==   Per     Clo     Per     Clo         ! 3D U-momentum
-ad_LBC(isVvel) ==   Per     Clo     Per     Clo         ! 3D V-momentum
-ad_LBC(isMtke) ==   Per     Clo     Per     Clo         ! mixing TKE
+ad_LBC(isFsur) ==   Cla     Clo     Cla     Clo         ! free-surface
+ad_LBC(isUbar) ==   Cla     Clo     Cla     Clo         ! 2D U-momentum
+ad_LBC(isVbar) ==   Cla     Clo     Cla     Clo         ! 2D V-momentum
+ad_LBC(isUvel) ==   Cla     Clo     Cla     Clo         ! 3D U-momentum
+ad_LBC(isVvel) ==   Cla     Clo     Cla     Clo         ! 3D V-momentum
+ad_LBC(isMtke) ==   Cla     Clo     Cla     Clo         ! mixing TKE
 
-ad_LBC(isTvar) ==   Per     Clo     Per     Clo \       ! temperature
-                    Per     Clo     Per     Clo         ! salinity
+ad_LBC(isTvar) ==   Cla     Clo     Cla     Clo \       ! temperature
+                    Cla     Clo     Cla     Clo         ! salinity
 
 ! Set lateral open boundary edge volume conservation switch for
 ! nonlinear model and adjoint-based algorithms. Usually activated
@@ -416,7 +416,7 @@ LtracerSponge == F F                            ! temperature, salinity, inert
 
       DSTART =  0.0d0                      ! days
   TIDE_START =  0.0d0                      ! days
-    TIME_REF =  0.0d0                      ! yyyymmdd.dd
+    TIME_REF =  20121123.22d0                      ! yyyymmdd.dd
 
 ! Nudging/relaxation time scales, inverse scales will be computed
 ! internally, [1:Ngrids].

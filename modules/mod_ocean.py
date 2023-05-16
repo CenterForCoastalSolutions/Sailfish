@@ -1,4 +1,4 @@
-import cupy as cp
+import numpy as cp
 
 # !  2D Primitive Variables.                                             !
 # !                                                                      !
@@ -8,42 +8,23 @@ import cupy as cp
 # !  ubar         Vertically integrated U-momentum component (m/s).      !
 # !  vbar         Vertically integrated V-momentum component (m/s).      !
 # !  zeta         Free surface (m).                                      !
-                                                                   !
 
 
 # Nonlinear model state.
 class T_OCEAN:
-    def __init__(self, Ni, Nj):
+    def __init__(self, input, GRID):
+        M = GRID.M
+        L = GRID.L
+
         # Nonlinear model state.
-        rubar = cp.zeros(2, Nj, Ni)
-        rvbar = cp.zeros(2, Nj, Ni)
-        rzeta = cp.zeros(2, Nj, Ni)
-        ubar  = cp.zeros(3, Nj, Ni)
-        vbar  = cp.zeros(3, Nj, Ni)
-        zeta  = cp.zeros(3, Nj, Ni)
+        self.rubar = cp.zeros((2, M + 1, L + 1), dtype = cp.float64)
+        self.rvbar = cp.zeros((2, M + 1, L + 1), dtype = cp.float64)
+        self.rzeta = cp.zeros((2, M + 1, L + 1), dtype = cp.float64)
 
+        self.ubar  = cp.zeros((3, M + 1, L + 1), dtype = cp.float64)
+        self.vbar  = cp.zeros((3, M + 1, L + 1), dtype = cp.float64)
+        self.zeta  = cp.zeros((3, M + 1, L + 1), dtype = cp.float64)
 
-
-def allocate_ocean(0, L, 0, M):
-# This routine allocates all variables in the module for all nested grids.                                                              !
-
-
-# Allocate and initialize module variables.
-# -----------------------------------------------------------------------
-
-    OCEAN = T_OCEAN(M, L)
-
-    # Set horizontal array size.
-    size2d=REAL((UBi-LBi+1)*(UBj-LBj+1),r8)
-
-
-
-def initialize_ocean():
-# This routine initialize all variables in the module using first     !
-# touch distribution policy.
-
-
-    IniVal = 0.0
 
 
 # Set array initialization range.
@@ -70,16 +51,7 @@ def initialize_ocean():
     # END IF
 
 
-    # Initialize module variables.
-    #-----------------------------------------------------------------------
-    self.rubar = createVar(shape2D, 2, IniVal)
-    self.rvbar = createVar(shape2D, 2, IniVal)
-    self.rzeta = createVar(shape2D, 2, IniVal)
 
-
-    self.rubar = createVar(shape2D, 3, IniVal)
-    self.rvbar = createVar(shape2D, 3, IniVal)
-    self.rzeta = createVar(shape2D, 3, IniVal)
 
 
 

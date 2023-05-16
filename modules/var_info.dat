@@ -1,0 +1,13 @@
+
+
+dtfast
+
+
+mod_ocean:
+    T_OCEAN:
+        rubar:              m4/s2, Right-hand-side of 2D U-momentum equation
+        rvbar:              m4/s2, Right-hand-side of 2D V-momentum equation
+        rzeta:              m3/s, Right-hand-side of free surface equation
+        ubar:               m/s, Vertically integrated U-momentum component
+        vbar:               m/s, Vertically integrated V-momentum component
+        zeta:               m, Free surface

@@ -14,9 +14,14 @@ def getBasicGridParameters():
     return Xsize, Esize, depth, f0, beta
 
 
+def computeAngle():
+    return anaBASE.computeAngle()
+
+def computeCoriolis():
+    return anaBASE.computeCoriolis()
 
 
-def computeCoordinates(Xsize, Esize):
+def computeCoordinates(Xsize, Esize, GRID):
     # Compute the (ξ,η) coordinates at PSI- and RHO-points.
     # Set grid spacing (m).
     # -----------------------------------------------------------------------
@@ -26,4 +31,16 @@ def computeCoordinates(Xsize, Esize):
     # be imposed in the grid coordinates.
 
     # Uses the basic method.
-    return anaBASE(Xsize, Esize)
+    return anaBASE.computeCoordinates(Xsize, Esize, GRID)
+
+
+def computeStatistics():
+    return anaBASE.computeStatistics()
+
+
+def computeCoordinateTransform(GRID):
+    return anaBASE.computeCoordinateTransform(GRID)
+
+
+def computeBathymetry(depth, GRID):
+    return anaBASE.computeBathymetry(depth, GRID)

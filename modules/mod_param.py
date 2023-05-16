@@ -101,40 +101,7 @@ class T_IO:
 #         real(r8) :: Ymin_v(:)
 #         real(r8) :: Ymax_v(:)
 
-DOMAIN = T_DOMAIN
-
-
-# Lateral Boundary Conditions (LBC) switches structure.
-# -----------------------------------------------------------------------
-
-# The lateral boundary conditions are specified by boolean switches.
-# The LBC structure is allocated as:
-#
-#       LBC[:, nLBCvar]
-#
-#  where : are the number boundary edges and nLBCvar are the number of state variables.
-#  For example, for free-surface gradient boundary conditions we have:
-#
-#       LBC[idx, isFsur].gradient
-
-
-class T_LBC:
-    def __init__(self):
-        self.acquire          = False        # process lateral boundary data
-        self.Chapman_explicit = False
-        self.Chapman_implicit = False
-        self.clamped          = False
-        self.closed           = False
-        self.Flather          = False
-        self.gradient         = False
-        self.mixed            = False
-        self.nested           = False
-        self.nudging          = False
-        self.periodic         = False
-        self.radiation        = False
-        self.reduced          = False
-        self.Shchepetkin      = False
-
+# DOMAIN = T_DOMAIN
 
 
 
@@ -188,7 +155,7 @@ def initialize_param():
     # Allocate Lateral Boundary Conditions switches structure.
     # Each 2D node has an independent T_LBC structure.
     # -----------------------------------------------------------------------
-    nLBCvar=3
+    nLBCvar = 3
 
 
     for ivar in range(nLBCvar):

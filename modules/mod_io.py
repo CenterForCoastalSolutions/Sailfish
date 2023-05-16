@@ -1,26 +1,26 @@
-
-import misc
+import numpy as cp
+from misc import *
 
 
 
 
 class T_IO:
 
-    def __init__(self):
+    def __init__(self, input):
 
 
-        nRST  = getInputVal('NRST',   minVal = -1, dtype = int)
-        nSTA  = getInputVal('NSTA',   minVal = -1, dtype = int)
-        nFLT  = getInputVal('NFLT',   minVal = -1, dtype = int)
-        ninfo = getInputVal('NINFO',  minVal = 0,  dtype = int)
+        self.nRST    = input.getVal('NRST',   minVal = -1, dtype = int)
+        self.nSTA    = input.getVal('NSTA',   minVal = -1, dtype = int)
+        self.nFLT    = input.getVal('NFLT',   minVal = -1, dtype = int)
+        self.ninfo   = input.getVal('NINFO',  minVal = 0,  dtype = int)
 
-        ldefout = getInputVal('LDEFOUT', minVal = 0, dtype = bool)
+        self.ldefout = input.getVal('LDEFOUT', minVal = 0, dtype = bool)
 
 
-        nHIS    = getInputVal('NHIS',      minVal = -1, dtype = int)
-        ndefHIS = getInputVal('NDEFHIS',   minVal = -1, dtype = int)
-        nQCK    = getInputVal('NQCK',      minVal = -1, dtype = int)
-        ndefQCK = getInputVal('NDEFQCK',   minVal = -1, dtype = int)
+        self.nHIS    = input.getVal('NHIS',      minVal = -1, dtype = int)
+        self.ndefHIS = input.getVal('NDEFHIS',   minVal = -1, dtype = int)
+        self.nQCK    = input.getVal('NQCK',      minVal = -1, dtype = int)
+        self.ndefQCK = input.getVal('NDEFQCK',   minVal = -1, dtype = int)
 
 
 
@@ -33,7 +33,10 @@ class T_IO:
 
         self.Hout = {}
         for idVar in idVars:
-            self.Hout[id] = getInputVal('Hout(%s)' % idVar, dtype = bool)
+            try:
+                self.Hout[idVar] = input.getVal('Hout(%s)' % idVar, dtype = bool)
+            except:
+                self.Hout[idVar] = False
 
 
 
@@ -53,7 +56,10 @@ class T_IO:
 
         self.Qout = {}
         for idVar in idVars:
-            self.Qout[id] = getInputVal('Qout(%s)' % idVar, dtype=bool)
+            try:
+                self.Qout[idVar] = input.getVal('Qout(%s)' % idVar, dtype=bool)
+            except:
+                self.Qout[idVar] = False
 
 
 
@@ -61,7 +67,25 @@ class T_IO:
 
         # data for NETCDF
         # =============================================================================
-        self.shuffle = getInputVal('NC_SHUFFLE', dtype = 'int')
-        self.shuffle = getInputVal('NC_DEFLATE', dtype = 'int')
-        self.shuffle = getInputVal('NC_DLEVEL',  dtype = 'int')
+        self.shuffle = input.getVal('NC_SHUFFLE', dtype = int)
+        self.shuffle = input.getVal('NC_DEFLATE', dtype = int)
+        self.shuffle = input.getVal('NC_DLEVEL',  dtype = int)
+
+
+
+        # Make sure that both component switches are activated when processing (Eastward, Northward) momentum components at RHO-points.
+        try:
+            if self.Hout['idu2dE'] or self.Hout['idv2dN']:
+                self.Hout['idu2dE'] = True
+                self.Hout['idv2dN'] = True
+        except:
+            pass
+
+
+        # Set switches to create NetCDF files.
+        self.LdefHIS = (self.nHIS > 0) and cp.any(list(self.Hout.values()))
+        self.LdefQCK = (self.nQCK > 0) and cp.any(list(self.Hout.values()))
+
+
+
 

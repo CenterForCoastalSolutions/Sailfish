@@ -876,23 +876,26 @@ BRYNAME                     Input open boundary data filename(s)
 !!! See prologue instructions above. Use a single line per entry with a
 !!! continuation (\) or a vertical bar (|) symbol after each entry, except
 !!! the last one.
-!!
-!!   NCLMFILES == 1                          ! number of climatology files
+
+NCLMFILES                   number of climatology files
+
 !!
 !!     CLMNAME == roms_clm.nc
-!!
-!!! Input climatology nudging coefficients file name.
-!!
-!!     NUDNAME == roms_nud.nc
+
+
+
+
+NUDNAME                     Input climatology nudging coefficients file name
 !!
 !!! Input Sources/Sinks forcing (like river runoff) file name.
 !!
 !!     NSSFFILES == 1
 !!     SSFNAME == roms_rivers.nc
-!!
-!!! Input tidal forcing file name.
-!!
-!!    TIDENAME == roms_tides.nc
+
+
+
+
+TIDENAME        Input tidal forcing file name.
 !!
 !!! Input forcing NetCDF file name(s).
 !!!
@@ -911,25 +914,38 @@ BRYNAME                     Input open boundary data filename(s)
 !!! (see Prolog instructions above). Use a single line per entry with a
 !!! continuation (\) or a vertical bar (|) symbol after each entry, except
 !!! the last one.
-!!
-!!     NFFILES == 1                          ! number of unique forcing files
-!!
-!!     FRCNAME == roms_frc.nc               ! forcing file 1, grid 1
-!!
-!!! Output NetCDF file names, [1:Ngrids].
-!!
-!!     RSTNAME == roms_rst.nc
-!!     HISNAME == roms_his.nc
-!!     QCKNAME == roms_qck.nc
-!!     TLMNAME == roms_tlm.nc
-!!     TLFNAME == roms_tlf.nc
-!!     AVGNAME == roms_avg.nc
-!!     HARNAME == roms_har.nc
-!!     DIANAME == roms_dia.nc
-!!     STANAME == roms_sta.nc
-!!     FLTNAME == roms_flt.nc
-!!
-!!
-!!     USRNAME =  ROMS/External/MyFile.dat
-!!
-!!
+
+NFFILES             Number of unique forcing files
+FRCNAME             Forcing file 1, grid 1
+
+
+
+! Output NetCDF file names, [1:Ngrids]
+
+*DAINAME            Output data assimilation next cycle initial conditions (4D-Var analysis) or restart (Ensemble Kalman Filter, EnKF) filename.
+*GSTNAME            Output GST analysis re-start filename.
+RSTNAME             Output re-start filename.
+HISNAME             Output history filename.
+QCKNAME             Output quicksave filename.
+*TLFNAME            Output impulse forcing for tangent linear (TLM and RPM) models.
+*TLMNAME            Output tangent linear filename.
+*ADJNAME            Output adjoint filename.
+AVGNAME             Output averages filename.
+*HARNAME            Output least-squares detiding harmonics filename.
+*DIANAME            Output diagnostics filename.
+STANAME             Output stations filename.
+FLTNAME             Output floats filename.
+
+
+
+
+!------------------------------------------------------------------------------
+! Input ASCII parameters filenames.
+!------------------------------------------------------------------------------
+
+APARNAM             Input assimilation parameters filename.
+SPOSNAM             Input stations positions filename.
+FPOSNAM             Input initial drifters positions filename.
+BPARNAM             Input biological parameters filename.
+SPARNAM             Input sediment transport parameters filename.
+USRNAME             USER's input generic filename.

@@ -1,11 +1,12 @@
 import mod_param
+import mod_param
 import mod_grid
-import mod_ncparam
-import cupy as cp
+# import mod_ncparam
+import numpy as cp
 import importlib
-import anaBase
+import anaBASE
 
-def ana_grid(analiticalCase):
+def ana_grid(analiticalCase, GRID):
     """
     This routine sets model grid using an analytical expressions.
 
@@ -43,7 +44,7 @@ def ana_grid(analiticalCase):
     # Determine I- and J-ranges for computing grid data.  These ranges
     # are special in periodic boundary conditons since periodicity cannot
     # be imposed in the grid coordinates.
-    I, J, dx, dy, xp, yp, xr, yr, xu, yu, xv, yv = modAnalitical.computeCoordinates(Xsize, Esize)
+    A = modAnalitical.computeCoordinates(Xsize, Esize, GRID)
 
 
     modAnalitical.computeStatistics()
@@ -53,7 +54,8 @@ def ana_grid(analiticalCase):
     # "pn" (1/m) associated with the differential distances in ξ and
     # η, respectively.
     # Compute d(1/n)/dξ and d(1/m)/dη at RHO-points.
-    pm, pn, dndξ, dmdη = modAnalitical.computeCoordinateTransform()
+    # pm, pn, dndξ, dmdη
+    GRID = modAnalitical.computeCoordinateTransform(GRID)
 
 
     # Compute angle (in radians) between ξ-axis and true EAST at RHO-points.
@@ -66,5 +68,5 @@ def ana_grid(analiticalCase):
 
 
     # Compute bathymetry (meters, positive down) at RHO-points.
-    h = modAnalitical.computeBathymetry()
+    h = modAnalitical.computeBathymetry(depth, GRID)
 
