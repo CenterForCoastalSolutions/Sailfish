@@ -59,14 +59,15 @@ class CompTimes:
         self.ntend   = 0      # End step
 
 
-    def first2DStep(self):
-        msgInfo('FILLLLL')
+    def isFirst2DStep(self):
+        # This works only for 2D XXX
+        return self.iic == self.ntfirst
 
 
-    def get2DBCTimes(self):
-        # This function is used in the 2D BC functions.
+    def get2DTimes(self):
+        # This function is used in the 2D functions.
 
-        if self.first2DStep():
+        if self.isFirst2DStep():
             know = self.krhs
             dt2d = self.dtfast
 

@@ -3,6 +3,44 @@
 dtfast
 
 
+mod_grid:
+    Grid:
+        dmde:       ETA-derivative of inverse metric factor pm, d(1/pm)/d(ETA).
+        dndx:       XI-derivative  of inverse metric factor pn, d(1/pn)/d(XI).
+        f:          Coriolis parameter (1/s).
+        fomn:       Compound term, f/(pm*pn) at RHO points.
+        grdscl:     Grid scale used to adjust horizontal mixing according to grid area.
+        h:          Bottom depth (m) at RHO-points.
+        latp:       Latitude (degrees_north) at PSI-points.
+        latr:       Latitude (degrees_north) at RHO-points.
+        latu:       Latitude (degrees_north) at U-points.
+        latv:       Latitude (degrees_north) at V-points.
+        lonp:       Longitude (degrees_east) at PSI-points.
+        lonr:       Longitude (degrees_east) at RHO-points.
+        lonu:       Longitude (degrees_east) at U-points.
+        lonv:       Longitude (degrees_east) at V-points.
+        MyLon:      Longitude work array for regridding.
+        omn:        RHO-grid area (meters2).
+        om_p:       PSI-grid spacing (meters) in the XI-direction.  (1/pm)
+        om_r:       RHO-grid spacing (meters) in the XI-direction.  (1/pm)
+        om_u:       U-grid spacing (meters) in the XI-direction.    (1/pm)
+        om_v:       V-grid spacing (meters) in the XI-direction.    (1/pm)
+        on_p:       PSI-grid spacing (meters) in the ETA-direction. (1/pn)
+        on_r:       RHO-grid spacing (meters) in the ETA-direction. (1/pn)
+        on_u:       U-grid spacing (meters) in the ETA-direction.   (1/pn)
+        on_v:       V-grid spacing (meters) in the ETA-direction.   (1/pn)
+        pm:         Coordinate transformation metric "m" (1/meters) associated with the differential distances in XI.
+        pmon_p:     Compound term, pm/pn at PSI-points.
+        pmon_r:     Compound term, pm/pn at RHO-points.
+        pmon_u:     Compound term, pm/pn at U-points.
+        pmon_v:     Compound term, pm/pn at V-points.
+        pn:         Coordinate transformation metric "n" (1/meters) associated with the differential distances in ETA.
+        pnom_p:     Compound term, pn/pm at PSI-points.
+        pnom_r:     Compound term, pn/pm at RHO-points.
+        pnom_u:     Compound term, pn/pm at U-points.
+        pnom_v:     Compound term, pn/pm at V-points.
+
+
 mod_ocean:
     T_OCEAN:
         rubar:              m4/s2, Right-hand-side of 2D U-momentum equation

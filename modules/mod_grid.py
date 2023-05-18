@@ -87,8 +87,8 @@ class Grid:
     def __init__(self, input):
 
         # Read sizes from the input file.
-        self.Lm = input.getVal('Lm', dtype = int, minVal=0)
-        self.Mm = input.getVal('Mm', dtype = int, minVal=0)
+        self.Lm = input.getVal('Lm', dtype = int, minVal = 2)
+        self.Mm = input.getVal('Mm', dtype = int, minVal = 2)
         self.L = self.Lm + 1
         self.M = self.Mm + 1
 

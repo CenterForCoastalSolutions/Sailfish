@@ -55,7 +55,7 @@ def buildBCIndices(Istr, Iend, Jstr, Jend, mask):
     # -----------------------------------------------
 
     L = Lm + 1
-    M = Mm + 1       xxxxxxx
+    M = Mm + 1
 
     periodicBCIdx = []
     periodicBCIdxSrc = []
