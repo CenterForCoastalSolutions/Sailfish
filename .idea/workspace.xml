@@ -1,20 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1447012b-a5d7-4617-8595-bf18be6f6cc2" name="Changes" comment="...">
+    <list default="true" id="1447012b-a5d7-4617-8595-bf18be6f6cc2" name="Changes" comment="Working on step2d.py.&#10;mod_physical_params.py created.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_arrays.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_arrays.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_comptimes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_comptimes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/mod_grid.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_grid.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/var_info.dat" beforeDir="false" afterPath="$PROJECT_DIR$/modules/var_info.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/baroclinicVelocityBC.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/barotropicVelocityBC.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/bc_2d_index_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/obsolete/bc_2d_index_builder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/bc_2d_index_preprocess.py" beforeDir="false" afterPath="$PROJECT_DIR$/obsolete/bc_2d_index_preprocess.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/exchange_2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/obsolete/exchange_2d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/set_vbc.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/set_vbc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/zetabc.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/zetabc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ana_grid.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/ana_grid_old.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tmp/testProgram.py" beforeDir="false" afterPath="$PROJECT_DIR$/tmp/testProgram.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utility/read_phypar.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_physical_params.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -183,7 +174,14 @@
       <option name="project" value="LOCAL" />
       <updated>1684341954186</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Working on step2d.py.&#10;mod_physical_params.py created.">
+      <created>1684436574610</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1684436574610</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -201,7 +199,8 @@
     <MESSAGE value="First commit" />
     <MESSAGE value="Some tests" />
     <MESSAGE value="..." />
-    <option name="LAST_COMMIT_MESSAGE" value="..." />
+    <MESSAGE value="Working on step2d.py.&#10;mod_physical_params.py created." />
+    <option name="LAST_COMMIT_MESSAGE" value="Working on step2d.py.&#10;mod_physical_params.py created." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -243,7 +242,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tmp/testProgram.py</url>
-          <line>49</line>
+          <line>51</line>
           <option name="timeStamp" value="76" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
