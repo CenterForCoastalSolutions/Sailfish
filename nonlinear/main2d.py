@@ -7,9 +7,16 @@ specified  time interval (seconds), RunInterval.
 
     import mod_param
     import mod_scalars
+    from ntimestep import ntimestep
     # import mod_stepping
     # import dateclock_mod
     # import step2d_mod
+    #from ini_fields_mod import ini_zeta, ini_fields, set_vbc
+    # import mod_iounits
+    #use set_vbc_mod
+    #use step_floats_mod
+    # use strings_mod
+
 
 
 
@@ -22,6 +29,7 @@ specified  time interval (seconds), RunInterval.
     # !
     Time_Step = True
 
+    # kernel loop
     while Time_Step:
 
         # Determine number of time steps to compute in each nested grid layer
@@ -30,9 +38,8 @@ specified  time interval (seconds), RunInterval.
         # set in the calling driver. Its value may span the full period of the
         # simulation, a multi-model coupling interval (RunInterval > ifac*dt),
         # or just a single step (RunInterval=0).
-        ntimesteps(iNLM, RunInterval, nl, Nsteps, Rsteps)
-        if (nl < 0) or (nl > NestLayers):
-            EXIT()
+        Nsteps, Rsteps = ntimesteps(iNLM, RunInterval, Nsteps, Rsteps)
+
 
         # Time-step governing equations for Nsteps.
         for istep in range(Nsteps):
@@ -44,8 +51,6 @@ specified  time interval (seconds), RunInterval.
             time_string(time, time_code)
             if (step_counter == Rsteps):
                 Time_Step = False
-
-
 
             # Read in required data, if any, from input NetCDF files.
             # ----------------------------------------------------------------------
@@ -81,18 +86,15 @@ specified  time interval (seconds), RunInterval.
 
             output()
             if (iic == ntend + 1):
-                EXIT
-
+                exit()
 
 
             # Solve the vertically integrated primitive equations for the
             # free-surface and momentum components.
             # -----------------------------------------------------------------------
 
-
             # Set time indices for predictor step. The PREDICTOR_2D_STEP switch
             # it is assumed to be false before the first time-step.
-
 
             iif = 1
             nfast = 1
@@ -107,11 +109,9 @@ specified  time interval (seconds), RunInterval.
                 knew = 3
                 krhs = indx1
 
-
-
             # Predictor step - Advance barotropic equations using 2D time-step
             # ==============   predictor scheme.
-            step2d()
+            call step2d_LF_AM3()
 
 
             # Set time indices for corrector step.

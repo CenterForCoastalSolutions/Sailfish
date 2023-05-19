@@ -1264,34 +1264,24 @@ def ref_clock(r_time, r_timeStr):
 #       RETURN
 #       END SUBROUTINE ROMS_clock
 # !
-# !***********************************************************************
-#       SUBROUTINE time_string (MyTime, date_string)
-# !***********************************************************************
-# !                                                                      !
-# !  This routine encodes current model time in seconds to a date        !
-# !  string of the form:                                                 !
-# !                                                                      !
-# !       YYYY-MM-DD hh:mm:ss.ss                                         !
-# !                                                                      !
-# !  The decimal seconds (ss.s) are rounded to the next digit. This      !
-# !  encoding allows an easy to read reporting time.                     !
-# !                                                                      !
-# !  On Input:                                                           !
-# !                                                                      !
-# !     MyTime        Current model time (seconds)                       !
-# !                                                                      !
-# !  On Output:                                                          !
-# !                                                                      !
-# !     date_string  Current model time date string (22 charactes).      !
-# !                                                                      !
-# !***********************************************************************
-# !
-# !  Imported variable declarations.
-# !
-#       real(dp), intent(in) :: MyTime
-#
-#       character (len=22), intent(out) :: date_string
-# !
+
+
+def time_string(MyTime, date_string):
+    '''
+    This routine encodes current model time in seconds to a date string of the form:
+    YYYY-MM-DD hh:mm:ss.ss
+
+    The decimal seconds (ss.s) are rounded to the next digit. This encoding allows an easy-to-read
+    reporting time.
+
+    On Input:
+        MyTime          Current model time (seconds)
+
+    On Output:
+        date_string     Current model time date string (22 characters)
+    '''
+
+
 # !  Local variable declarations.
 # !
 #       integer :: day, hour, minutes, month, year
@@ -1302,24 +1292,17 @@ def ref_clock(r_time, r_timeStr):
 #       character (len= 5) :: sec_string
 #       character (len=22) :: string
 # !
-# !-----------------------------------------------------------------------
-# !  Encode current model time.
-# !-----------------------------------------------------------------------
-# !
-# !  Convert current model time to calendar date.
-# !
-#       CurrentTime=MyTime/86400.0_dp                  ! seconds to days
-# !
-#       CALL caldate (CurrentTime,                                        &
-#      &              yy_i=year,                                          &
-#      &              mm_i=month,                                         &
-#      &              dd_i=day,                                           &
-#      &              h_i=hour,                                           &
-#      &              m_i=minutes,                                        &
-#      &              s_dp=seconds)
-#
-# !
-# !  Encode fractional seconds to a string. Round to one digit.
+    #Encode current model time.
+    #Convert current model time to calendar date.
+
+    CurrentTime = MyTime/86400.0 #seconds to days
+
+    call caldate(CurrentTime, yy_i=year, mm_i=month, dd_i=day, h_i=hour, m_i=minutes, s_dp=seconds)
+
+
+    #Encode fractional seconds to a string. Round to one digit.
+
+    return date_string
 # !
 #       WRITE (sec_string, '(f5.2)') seconds
 #       DO i=1,LEN(sec_string)                        ! replace leading
