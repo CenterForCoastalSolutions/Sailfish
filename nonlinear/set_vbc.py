@@ -44,6 +44,7 @@ def set_vbc():
 
 
     # Apply boundary conditions.
+    # TODO: Is this necessary here?
     barotropicVelocityBC(bustr, bvstr)
 
 

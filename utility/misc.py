@@ -8,6 +8,15 @@ exit_flag = {0: 'No error', 1: 'Blows up', 2: 'Input error', 3: 'Output error', 
              8: 'Fatal algorith result', 9: 'Coupling error'}
 
 
+
+def exitProgram(str = None):
+    if str is not None:
+        print(str)
+
+    print('PROGRAM ENDED SUCCESFULY')
+    sys.exit(0)
+
+
 def msgError(str, error = 1000):
     print('ERROR: ', str)
     sys.exit(error)

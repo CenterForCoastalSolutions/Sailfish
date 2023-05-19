@@ -4,7 +4,7 @@ from zetabc               import zetabc
 from mod_constants import *
 from misc          import *
 
-def step2d(compTimes, GRID, OCEAN):
+def step2d(isPredictorStep, compTimes, GRID, OCEAN):
 
 
     # Do not perform the actual time stepping during the auxiliary nfast(ng)+1) time step.
@@ -12,7 +12,7 @@ def step2d(compTimes, GRID, OCEAN):
         return
 
     ptsk = 3 - compTimes.kstp   # TODO: Do this in compTimes
-    # is2DCorrectorStep = not compTimes.PREDICTOR_2D_STEP   XXXXX
+    isCorrectorStep = not isPredictorStep
 
 
     # Aliases/views
@@ -51,7 +51,7 @@ def step2d(compTimes, GRID, OCEAN):
         gzeta = 0.5*(zeta_tstp + zeta_tnew)
 
 
-    elif compTimes.is2DPredictorStep:
+    elif isPredictorStep:
         # The predictor consists of a leapfrog time step where the RHS is computed at tn and time derivatives are centered at tn (f(tn+1) - f(tn-1))/2*dtfast.
 
         zeta_tnew = zeta_tstp + Δt*rhs_zeta
@@ -60,15 +60,13 @@ def step2d(compTimes, GRID, OCEAN):
         gzeta = (1 - w)*zeta_trhs + w*0.5*(zeta_tstp + zeta_tnew)
 
 
-    elif compTimes.corrector2DStep:
+    else:  # Corrector step
 
         zeta_tnew = zeta_tstp + Δt*(AM3a*rhs_zeta + AM3b*rzeta[kstp,:,:] + AM3c*rzeta[ptsk,:,:])
 
         w = 2.0/5.0
         gzeta  = (1 - w)*zeta_tnew + w*zeta_trhs
 
-    else:
-        msgError('This code shouldn''t be reachable')
 
 
     # Load new free-surface values into shared array at both predictor corrector steps.
@@ -171,13 +169,13 @@ def step2d(compTimes, GRID, OCEAN):
     # step is Leap-frog and the corrector step is Adams-Moulton.
 
 
-    if compTimes.isFirst2DStep() or compTimes.predictor2DStep:
+    if compTimes.isFirst2DStep() or isPredictorStep:
 
         ubar_tnew = (ubar_tstp*(DstpU + Δt*pmnU*rhs_ubar))/DnewU
         vbar_tnew = (vbar_tstp*(DstpV + Δt*pmnV*rhs_vbar))/DnewV
 
 
-    elif compTimes.corrector2DStep:
+    else compTimes.corrector2DStep:
 
         ubar_tnew = (ubar_tstp*(DstpU + Δt*pmnU*(AM3a*rhs_ubar + AM3b*rubar[kstp,:,:] + aM3c*rubar[ptsk,:,:])))/DnewU
         vbar_tnew = (vbar_tstp*(DstpV + Δt*pmnV*(AM3a*rhs_vbar + AM3b*rvbar[kstp,:,:] + aM3c*rvbar[ptsk,:,:])))/DnewU

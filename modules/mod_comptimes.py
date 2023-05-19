@@ -60,9 +60,53 @@ class CompTimes:
         self.ntend   = 0      # End step
 
 
+    def isInitialTimeStep(self):
+        return self.iic == self.ntstart
+
+
+    def isFinalTimeStep(self):
+        return self.iic == self.ntend + 1
+
+
     def isFirst2DStep(self):
-        # This works only for 2D XXX
+        # Not sure what is the difference between initial and First (or ntstart and ntfirst)
         return self.iic == self.ntfirst
+
+
+    def nextTimeStep(self, dt):
+        """Advances one time step"""
+
+        self.iic += 1
+        self.time += dt
+        self.tdays = self.time * sec2day
+
+        # I think that the best way to explain what these do is this:
+        # time step     Predictor?      kstp    krhs    knew
+        # 0                 y           0       2       1
+        # 0                 n           0       1       2
+        # 1                 y           1       2       0
+        # 1                 n           1       0       2
+        # 2                 y           0       2       1
+        # 2                 n           0       1       2
+        # ...
+        # Or, in other words, kstp has the parity of time step and the other two ocupy the other two spaces,
+        # interchanging them between predictor and corrector
+        self.kstp = 1 - self.kstp
+
+        return self.kstp
+
+
+    def updateIndices(self, isPredictor):
+
+        if CCCCXXXXXX
+
+
+
+
+
+        # time_string(time, time_code)
+        if (step_counter == Rsteps):
+            self.time_Step = False
 
 
     def get2DTimes(self):

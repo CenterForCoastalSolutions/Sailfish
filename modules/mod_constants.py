@@ -26,3 +26,17 @@ rho0    = 1025.0         # Mean density (Kg/m3) used when the Boussinesq approxi
 g       = 9.81           # Acceleration due to gravity (m/s2).
 gorho0  = g/rho0         # gravity divided by mean density anomaly. m4/s2/kg
 vonKar  = 0.41           # von Karman constant (non dimensional)
+
+
+# Math constants.
+# -----------------------------------------------------------------------
+pi = 3.14159265358979323846
+deg2rad = pi/180.0
+rad2deg = 180.0/pi
+day2sec = 86400.0
+
+
+# Time constants.
+# -----------------------------------------------------------------------
+sec2day = 1.0/86400.0
+jul_off = 2440000.0
