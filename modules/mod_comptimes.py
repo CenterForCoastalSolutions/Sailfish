@@ -16,7 +16,8 @@ class CompTimes:
         self.LastRec = (input.getVal('NRREC', dtype = int) < 0)
 
         self.PerfectRST        = False
-        self.PREDICTOR_2D_STEP = False
+        self.is2DPredictorStep = False
+        self.is2DCorrectorStep = True
 
 
         self.indx1 = 0       # 2D timestep rolling counter.
@@ -71,7 +72,7 @@ class CompTimes:
             know = self.krhs
             dt2d = self.dtfast
 
-        elif self.PREDICTOR_2D_STEP:
+        elif self.is2DPredictorStep:
             know = self.krhs
             dt2d = 2.0*self.dtfast
 
