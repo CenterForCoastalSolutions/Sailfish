@@ -335,7 +335,7 @@ def ana_grid(LBi, UBi, LBj, UBj, GRID):
     exchange_r2d(LBi, UBi, LBj, UBj, (pm, pn))
 
 
-    XXXXif analiticalCase == 'CURVGRID' and analiticalCase == 'UV_ADV' :
+    # if analiticalCase == 'CURVGRID' and analiticalCase == 'UV_ADV' :
     # Compute d(1/n)/d(xi) and d(1/m)/d(eta) at RHO-points.
     # -----------------------------------------------------------------------
 

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
-  </component>
   <component name="ChangeListManager">
-    <list default="true" id="1447012b-a5d7-4617-8595-bf18be6f6cc2" name="Changes" comment="..." />
+    <list default="true" id="1447012b-a5d7-4617-8595-bf18be6f6cc2" name="Changes" comment="Working on step2d.py.&#10;mod_physical_params.py created.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_grid.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_grid.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/ana_grid.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/ana_grid_old.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp/testProgram.py" beforeDir="false" afterPath="$PROJECT_DIR$/tmp/testProgram.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -51,10 +53,10 @@
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\projects\src\oceangpu\modules" />
+      <recent name="D:\projects\src\oceangpu\obsolete" />
       <recent name="D:\projects\src\oceangpu" />
       <recent name="D:\projects\src\oceangpu\utility" />
       <recent name="D:\projects\src\oceangpu\tmp" />
-      <recent name="D:\projects\src\oceangpu\nonlinear" />
     </key>
   </component>
   <component name="RunManager" selected="Python.testProgram">
@@ -165,7 +167,21 @@
       <option name="project" value="LOCAL" />
       <updated>1684265756602</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="...">
+      <created>1684341954186</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1684341954186</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Working on step2d.py.&#10;mod_physical_params.py created.">
+      <created>1684436574610</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1684436574610</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -183,7 +199,8 @@
     <MESSAGE value="First commit" />
     <MESSAGE value="Some tests" />
     <MESSAGE value="..." />
-    <option name="LAST_COMMIT_MESSAGE" value="..." />
+    <MESSAGE value="Working on step2d.py.&#10;mod_physical_params.py created." />
+    <option name="LAST_COMMIT_MESSAGE" value="Working on step2d.py.&#10;mod_physical_params.py created." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -225,7 +242,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tmp/testProgram.py</url>
-          <line>52</line>
+          <line>51</line>
           <option name="timeStamp" value="76" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">

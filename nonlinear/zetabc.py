@@ -6,7 +6,7 @@ def zetabc(zeta, kout, compTimes, BOUNDARY):
 
 
     # Set time-indices
-    know, dt2d = compTimes.get2DBCTimes()
+    know, dt2d = compTimes.get2DTimes()
 
 
 

@@ -1,11 +1,11 @@
 from misc import *
 
 
-def baroclinicVelocityBC(ubar, vbar, kout, compTimes, BOUNDARY):
+def barotropicVelocityBC(ubar, vbar, kout, compTimes, BOUNDARY):
     """"This subroutine sets lateral boundary conditions for vertically integrated (barotropic) velocities"""
 
     # Set time-indices
-    know, dt2d = compTimes.get2DBCTimes()
+    know, dt2d = compTimes.get2DTimes()
 
 
     ubarKout = ubar[kout, :].ravel()
