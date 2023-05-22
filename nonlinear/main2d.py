@@ -11,15 +11,9 @@ def main2d(RunInterval, compTimes,  GRID, OCEAN):
     """
 
 
-    # Time-step vertically integrated equations.
-    # =======================================================================
-
-    Time_Step = True
-
-
     # Initialize all time levels and compute other initial fields.
     # -----------------------------------------------------------------------
-    if compTimes.isInitialTime():
+    if compTimes.isInitialTime():   # Not sure if this if is necessary.
 
         # Initialize free-surface.
         ini_zeta()
@@ -33,7 +27,7 @@ def main2d(RunInterval, compTimes,  GRID, OCEAN):
 
 
     # Main loop
-    while Time_Step:
+    while compTime.keepRunning:
 
         # Determine number of time steps to compute in each nested grid layer
         # based on the specified time interval (seconds), RunInterval. Non
@@ -68,7 +62,7 @@ def main2d(RunInterval, compTimes,  GRID, OCEAN):
             output()
 
 
-            if compTime.isFinalTimeStep():
+            if compTimes.isFinalTimeStep():
                 exitProgram()
 
 

@@ -1,4 +1,7 @@
 import sys
+
+import mod_operators
+
 sys.path.insert(0, '../modules')
 sys.path.insert(0, '../utility')
 
@@ -29,6 +32,8 @@ io             = mod_io             .T_IO(input)
 physicalParams = mod_physical_params.PhysicalParams(input, GRID)
 compTimes      = mod_comptimes      .CompTimes(input)
 OCEAN          = mod_ocean          .T_OCEAN(input, GRID)
+
+mod_operators.initModule(GRID)
 
 
 v = OCEAN.zeta[0,:,:]

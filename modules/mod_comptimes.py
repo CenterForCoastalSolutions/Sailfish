@@ -51,7 +51,7 @@ class CompTimes:
         self.kstp = 1        # Barotropic (fast) time-step index to which the current changes are added to compute new 2D primitive equation variables.
 
         # Time-step counter for current execution time-window.
-        self. step_counter = 0.0
+        self.step_counter = 0.0
 
 
         # First, starting, and ending timestepping parameters
@@ -88,25 +88,47 @@ class CompTimes:
         # 1                 n           1       0       2
         # 2                 y           0       2       1
         # 2                 n           0       1       2
+        # 3                 y           1       2       0
+        # 3                 n           1       0       2
         # ...
         # Or, in other words, kstp has the parity of time step and the other two ocupy the other two spaces,
         # interchanging them between predictor and corrector
-        self.kstp = 1 - self.kstp
+        # In this function we compute kstp. krhs and knew are set in updateIndices().
+        self.kstp = self.iic % 1
+
+
+
+
+        xxxx
+        # time_string(time, time_code)
+        if (step_counter == Rsteps):
+            self.keepRunning = False
 
         return self.kstp
 
 
     def updateIndices(self, isPredictor):
 
-        if CCCCXXXXXX
+        if self.kstp == 0:
+            if isPredictor:
+                krhs = 2
+                knew = 1
+            else:
+                krhs = 1
+                knew = 2
+
+        else:
+            if isPredictor:
+                krhs = 2
+                knew = 0
+            else:
+                krhs = 0
+                knew = 2
 
 
 
 
 
-        # time_string(time, time_code)
-        if (step_counter == Rsteps):
-            self.time_Step = False
 
 
     def get2DTimes(self):
