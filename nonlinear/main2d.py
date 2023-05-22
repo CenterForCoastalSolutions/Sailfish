@@ -41,7 +41,7 @@ def main2d(RunInterval, compTimes,  GRID, OCEAN):
         # set in the calling driver. Its value may span the full period of the
         # simulation, a multi-model coupling interval (RunInterval > ifac*dt),
         # or just a single step (RunInterval=0).
-        Nsteps, Rsteps = ntimesteps(RunInterval, Nsteps, Rsteps)
+        Nsteps, Rsteps = ntimestep(RunInterval, Nsteps, Rsteps)
 
 
         # Time-step governing equations for Nsteps.
