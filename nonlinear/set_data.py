@@ -17,8 +17,18 @@ def set_data():
     import mod_ocean
     import mod_stepping
     import mod_scalars
+    import ana_grid
 
 
+
+    ana_grid.bulkFluxes()
+    ana_grid.sources()
+    ana_grid.kinematicSurfaceMomentumFlux()
+    ana_grid.
+
+
+    # implement later
+    # do something with netCDF here
 
 # Set point Sources/Sinks (river runoff).
 # =======================================================================
@@ -26,12 +36,7 @@ def set_data():
 
 # Point Source/Sink vertically integrated mass transport.
 
-# ifdef ANA_PSOURCE
-      if LuvSrc or LwSrc or ANY(LtracerSrc(:)):
-        CALL ana_psource (iNLM)
-
-
-
+#
 # Set forcing data.
 # =======================================================================
 
@@ -43,10 +48,7 @@ def set_data():
 
 # Set kinematic surface momentum flux (m2/s2).
 
-#  ifdef ANA_SMFLUX
-      ana_smflux (iNLM)
-
-# endif
+#
 
 
 # Set surface air pressure (mb).
