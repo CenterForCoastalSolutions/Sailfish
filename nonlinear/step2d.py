@@ -104,10 +104,7 @@ def step2d(isPredictorStep, compTimes, GRID, OCEAN):
     rhs_ubar = 0.5*g*RtoU(h)*DξU(gzeta + gzeta2)
     rhs_vbar = 0.5*g*RtoV(h)*DηV(gzeta + gzeta2)
 
-
-
-
-    # if UV_ADV:
+                        # if UV_ADV:
     #     #!---------------------------------------------------------------------------
     #     #! Contribution of a term corresponding to product of
     #     #! Stokes and Eulerian Velocity Eqn. 26 and 27.
