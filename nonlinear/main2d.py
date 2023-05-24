@@ -6,7 +6,7 @@ from misc import *
 from step2d import step2dPredictor, step2dCorrector
 
 
-def main2d(RunInterval, compTimes,  GRID, OCEAN):
+def main2d(RunInterval, compTimes,  GRID, OCEAN, BOUNDARY):
     """ This subroutine is the main driver for nonlinear ROMS/TOMS when configurated as shallow water (barotropic) ocean
     model only. It advances forward  the vertically integrated primitive equations for all nested grids,  if any,  by the
     specified  time interval (seconds), RunInterval.
@@ -34,7 +34,7 @@ def main2d(RunInterval, compTimes,  GRID, OCEAN):
 
 
         # Set time indices and time clock. Get's the index of the first dimension of variables like OCEAN.zeta.
-        compTimes.nextTimeStep(dt)
+        compTimes.nextTimeStep()
         OCEAN.cycleTimes()
         # compTimes.updateIndices(True)
 
@@ -65,7 +65,7 @@ def main2d(RunInterval, compTimes,  GRID, OCEAN):
 
         # Predictor step - Advance barotropic equations using 2D time-step
         # ==============   predictor scheme.
-        step2dPredictor(compTimes, GRID, OCEAN)
+        step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY)
 
 
         # # Computes the indices (of the first dimensions of variables like OCEAN.zeta) for the corrector step.

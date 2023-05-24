@@ -56,7 +56,7 @@ input.printReport()
 ana_grid.ana_grid('Basin', GRID)
 
 
-main2d(100000, compTimes,  GRID, OCEAN)
+main2d(100000, compTimes,  GRID, OCEAN, BOUNDARY)
 
 
 pass

@@ -2,7 +2,7 @@
 
 #import modules
 import mod_iounits
-import numpy as cp
+import cupy as cp
 
 def ntimesteps(model, RunInterval):
     """ This routine set the number of time-steps to compute. In nesting

@@ -1,5 +1,5 @@
 import mod_grid
-import numpy as cp
+import cupy as cp
 
 
 #   IJwaterR   Water points IJ couter for RHO-points masked variables.
@@ -218,37 +218,37 @@ def divUVtoR(U, V, R):
 
 
 
-rhs_ubar(i,j)=*on_u(i,j)* ((h(i-1,j)+ h(i ,j))* (gzeta(i-1,j)-   gzeta(i  ,j))+ (gzeta2(i - 1, j) -  gzeta2(i, j)))
-
-
-((h(j, i-1)-
-
-
-
-cff1 = g
-
-
-
-
-
-
-R = cp.arange(0, 25, dtype=cp.float64)
-R = R.reshape(5, 5)
-V = cp.zeros_like(R)
-U = cp.zeros_like(R)
-V = RtoV(R, V)
-U = RtoU(R, U)
-print('this is R:')
-print(R)
-
-print('\nthis is U:')
-print(U)
-
-
-print('this is R:')
-print(R)
-
-print('\nthis is V:')
-print(V)
-
-#def divUVtoR(u, v):
+# # rhs_ubar(i,j)=*on_u(i,j)* ((h(i-1,j)+ h(i ,j))* (gzeta(i-1,j)-   gzeta(i  ,j))+ (gzeta2(i - 1, j) -  gzeta2(i, j)))
+# #
+# #
+# # ((h(j, i-1)-
+# #
+# #
+# #
+# # cff1 = g
+# #
+# #
+# #
+# #
+# #
+# #
+# # R = cp.arange(0, 25, dtype=cp.float64)
+# # R = R.reshape(5, 5)
+# # V = cp.zeros_like(R)
+# # U = cp.zeros_like(R)
+# # V = RtoV(R, V)
+# # U = RtoU(R, U)
+# # print('this is R:')
+# # print(R)
+# #
+# # print('\nthis is U:')
+# # print(U)
+# #
+# #
+# # print('this is R:')
+# # print(R)
+#
+# print('\nthis is V:')
+# print(V)
+#
+# #def divUVtoR(u, v):

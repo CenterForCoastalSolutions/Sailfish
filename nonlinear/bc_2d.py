@@ -12,7 +12,7 @@
 #    bc_u2d:       Boundary conditions for field at U-points
 #    bc_v2d:       Boundary conditions for field at V-points
 
-import numpy as cp
+import cupy as cp
 
 import mod_boundary
 

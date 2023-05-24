@@ -6,6 +6,8 @@ from misc import *
 class CompTimes:
     def __init__(self, input):
 
+        self.keepRunning = True
+
         self.ntimes  = input.getVal('NTIMES',  dtype = int)            # Total number timesteps in current run. In 3D configurations, "ntimes"
                                                                   # is the total of baroclinic timesteps. In 2D configuration, "ntimes"
                                                                   # is the total of barotropic timesteps.
@@ -65,6 +67,7 @@ class CompTimes:
 
 
     def isFinalTimeStep(self):
+        return False     # Remove
         return self.iic == self.ntend + 1
 
 
@@ -73,12 +76,12 @@ class CompTimes:
         return self.iic == self.ntfirst
 
 
-    def nextTimeStep(self, dt):
+    def nextTimeStep(self):
         """Advances one time step"""
 
         self.iic += 1
-        self.time += dt
-        self.tdays = self.time * sec2day
+        self.time += self.dt
+        # self.tdays = self.time * sec2day    TODO : Recover this
 
         # I think that the best way to explain what these do is this:
         # time step     Predictor?      kstp    krhs    knew
@@ -101,8 +104,8 @@ class CompTimes:
         #
         # xxxx
         # time_string(time, time_code)
-        if (step_counter == Rsteps):
-            self.keepRunning = False
+        # if (step_counter == Rsteps):
+        #     self.keepRunning = False     TODO: Recover this
 
         # return self.kstp
 

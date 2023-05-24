@@ -1,4 +1,4 @@
-# import numpy as cp
+# import cupy as cp
 # import pandas as cudf
 
 import cupy as cp
@@ -101,7 +101,7 @@ for k in range(kmax):
 
 # print(aJRep)
 # print(aIRep)
-# numpy.repeat()
+# cupy.repeat()
 
 
 

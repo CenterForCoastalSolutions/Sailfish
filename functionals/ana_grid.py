@@ -2,7 +2,7 @@ import mod_param
 import mod_param
 import mod_grid
 # import mod_ncparam
-import numpy as cp
+import cupy as cp
 import importlib
 import anaBASE
 

@@ -1,4 +1,4 @@
-import numpy as cp
+import cupy as cp
 # import mod_param
 
 #   IJwaterR   Water points IJ couter for RHO-points masked variables.

@@ -7,7 +7,7 @@
 # import mod_netcdf
 # import mod_scalars
 # import mod_strings
-import numpy as cp
+import cupy as cp
 
 # import dateclock
 

@@ -1,4 +1,4 @@
-import numpy as cp
+import cupy as cp
 
 def computeCoordinates(Xsize, Esize, GRID):
     # Compute the (ξ,η) coordinates at PSI- and RHO-points.

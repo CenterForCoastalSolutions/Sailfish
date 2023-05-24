@@ -1,6 +1,6 @@
 # include "cppdefs.h"
 
-import numpy as cp
+import cupy as cp
 
 def regrid (ng, model, ncname, ncid, ncvname, ncvarid, gtype, iflag, Nx, Ny, Finp, Amin, Amax,
             LBi, UBi, LBj, UBj, Imin, Imax, Jmin, Jmax,

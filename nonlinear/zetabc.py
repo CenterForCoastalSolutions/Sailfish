@@ -1,5 +1,5 @@
 from misc import *
-import numpy as cp
+import cupy as cp
 
 def zetabc(zeta, compTimes, BOUNDARY):
     """This routine sets lateral boundary conditions for free-surface."""

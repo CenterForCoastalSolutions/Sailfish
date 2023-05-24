@@ -1,5 +1,5 @@
 import os
-import numpy as np
+import cupy as np
 
 
 def readVar(file, isInput, dictIn):
