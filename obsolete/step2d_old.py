@@ -5,28 +5,105 @@ from zetabc               import zetabc
 from mod_constants import *
 from misc          import *
 
+def step2d(isPredictorStep, compTimes, GRID, OCEAN):
 
-def computeZetaRHS(zeta, h, ubar, vbar):
+
+    # Do not perform the actual time stepping during the auxiliary nfast(ng)+1) time step.
+    if compTimes.iif > compTimes.nfast:
+        return
+
+    ptsk = 3 - compTimes.kstp   # TODO: Do this in compTimes, check if this variable has another name knew?
+
+
+    # Aliases/views
+    zeta_t2  = OCEAN.zeta [compTimes.i2,:,:].ravel()
+    ubar_t2  = OCEAN.ubar [compTimes.i2,:,:].ravel()
+    vbar_t2  = OCEAN.vbar [compTimes.i2,:,:].ravel()
+    rzeta_t2 = OCEAN.rzeta[compTimes.i2,:,:].ravel()
+    rubar_t2 = OCEAN.rubar[compTimes.i2,:,:].ravel()
+    rvbar_t2 = OCEAN.rvbar[compTimes.i2,:,:].ravel()
+    zeta_t1  = OCEAN.zeta [compTimes.i1,:,:].ravel()
+    ubar_t1  = OCEAN.ubar [compTimes.i1,:,:].ravel()
+    vbar_t1  = OCEAN.vbar [compTimes.i1,:,:].ravel()
+    rzeta_t1 = OCEAN.rzeta[compTimes.i1,:,:].ravel()
+    rubar_t1 = OCEAN.rubar[compTimes.i1,:,:].ravel()
+    rvbar_t1 = OCEAN.rvbar[compTimes.i1,:,:].ravel()
+    rzeta_t0 = OCEAN.rzeta[compTimes.i0,:,:].ravel()
+    rubar_t0 = OCEAN.rubar[compTimes.i0,:,:].ravel()
+    rvbar_t0 = OCEAN.rvbar[compTimes.i0,:,:].ravel()
+
+
+    h = GRID.h
+
+    D_i1 = zeta_t1 + h
+
+    # DUon can be read as "DU over n", in other words: D*U/n and D*V/m
+    DU_t1 = ubar_t1*RtoU(D_i1)
+    DV_t1 = vbar_t1*RtoV(D_i1)
+
+
+    know, Δt = compTimes.get2DTimes()
+    kstp, krhs = compTimes.updateTimes(isPredictorStep) xxxx
+
+    # Time step free-surface equation.
+    # =================================
+
+    # During the first time-step, the predictor step is Forward-Euler and the corrector step is Backward-Euler. Otherwise,
+    # the predictor step is Leap-frog and the corrector step is Adams-Moulton.
+
+    rhs_zeta = DivUVtoR(DU, DV)
+
+    if compTimes.isFirst2DStep():
+        # The first time it performs a simple Euler time step. RHS is computed at tn and time derivatives are (f(tn) - f(tn-1))/dtfast
+
+        zeta_t2[:] = zeta_t1+ Δt*rhs_zeta
+
+        gzeta = 0.5*(zeta_t2 + zeta_t1)
+
+
+    elif isPredictorStep:
+        # The predictor consists of a leapfrog time step where the RHS is computed at tn and time derivatives are centered at tn (f(tn+1) - f(tn-1))/2*dtfast.
+
+        zeta_t2[:] = zeta_t1 + Δt*rhs_zeta
+
+        w = 4.0/25.0
+        gzeta = (1 - w)*zeta_t1 + w*0.5*(zeta_tstp + zeta_tnew)
+
+        # In the predictor step, save the rhs for future use.
+        rzeta_t2[:] = rhs_zeta
+
+
+    else:  # Corrector step
+
+        zeta_t2[:] = zeta_t1 + Δt*(AM3_2*rzeta_t2 + AM3_2*rzeta_t1 + AM3_2*rzeta_t0)
+
+        w = 2.0/5.0
+        gzeta  = (1 - w)*zeta_t2 + w*zeta_t1
+
+
+
+    gzeta2 = gzeta*gzeta
+
+
 
     #Apply mass point sources (volume vertical influx), if any
     # TODO: Implement XXXX
     # if LwSrc:
     #     ij = SOURCES.IJsrc   # This has to be precomputed as i + j*width
     #     zeta[knew,:,:].ravel()[ij] += SOURCES.Qbar*pm.ravel()[ij]*pn.ravel()[ij]*dtfast
-    # addForcings()
-
-    # compute the water column depth
-    D = zeta + h
-
-    DU = ubar*RtoU(D)
-    DV = vbar*RtoV(D)
-
-    return DivUVtoR(DU, DV)
 
 
-def computeMomentumRHS(h, gzeta):
-    rhs_ubar = 0.5 * g * RtoU(h) * DξU(gzeta + gzeta*gzeta)
-    rhs_vbar = 0.5 * g * RtoV(h) * DηV(gzeta + gzeta*gzeta)
+
+    # Apply free-surface lateral BC
+    zetabc(OCEAN.zeta, kout, compTimes, BOUNDARY)
+
+
+    #compute right-hand-side for the 2D momentum equations
+    rhs_ubar = 0.5*g*RtoU(h)*DξU(gzeta + gzeta2)
+    rhs_vbar = 0.5*g*RtoV(h)*DηV(gzeta + gzeta2)
+
+
+
 
     # if UV_ADV:
     #     #!---------------------------------------------------------------------------
@@ -60,83 +137,29 @@ def computeMomentumRHS(h, gzeta):
     #     cff4          = DVSom(i,j) * cff2
     #     rhs_vbar(i,j) = rhs_vbar(i,j) + cff3 + cff4
 
+
+
     # # add in bottom stress
     # rhs_ubar[:,:] -= bustr*om_u*on_u
     # rhs_vbar[:,:] -= bvstr*om_v*on_v
 
+
     #  Time step 2D momentum equations.
 
     # compute the water column depth at times "new" and "stp"
+    Dstp = zeta_tstp + h
+    Dnew = zeta_tnew + h
 
-    return rhs_ubar, rhs_vbar
-
-
-
-def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
-
-    # Aliases
-    zeta_t2, zeta_t1, zeta_t0 = (OCEAN.zeta_t2, OCEAN.zeta_t1, OCEAN.zeta_t0)
-    ubar_t2, ubar_t1, ubar_t0 = (OCEAN.ubar_t2, OCEAN.ubar_t1, OCEAN.ubar_t0)
-    vbar_t2, vbar_t1, vbar_t0 = (OCEAN.vbar_t2, OCEAN.vbar_t1, OCEAN.vbar_t0)
-    rzeta_t1, rzeta_t0 = (OCEAN.rzeta_t1, OCEAN.rzeta_t0)
-    rubar_t1, rubar_t0 = (OCEAN.rubar_t1, OCEAN.rubar_t0)
-    rvbar_t1, rvbar_t0 = (OCEAN.rvbar_t1, OCEAN.rvbar_t0)
-    h = GRID.h
-
-    Δt = compTimes.get2DTimes()
+    # And interpolate them at points U, V
+    DstpU = RtoU(Dstp)
+    DstpV = RtoV(Dstp)
+    DnewU = RtoU(Dnew)
+    DnewV = RtoV(Dnew)
 
 
-    # Free-surface equation.
-    # =================================
-
-    # During the first time-step, the predictor step is Forward-Euler. Otherwise, the predictor step is Leap-frog.
-
-    rhs_zeta_t1 = computeZetaRHS(zeta_t1, h, ubar_t1, vbar_t1)
-
-
-    if compTimes.isFirst2DStep():
-        # The first time it performs a simple Euler time step. RHS is computed at tn and time derivatives are
-        # (f(tn) - f(tn-1))/dtfast
-
-        zeta_t2[:] = zeta_t1 + Δt*rhs_zeta_t1
-
-        gzeta = 0.5*(zeta_t2 + zeta_t1)
-
-
-    else:
-        # If is not the first time step, the predictor consists of a leapfrog time step where the RHS is computed at tn
-        # and time derivatives are centered at tn (f(tn+1) - f(tn-1))/2*dtfast.
-
-        zeta_t2[:] = zeta_t1 + Δt*rhs_zeta_t1
-
-        weight = 4.0/25.0
-        gzeta = (1 - weight)*zeta_t1 + weight*0.5*(zeta_t2 + zeta_t0)
-
-        # In the predictor step, save the rhs for future use.
-        rzeta_t1[:] = rhs_zeta_t1
-
-
-
-    # Apply free-surface lateral BC
-    zetabc(OCEAN, BOUNDARY)
-
-
-
-
-    # Momentum equations.
-    # ===================
-
-
-    #compute right-hand-side for the 2D momentum equations
-    rhs_ubar, rhs_vbar = computeMomentumRHS(h, gzeta)
-
-
-    # Interpolate depth at points U, V
-    D_t2 = zeta_t2 + h
-    D_t1U = RtoU(D_t1)
-    D_t1V = RtoV(D_t1)
-    D_t2U = RtoU(D_t2)
-    D_t2V = RtoV(D_t2)
+    # Metric factors interpolated at U, V points.
+    pmnU = RtoU(pm)*RtoU(pn)
+    pmnV = RtoV(pm)*RtoV(pn)
 
 
     # During the first time-step, the predictor step is Forward-Euler
@@ -144,72 +167,28 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # step is Leap-frog and the corrector step is Adams-Moulton.
 
 
-    ubar_t2[:] = (ubar_t1*(D_t1U + Δt*rhs_ubar))/D_t2U
-    vbar_t2[:] = (vbar_t1*(D_t1V + Δt*rhs_vbar))/D_t2V
+    if compTimes.isFirst2DStep() or isPredictorStep:
 
-    # In the predictor step, save the rhs for future use.
-    rubar_t2[:] = rhs_ubar
-    rvbar_t2[:] = rhs_vbar
+        ubar_tnew[:] = (ubar_tstp*(DstpU + Δt*pmnU*rhs_ubar))/DnewU
+        vbar_tnew[:] = (vbar_tstp*(DstpV + Δt*pmnV*rhs_vbar))/DnewV
 
-
-    # Apply lateral boundary conditions.
-    barotropicVelocityBC(OCEAN, BOUNDARY)
+        # In the predictor step, save the rhs for future use.
+        rubar_trhs[:] = rhs_ubar
+        rvbar_trhs[:] = rhs_vbar
 
 
-def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
+    else:
 
-    # Aliases
-    zeta_t2, zeta_t1, zeta_t0 = (OCEAN.zeta_t2, OCEAN.zeta_t1, OCEAN.zeta_t0)
-    ubar_t2, ubar_t1, ubar_t0 = (OCEAN.ubar_t2, OCEAN.ubar_t1, OCEAN.ubar_t0)
-    vbar_t2, vbar_t1, vbar_t0 = (OCEAN.vbar_t2, OCEAN.vbar_t1, OCEAN.vbar_t0)
-    rzeta_t1, rzeta_t0 = (OCEAN.rzeta_t1, OCEAN.rzeta_t0)
-    rubar_t1, rubar_t0 = (OCEAN.rubar_t1, OCEAN.rubar_t0)
-    rvbar_t1, rvbar_t0 = (OCEAN.rvbar_t1, OCEAN.rvbar_t0)
-    h = GRID.h
-
-    Δt = compTimes.get2DTimes()
-
-    # Free-surface equation.
-    # =================================
-
-    # During the first time-step,the corrector step is Backward-Euler. Otherwise, the corrector step is Adams-Moulton.
-
-    rhs_zeta_t2 = computeZetaRHS(zeta_t2, h, ubar_t2, vbar_t2)
-
-    # Adams-Moulton order 3
-    zeta_t2[:] = zeta_t1 + Δt*(AM3_2*rhs_zeta_t2 + AM3_2*rzeta_t1 + AM3_2*rzeta_t0)
-
-    weight = 2.0/5.0
-    gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1
+        ubar_tnew[:] = (ubar_tstp*(DstpU + Δt*pmnU*(AM3a*rhs_ubar + AM3b*rubar_tstp + aM3c*rubar_ptsk)))/DnewU
+        vbar_tnew[:] = (vbar_tstp*(DstpV + Δt*pmnV*(AM3a*rhs_vbar + AM3b*rvbar_tstp + aM3c*rvbar_ptsk)))/DnewU
 
 
 
-
-    # Apply free-surface lateral BC
-    zetabc(OCEAN, BOUNDARY)
-
-
-    #compute right-hand-side for the 2D momentum equations
-    rhs_ubar, rhs_vbar = computeMomentumRHS(h, gzeta)
-
-
-    # And interpolate them at points U, V
-    D_t1 = zeta_t1 + h
-    D_t2 = zeta_t2 + h
-    D_t1U = RtoU(D_t1)
-    D_t1V = RtoV(D_t1)
-    D_t2U = RtoU(D_t2)
-    D_t2V = RtoV(D_t2)
-
-
-    # During the first time-step, the corrector step is Backward-Euler. Otherwise, the corrector step is Adams-Moulton.
-    ubar_t2[:] = (ubar_t1*(D_t1U + Δt*(AM3_2*rhs_ubar + AM3_1*rubar_t1 + AM3_0*rubar_t0)))/D_t2U
-    vbar_t2[:] = (vbar_t1*(D_t1V + Δt*(AM3_2*rhs_vbar + AM3_1*rvbar_t1 + AM3_0*rvbar_t0)))/D_t2V
 
 
 
     # Apply lateral boundary conditions.
-    barotropicVelocityBC(OCEAN, BOUNDARY))
+    barotropicVelocityBC(ubar, vbar, zeta, krhs, kstp, knew)
 
 
     # Compute integral mass flux across open boundaries and adjust for volume conservation.

@@ -2,9 +2,9 @@
 
 
 # Adams-Moulton 3rd order coefficients
-AM3a = 5.0 / 12.0
-AM3b = 8.0 / 12.0
-AM3c = -1.0 / 12.0
+AM3_2 =  5.0 / 12.0
+AM3_1 =  8.0 / 12.0
+AM3_0 = -1.0 / 12.0
 
 
 # HSIMT tracer advection coefficients for the TVD limiter (Wu and Zhu, 2010).

@@ -93,37 +93,38 @@ class CompTimes:
         # ...
         # Or, in other words, kstp has the parity of time step and the other two ocupy the other two spaces,
         # interchanging them between predictor and corrector
-        # In this function we compute kstp. krhs and knew are set in updateIndices().
-        self.kstp = self.iic % 1
-
-
-
-
-        xxxx
+        # # In this function we compute kstp. krhs and knew are set in updateIndices().
+        # self.kstp = self.iic % 1
+        #
+        #
+        #
+        #
+        # xxxx
         # time_string(time, time_code)
         if (step_counter == Rsteps):
             self.keepRunning = False
 
-        return self.kstp
+        # return self.kstp
 
 
-    def updateIndices(self, isPredictor):
-
-        if self.kstp == 0:
-            if isPredictor:
-                krhs = 2
-                knew = 1
-            else:
-                krhs = 1
-                knew = 2
-
-        else:
-            if isPredictor:
-                krhs = 2
-                knew = 0
-            else:
-                krhs = 0
-                knew = 2
+    # TODO: remove
+    # def updateIndices(self, isPredictor):
+    #
+    #     if self.kstp == 0:
+    #         if isPredictor:
+    #             krhs = 2
+    #             knew = 1
+    #         else:
+    #             krhs = 1
+    #             knew = 2
+    #
+    #     else:
+    #         if isPredictor:
+    #             krhs = 2
+    #             knew = 0
+    #         else:
+    #             krhs = 0
+    #             knew = 2
 
 
 
@@ -147,4 +148,4 @@ class CompTimes:
             dt2d = self.dtfast
 
 
-        return know, dt2d
+        return  dt2d
