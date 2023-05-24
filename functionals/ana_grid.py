@@ -38,7 +38,6 @@ def ana_grid(analiticalCase, GRID):
 
 
 
-
     # Compute the (ξ,η) coordinates at U, V, PSI and RHO points.
     # Set grid spacing (m).
     # Determine I- and J-ranges for computing grid data.  These ranges

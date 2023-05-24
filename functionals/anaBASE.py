@@ -49,7 +49,7 @@ def computeBathymetry(depth, GRID):
 
     h = cp.zeros((GRID.M, GRID.L))
 
-    h[:,:] = depth
+    GRID.h[:,:] = depth
 
 
 def computeStatistics():

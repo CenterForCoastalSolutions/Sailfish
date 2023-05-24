@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1447012b-a5d7-4617-8595-bf18be6f6cc2" name="Changes" comment="&#10;...">
-      <change afterPath="$PROJECT_DIR$/obsolete/step2d_old.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/step2Dnew.py" afterDir="false" />
+    <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="&#10;...">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_comptimes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_comptimes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_constants.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functionals/anaBASE.py" beforeDir="false" afterPath="$PROJECT_DIR$/functionals/anaBASE.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functionals/anaBasin.py" beforeDir="false" afterPath="$PROJECT_DIR$/functionals/anaBasin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functionals/ana_grid.py" beforeDir="false" afterPath="$PROJECT_DIR$/functionals/ana_grid.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/mod_ocean.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_ocean.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_physical_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_physical_params.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/get_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/get_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_operators.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_operators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/barotropicVelocityBC.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/barotropicVelocityBC.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/main2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main2d.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/step2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/zetabc.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/zetabc.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tmp/testProgram.py" beforeDir="false" afterPath="$PROJECT_DIR$/tmp/testProgram.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utility/dateclock.py" beforeDir="false" afterPath="$PROJECT_DIR$/utility/dateclock.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,14 +44,14 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "D:/projects/src/oceangpu/nonlinear",
-    "settings.editor.selected.configurable": "editor.preferences.tabs"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/projects/src/oceangpu/nonlinear&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.tabs&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\projects\src\oceangpu\nonlinear" />
@@ -264,12 +265,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/functionals/ana_grid.py</url>
-          <line>49</line>
+          <line>48</line>
           <option name="timeStamp" value="71" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/functionals/ana_grid.py</url>
-          <line>70</line>
+          <line>69</line>
           <option name="timeStamp" value="72" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -279,18 +280,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tmp/testProgram.py</url>
-          <line>56</line>
+          <line>61</line>
           <option name="timeStamp" value="76" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/functionals/anaBASE.py</url>
-          <line>21</line>
-          <option name="timeStamp" value="77" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/modules/mod_boundary.py</url>
-          <line>237</line>
-          <option name="timeStamp" value="82" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/modules/mod_boundary.py</url>

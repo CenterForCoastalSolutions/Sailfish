@@ -29,26 +29,26 @@ class T_OCEAN:
 
         # These aliases are used in the predictor/corrector steps. t2, t1 and t0 always mean t+2Δt, t+Δt and t,
         # but their location in the arrays changes (as given by cycleTimes) to avoid copying lots of data.
-        self.zeta_t2 = zeta[2, :, :].ravel()
-        self.zeta_t1 = zeta[1, :, :].ravel()
-        self.zeta_t0 = zeta[0, :, :].ravel()
+        self.zeta_t2 = self.zeta[2, :, :].ravel()
+        self.zeta_t1 = self.zeta[1, :, :].ravel()
+        self.zeta_t0 = self.zeta[0, :, :].ravel()
 
-        self.ubar_t2 = ubar[2, :, :].ravel()
-        self.ubar_t1 = ubar[1, :, :].ravel()
-        self.ubar_t0 = ubar[0, :, :].ravel()
+        self.ubar_t2 = self.ubar[2, :, :].ravel()
+        self.ubar_t1 = self.ubar[1, :, :].ravel()
+        self.ubar_t0 = self.ubar[0, :, :].ravel()
 
-        self.vbar_t2 = vbar[2, :, :].ravel()
-        self.vbar_t1 = vbar[1, :, :].ravel()
-        self.vbar_t0 = vbar[0, :, :].ravel()
+        self.vbar_t2 = self.vbar[2, :, :].ravel()
+        self.vbar_t1 = self.vbar[1, :, :].ravel()
+        self.vbar_t0 = self.vbar[0, :, :].ravel()
 
-        self.rzeta_t1 = zeta[1, :, :].ravel()
-        self.rzeta_t0 = zeta[0, :, :].ravel()
+        self.rzeta_t1 = self.zeta[1, :, :].ravel()
+        self.rzeta_t0 = self.zeta[0, :, :].ravel()
 
-        self.rubar_t1 = ubar[1, :, :].ravel()
-        self.rubar_t0 = ubar[0, :, :].ravel()
+        self.rubar_t1 = self.ubar[1, :, :].ravel()
+        self.rubar_t0 = self.ubar[0, :, :].ravel()
 
-        self.rvbar_t1 = vbar[1, :, :].ravel()
-        self.rvbar_t0 = vbar[0, :, :].ravel()
+        self.rvbar_t1 = self.vbar[1, :, :].ravel()
+        self.rvbar_t0 = self.vbar[0, :, :].ravel()
 
 
 
@@ -58,32 +58,32 @@ class T_OCEAN:
         # The reason for cycling is to reuse the same memory. the t2 variables contain "garbage" at this point. They
         # must be filled with newly computed values.
 
-        temp = self.zeta_t2
-        self.zeta_t2 = self.zeta_t1
-        self.zeta_t1 = self.zeta_t0
-        self.zeta_t0 = temp
+        temp = self.zeta_t0
+        self.zeta_t0 = self.zeta_t1
+        self.zeta_t1 = self.zeta_t2
+        self.zeta_t2 = temp
 
-        temp = self.ubar_t2
-        self.ubar_t2 = self.ubar_t1
-        self.ubar_t1 = self.ubar_t0
-        self.ubar_t0 = temp
+        temp = self.ubar_t0
+        self.ubar_t0 = self.ubar_t1
+        self.ubar_t1 = self.ubar_t2
+        self.ubar_t2 = temp
 
-        temp = self.vbar_t2
-        self.vbar_t2 = self.vbar_t1
-        self.vbar_t1 = self.vbar_t0
-        self.vbar_t0 = temp
+        temp = self.vbar_t0
+        self.vbar_t0 = self.vbar_t1
+        self.vbar_t1 = self.vbar_t2
+        self.vbar_t2 = temp
 
-        temp = self.rzeta_t1
-        self.rzeta_t1 = self.rzeta_t0
-        self.rzeta_t0 = temp
+        temp = self.rzeta_t0
+        self.rzeta_t0 = self.rzeta_t1
+        self.rzeta_t1 = temp
 
-        temp = self.rubar_t1
-        self.rubar_t1 = self.rubar_t0
-        self.rubar_t0 = temp
+        temp = self.rubar_t0
+        self.rubar_t0 = self.rubar_t1
+        self.rubar_t1 = temp
 
-        temp = self.rvbar_t1
-        self.rvbar_t1 = self.rvbar_t0
-        self.rvbar_t0 = temp
+        temp = self.rvbar_t0
+        self.rvbar_t0 = self.rvbar_t1
+        self.rvbar_t1 = temp
 
 
 

@@ -1,8 +1,8 @@
 import mod_param
 import mod_scalars
 from misc import *
-from get_data import get_data
-from set_data import set_data
+# from get_data import get_data
+# from set_data import set_data
 from step2d import step2dPredictor, step2dCorrector
 
 
@@ -13,19 +13,20 @@ def main2d(RunInterval, compTimes,  GRID, OCEAN):
     """
 
 
-    # Initialize all time levels and compute other initial fields.
-    # -----------------------------------------------------------------------
-    if compTimes.isInitialTime():   # Not sure if this if is necessary.
-
-        # Initialize free-surface.
-        ini_zeta()
-
-        # Initialize other state variables.
-        ini_fields ()
-
-
-        # Set vertical boundary conditions. Process tidal forcing.
-        set_vbc()
+    # TODO: Recover this
+    # # Initialize all time levels and compute other initial fields.
+    # # -----------------------------------------------------------------------
+    # if compTimes.isInitialTime():   # Not sure if this if is necessary.
+    #
+    #     # Initialize free-surface.
+    #     ini_zeta()
+    #
+    #     # Initialize other state variables.
+    #     ini_fields ()
+    #
+    #
+    #     # Set vertical boundary conditions. Process tidal forcing.
+    #     set_vbc()
 
 
     # Main loop
@@ -41,11 +42,11 @@ def main2d(RunInterval, compTimes,  GRID, OCEAN):
 
         # Read in required data, if any, from input NetCDF files.
         # ----------------------------------------------------------------------
-        get_data()
+        # get_data()
 
         # If applicable, process input data: time interpolate between data snapshots.
         # -----------------------------------------------------------------------
-        set_data()
+        # set_data()
 
 
 

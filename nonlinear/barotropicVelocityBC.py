@@ -1,20 +1,16 @@
 from misc import *
 
 
-def barotropicVelocityBC(ubar, vbar, kout, compTimes, BOUNDARY):
+def barotropicVelocityBC(ubar, vbar, compTimes, BOUNDARY):
     """"This subroutine sets lateral boundary conditions for vertically integrated (barotropic) velocities"""
 
     # Set time-indices
-    know, dt2d = compTimes.get2DTimes()
-
-
-    ubarKout = ubar[kout, :].ravel()
-    vbarKout = vbar[kout, :].ravel()
+    dt2d = compTimes.get2DTimes()
 
 
     # closed boundary condition.
-    ubarKout[BOUNDARY.ubarClosedBCIdx1] = 0.0
-    vbarKout[BOUNDARY.vbarClosedBCIdx1] = 0.0
+    ubar[BOUNDARY.ubarClosedBCIdx1] = 0.0
+    vbar[BOUNDARY.vbarClosedBCIdx1] = 0.0
 
 
 
@@ -25,8 +21,8 @@ def barotropicVelocityBC(ubar, vbar, kout, compTimes, BOUNDARY):
 
 
     # Gradient boundary condition.
-    ubarKout[BOUNDARY.ubarGradientBCIdx1] = ubarKout[BOUNDARY.ubarGradientBCIdx2]
-    vbarKout[BOUNDARY.vbarGradientBCIdx1] = vbarKout[BOUNDARY.vbarGradientBCIdx2]
+    ubar[BOUNDARY.ubarGradientBCIdx1] = ubar[BOUNDARY.ubarGradientBCIdx2]
+    vbar[BOUNDARY.vbarGradientBCIdx1] = vbar[BOUNDARY.vbarGradientBCIdx2]
 
 
 

@@ -1,21 +1,18 @@
 from misc import *
 import numpy as cp
 
-def zetabc(zeta, kout, compTimes, BOUNDARY):
+def zetabc(zeta, compTimes, BOUNDARY):
     """This routine sets lateral boundary conditions for free-surface."""
 
 
     # Set time-indices
-    know, dt2d = compTimes.get2DTimes()
+    dt2d = compTimes.get2DTimes()
 
-
-
-    zetaKout = zeta[kout, :].ravel()
 
     # Gradient/closed boundary condition.
     # "This boundary condition is extremely simple and consists of setting the gradient of a field to zero
     # at the edge. The outside value is set equal to the closest interior value"
-    zetaKout[BOUNDARY.zetaClosedOrGradientBCIdx1] = zetaKout[BOUNDARY.zetaClosedOrGradientBCIdx2]
+    zeta[BOUNDARY.zetaClosedOrGradientBCIdx1] = zeta[BOUNDARY.zetaClosedOrGradientBCIdx2]
 
 
     # Clamped boundary condition.

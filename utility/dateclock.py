@@ -1297,7 +1297,7 @@ def time_string(MyTime, date_string):
 
     CurrentTime = MyTime/86400.0 #seconds to days
 
-    call caldate(CurrentTime, yy_i=year, mm_i=month, dd_i=day, h_i=hour, m_i=minutes, s_dp=seconds)
+    # call caldate(CurrentTime, yy_i=year, mm_i=month, dd_i=day, h_i=hour, m_i=minutes, s_dp=seconds   TODO: Collin to recover this
 
 
     #Encode fractional seconds to a string. Round to one digit.

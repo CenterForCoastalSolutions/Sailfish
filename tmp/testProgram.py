@@ -13,6 +13,8 @@ import mod_ocean
 import mod_comptimes
 import mod_physical_params
 
+from main2d import main2d
+
 from barotropicVelocityBC import barotropicVelocityBC
 from zetabc import zetabc
 
@@ -41,8 +43,8 @@ v = OCEAN.zeta[0,:,:]
 
 
 kout = 0
-zetabc(OCEAN.zeta, kout, compTimes, BOUNDARY)
-barotropicVelocityBC(OCEAN.ubar, OCEAN.vbar, kout, compTimes, BOUNDARY)
+zetabc(OCEAN.zeta_t2, compTimes, BOUNDARY)
+barotropicVelocityBC(OCEAN.ubar_t2, OCEAN.vbar_t2, compTimes, BOUNDARY)
 
 
 # Print report of all input parameters read.
@@ -52,6 +54,9 @@ input.printReport()
 
 # Generates the mesh.
 ana_grid.ana_grid('Basin', GRID)
+
+
+main2d(100000, compTimes,  GRID, OCEAN)
 
 
 pass

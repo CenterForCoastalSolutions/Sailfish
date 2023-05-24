@@ -89,11 +89,7 @@ import numpy as cp
 
 grid = None
 
-def initModule(GRID, _grid):
-    global grid, pm...
-    grid = _grid
-    pm = grid.pm
-    pn = grid.pn
+
 
 
 preamble2D = r'''
