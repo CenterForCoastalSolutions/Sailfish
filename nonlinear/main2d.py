@@ -1,7 +1,9 @@
 import mod_param
 import mod_scalars
-from ntimestep import ntimestep
-from step2d import step2d
+from misc import *
+from get_data import get_data
+from set_data import set_data
+from step2d import step2dPredictor, step2dCorrector
 
 
 def main2d(RunInterval, compTimes,  GRID, OCEAN):
@@ -27,63 +29,53 @@ def main2d(RunInterval, compTimes,  GRID, OCEAN):
 
 
     # Main loop
-    while compTime.keepRunning:
-
-        # Determine number of time steps to compute in each nested grid layer
-        # based on the specified time interval (seconds), RunInterval. Non
-        # nesting applications have NestLayers=1. Notice that RunInterval is
-        # set in the calling driver. Its value may span the full period of the
-        # simulation, a multi-model coupling interval (RunInterval > ifac*dt),
-        # or just a single step (RunInterval=0).
-        Nsteps, Rsteps = ntimestep(RunInterval, Nsteps, Rsteps)
+    while compTimes.keepRunning:
 
 
-        # Time-step governing equations for Nsteps.
-        for istep in range(Nsteps):
-
-
-            # Set time indices and time clock. Get's the index of the first dimension of variables like OCEAN.zeta.
-            compTimes.nextTimeStep(dt)
-            compTimes.updateIndices(True)
+        # Set time indices and time clock. Get's the index of the first dimension of variables like OCEAN.zeta.
+        compTimes.nextTimeStep(dt)
+        OCEAN.cycleTimes()
+        # compTimes.updateIndices(True)
 
 
 
-            # Read in required data, if any, from input NetCDF files.
-            # ----------------------------------------------------------------------
-            get_data()
+        # Read in required data, if any, from input NetCDF files.
+        # ----------------------------------------------------------------------
+        get_data()
 
-            # If applicable, process input data: time interpolate between data snapshots.
-            # -----------------------------------------------------------------------
-            set_data()
-
-
-
-            # If appropriate, write out fields into output NetCDF files.
-            output()
+        # If applicable, process input data: time interpolate between data snapshots.
+        # -----------------------------------------------------------------------
+        set_data()
 
 
-            if compTimes.isFinalTimeStep():
-                exitProgram()
+
+        # If appropriate, write out fields into output NetCDF files.
+        # output()
 
 
-            # Solve the vertically integrated primitive equations for the free-surface and momentum components.
-            # -----------------------------------------------------------------------
-
-            nfast = 1    # TODO: What is this?????? Can line 88 ever be true??
-
-            # Predictor step - Advance barotropic equations using 2D time-step
-            # ==============   predictor scheme.
-            step2d(True, compTimes, GRID, OCEAN)
+        if compTimes.isFinalTimeStep():
+            exitProgram()
 
 
-            # Computes the indices (of the first dimensions of variables like OCEAN.zeta) for the corrector step.
-            compTimes.updateIndices(False)
+        # Solve the vertically integrated primitive equations for the free-surface and momentum components.
+        # -----------------------------------------------------------------------
 
-            if compTimes.iif < nfast + 1:
+        nfast = 1    # TODO: What is this?????? Can line 88 ever be true??
 
-                # Corrector step - Apply 2D time-step corrector scheme.  Notice that there is not need for a corrector step
-                # during the auxiliary (nfast+1) time-step.
-                step2d(False)
+        # Predictor step - Advance barotropic equations using 2D time-step
+        # ==============   predictor scheme.
+        step2dPredictor(compTimes, GRID, OCEAN)
+
+
+        # # Computes the indices (of the first dimensions of variables like OCEAN.zeta) for the corrector step.
+        # compTimes.updateIndices(False)
+
+
+        # if compTimes.iif < nfast + 1: TODO: Keep this extra step???
+
+        # Corrector step - Apply 2D time-step corrector scheme.  Notice that there is not need for a corrector step
+        # during the auxiliary (nfast+1) time-step.
+        step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY)
 
 
 

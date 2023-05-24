@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
-  </component>
   <component name="ChangeListManager">
-    <list default="true" id="1447012b-a5d7-4617-8595-bf18be6f6cc2" name="Changes" comment="...">
+    <list default="true" id="1447012b-a5d7-4617-8595-bf18be6f6cc2" name="Changes" comment="&#10;...">
+      <change afterPath="$PROJECT_DIR$/obsolete/step2d_old.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/step2Dnew.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_comptimes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_comptimes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_constants.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_ocean.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_ocean.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_physical_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_physical_params.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/get_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/get_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/main2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/step2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp/testProgram.py" beforeDir="false" afterPath="$PROJECT_DIR$/tmp/testProgram.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +48,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "last_opened_file_path": "D:/projects/src/oceangpu/nonlinear",
-    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors"
+    "settings.editor.selected.configurable": "editor.preferences.tabs"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -61,16 +68,15 @@
   </component>
   <component name="RunManager" selected="Python.testProgram">
     <configuration name="testProgram" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="Sailfish" />
+      <module name="oceangpu" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\collin.ortals\PycharmProjects\OceanGPU_Collin\venv\Scripts\python.exe" />
-      <option name="SDK_NAME" value="Python 3.9 (OceanGPU_Collin)" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tmp" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tmp/testProgram.py" />
@@ -203,12 +209,12 @@
       <option name="project" value="LOCAL" />
       <updated>1684531426614</updated>
     </task>
-    <task id="LOCAL-00013" summary="...">
-      <created>1684937808661</created>
+    <task id="LOCAL-00013" summary="&#10;...">
+      <created>1684774691450</created>
       <option name="number" value="00013" />
       <option name="presentableId" value="LOCAL-00013" />
       <option name="project" value="LOCAL" />
-      <updated>1684937808661</updated>
+      <updated>1684774691450</updated>
     </task>
     <option name="localTasksCounter" value="14" />
     <servers />
@@ -227,10 +233,11 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="First commit" />
     <MESSAGE value="Some tests" />
+    <MESSAGE value="..." />
     <MESSAGE value="Working on step2d.py.&#10;mod_physical_params.py created." />
     <MESSAGE value="Working on step2d.py." />
-    <MESSAGE value="..." />
-    <option name="LAST_COMMIT_MESSAGE" value="..." />
+    <MESSAGE value="&#10;..." />
+    <option name="LAST_COMMIT_MESSAGE" value="&#10;..." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
