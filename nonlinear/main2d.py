@@ -57,6 +57,7 @@ def main2d(RunInterval, compTimes,  GRID, OCEAN, BOUNDARY):
 
 
         if compTimes.isFinalTimeStep():
+            print(1)
             t2 = time.time()
             print(t2-t1)
             exitProgram()
