@@ -118,13 +118,6 @@
       <option name="presentableId" value="Default" />
       <updated>1675796239226</updated>
     </task>
-    <task id="LOCAL-00012" summary="Working on step2d.py.">
-      <created>1684531426614</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1684531426614</updated>
-    </task>
     <task id="LOCAL-00013" summary="&#10;...">
       <created>1684774691450</created>
       <option name="number" value="00013" />
@@ -461,7 +454,14 @@
       <option name="project" value="LOCAL" />
       <updated>1685041908840</updated>
     </task>
-    <option name="localTasksCounter" value="61" />
+    <task id="LOCAL-00061" summary="...">
+      <created>1685042143168</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1685042143169</updated>
+    </task>
+    <option name="localTasksCounter" value="62" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
