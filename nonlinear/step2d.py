@@ -26,7 +26,7 @@ def computeZetaRHS(zeta, h, ubar, vbar, GRID):
 
 
 def computeMomentumRHS(h, gzeta):
-    rhs_ubar = 0.5 * g * RtoU(h) #* DξU(gzeta + gzeta*gzeta)
+    rhs_ubar = 0.5 * g * RtoU(h) #* DξU(gzeta + gzeta*gzeta) # TODO: Recover!!!!
     rhs_vbar = 0.5 * g * RtoV(h) #* DηV(gzeta + gzeta*gzeta)
 
     # if UV_ADV:
