@@ -29,6 +29,8 @@ def main2d(RunInterval, compTimes,  GRID, OCEAN, BOUNDARY):
     #     set_vbc()
 
 
+    import time
+    t1 = time.time()
     # Main loop
     while compTimes.keepRunning:
 
@@ -55,6 +57,8 @@ def main2d(RunInterval, compTimes,  GRID, OCEAN, BOUNDARY):
 
 
         if compTimes.isFinalTimeStep():
+            t2 = time.time()
+            print(t2-t1)
             exitProgram()
 
 
