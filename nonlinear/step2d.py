@@ -159,7 +159,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
 
     # Apply lateral boundary conditions.
-    barotropicVelocityBC(OCEAN, BOUNDARY)
+    barotropicVelocityBC(ubar_t2, vbar_t2, OCEAN, BOUNDARY)
 
 
 def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
@@ -214,7 +214,7 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
 
     # Apply lateral boundary conditions.
-    barotropicVelocityBC(OCEAN, BOUNDARY)
+    barotropicVelocityBC(ubar_t2, vbar_t2, OCEAN, BOUNDARY)
 
 
     # Compute integral mass flux across open boundaries and adjust for volume conservation.
