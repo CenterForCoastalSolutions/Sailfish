@@ -18,10 +18,10 @@ def computeZetaRHS(zeta, h, ubar, vbar):
     # compute the water column depth
     D = zeta + h
 
-    DU = ubar*RtoU(D, ubar)
+    DU = ubar*RtoU(D, ubar)   # TODO: Remember to check if we can remove the extra parameter (ubar)
     DV = vbar*RtoV(D, vbar)
 
-    return divUVtoR(DU, DV)
+    return divUVtoR(DU, DV, D)   # TODO: Remember to check if we can remove the extra parameter (D)
 
 
 def computeMomentumRHS(h, gzeta):
