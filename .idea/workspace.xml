@@ -2,28 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="...">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_5_22_2023_10_57_AM__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_5_22_2023_10_57_AM__Changes_.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functionals/anaBASE.py" beforeDir="false" afterPath="$PROJECT_DIR$/functionals/anaBASE.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functionals/ana_grid.py" beforeDir="false" afterPath="$PROJECT_DIR$/functionals/ana_grid.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_boundary.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_boundary.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_comptimes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_comptimes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/mod_grid.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_grid.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_io.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_io.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_ocean.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_ocean.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_operators.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_operators.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_physical_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_physical_params.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/bc_2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/bc_2d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/main2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main2d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/step2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/zetabc.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/zetabc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/testSpline.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/testSpline.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/translator/readSavedData.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/translator/readSavedData.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tmp/oded_miniapp.py" beforeDir="false" afterPath="$PROJECT_DIR$/tmp/oded_miniapp.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tmp/testProgram.py" beforeDir="false" afterPath="$PROJECT_DIR$/tmp/testProgram.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utility/dateclock.py" beforeDir="false" afterPath="$PROJECT_DIR$/utility/dateclock.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utility/ntimestep.py" beforeDir="false" afterPath="$PROJECT_DIR$/utility/ntimestep.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utility/regrid.py" beforeDir="false" afterPath="$PROJECT_DIR$/utility/regrid.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,14 +38,14 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/projects/src/oceangpu/nonlinear&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.tabs&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "D:/projects/src/oceangpu/nonlinear",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\projects\src\oceangpu\nonlinear" />
@@ -237,7 +218,14 @@
       <option name="project" value="LOCAL" />
       <updated>1684962524965</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="...">
+      <created>1684971983365</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1684971983365</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -285,7 +273,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tmp/testProgram.py</url>
-          <line>61</line>
+          <line>62</line>
           <option name="timeStamp" value="76" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -302,6 +290,11 @@
           <url>file://$PROJECT_DIR$/nonlinear/step2d.py</url>
           <line>20</line>
           <option name="timeStamp" value="92" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/modules/mod_grid.py</url>
+          <line>130</line>
+          <option name="timeStamp" value="93" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
