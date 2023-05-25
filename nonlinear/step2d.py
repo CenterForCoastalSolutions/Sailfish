@@ -139,10 +139,10 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # Interpolate depth at points U, V
     D_t1 = zeta_t1 + h
     D_t2 = zeta_t2 + h
-    D_t1U = RtoU(D_t1)
-    D_t1V = RtoV(D_t1)
-    D_t2U = RtoU(D_t2)
-    D_t2V = RtoV(D_t2)
+    D_t1U = RtoU(D_t1, ubar_t2)
+    D_t1V = RtoV(D_t1, vbar_t2)
+    D_t2U = RtoU(D_t2, ubar_t2)
+    D_t2V = RtoV(D_t2, vbar_t2)
 
 
     # During the first time-step, the predictor step is Forward-Euler
@@ -202,10 +202,10 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # And interpolate them at points U, V
     D_t1 = zeta_t1 + h
     D_t2 = zeta_t2 + h
-    D_t1U = RtoU(D_t1)
-    D_t1V = RtoV(D_t1)
-    D_t2U = RtoU(D_t2)
-    D_t2V = RtoV(D_t2)
+    D_t1U = RtoU(D_t1, ubar_t2)
+    D_t1V = RtoV(D_t1, vbar_t2)
+    D_t2U = RtoU(D_t2, ubar_t2)
+    D_t2V = RtoV(D_t2, vbar_t2)
 
 
     # During the first time-step, the corrector step is Backward-Euler. Otherwise, the corrector step is Adams-Moulton.
