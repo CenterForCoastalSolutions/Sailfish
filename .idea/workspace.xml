@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="...">
-      <change beforePath="$PROJECT_DIR$/modules/mod_boundary.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_boundary.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/step2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -272,7 +273,112 @@
       <option name="project" value="LOCAL" />
       <updated>1684975961626</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="...">
+      <created>1684976033327</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1684976033327</updated>
+    </task>
+    <task id="LOCAL-00024" summary="...">
+      <created>1684976123374</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1684976123374</updated>
+    </task>
+    <task id="LOCAL-00025" summary="...">
+      <created>1684976162396</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1684976162396</updated>
+    </task>
+    <task id="LOCAL-00026" summary="...">
+      <created>1684976294102</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1684976294102</updated>
+    </task>
+    <task id="LOCAL-00027" summary="...">
+      <created>1684976385341</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1684976385341</updated>
+    </task>
+    <task id="LOCAL-00028" summary="...">
+      <created>1684976564946</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1684976564946</updated>
+    </task>
+    <task id="LOCAL-00029" summary="...">
+      <created>1684976699588</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1684976699588</updated>
+    </task>
+    <task id="LOCAL-00030" summary="...">
+      <created>1684976816273</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1684976816273</updated>
+    </task>
+    <task id="LOCAL-00031" summary="...">
+      <created>1684977194362</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1684977194362</updated>
+    </task>
+    <task id="LOCAL-00032" summary="...">
+      <created>1684977664438</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1684977664438</updated>
+    </task>
+    <task id="LOCAL-00033" summary="...">
+      <created>1684977758119</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1684977758119</updated>
+    </task>
+    <task id="LOCAL-00034" summary="...">
+      <created>1684977865611</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1684977865612</updated>
+    </task>
+    <task id="LOCAL-00035" summary="...">
+      <created>1684978028730</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1684978028730</updated>
+    </task>
+    <task id="LOCAL-00036" summary="...">
+      <created>1684978175748</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1684978175748</updated>
+    </task>
+    <task id="LOCAL-00037" summary="...">
+      <created>1684978223119</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1684978223119</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -325,17 +431,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/modules/mod_boundary.py</url>
-          <line>213</line>
+          <line>211</line>
           <option name="timeStamp" value="86" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/nonlinear/step2d.py</url>
-          <line>93</line>
+          <line>96</line>
           <option name="timeStamp" value="90" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/nonlinear/step2d.py</url>
-          <line>20</line>
+          <line>21</line>
           <option name="timeStamp" value="92" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
