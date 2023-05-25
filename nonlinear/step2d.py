@@ -29,9 +29,9 @@ def computeZetaRHS(zeta, h, ubar, vbar, GRID):
     return divUVtoR(DU, DV, D, GRID)   # TODO: Remember to check if we can remove the extra parameter (D)
 
 
-def computeMomentumRHS(h, gzeta):
-    rhs_ubar = -0.5*g*RtoU(h)*DξRtoU(gzeta + gzeta*gzeta, D)
-    rhs_vbar = -0.5*g*RtoV(h)*DηRtoV(gzeta + gzeta*gzeta, D)
+def computeMomentumRHS(h, gzeta, U, V):
+    rhs_ubar = -0.5*g*RtoU(h, U)*DξRtoU(gzeta + gzeta*gzeta, U)
+    rhs_vbar = -0.5*g*RtoV(h, V)*DηRtoV(gzeta + gzeta*gzeta, V)
 
     # if UV_ADV:
     #     #!---------------------------------------------------------------------------
@@ -133,7 +133,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
 
     #compute right-hand-side for the 2D momentum equations
-    rhs_ubar, rhs_vbar = computeMomentumRHS(h, gzeta)
+    rhs_ubar, rhs_vbar = computeMomentumRHS(h, gzeta, ubar_t2, vbar_t2)
 
 
     # Interpolate depth at points U, V
