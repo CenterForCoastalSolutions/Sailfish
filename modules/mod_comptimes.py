@@ -67,7 +67,7 @@ class CompTimes:
 
 
     def isFinalTimeStep(self):
-        return False     # Remove
+        # return False     # Remove
         return self.iic == self.ntend + 1
 
 
