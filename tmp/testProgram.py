@@ -5,6 +5,7 @@ import sys
 sys.path.insert(0, '../modules')
 sys.path.insert(0, '../utility')
 sys.path.insert(0, '../nonlinear')
+sys.path.insert(0, '../functionals')
 
 import io_utils
 import mod_grid
