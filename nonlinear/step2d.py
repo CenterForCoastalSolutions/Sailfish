@@ -95,7 +95,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # =================================
 
     # During the first time-step, the predictor step is Forward-Euler. Otherwise, the predictor step is Leap-frog.
-    print('ffff', zeta_t.shape, h.shape, ubar_t1.shape, vbar_t1.shape)
+    print('ffff', zeta_t1.shape, h.shape, ubar_t1.shape, vbar_t1.shape)
     rhs_zeta_t1 = computeZetaRHS(zeta_t1, h, ubar_t1, vbar_t1, GRID)
 
 
