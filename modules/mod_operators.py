@@ -234,7 +234,7 @@ DξRtoU_CUDA = cp.ElementwiseKernel(
             STENCIL(R);
             STENCIL(on_u);
 
-            R = on_u(0,0)*((R(0, 0) - R(0, -1));
+            R = on_u(0,0)*(R(0, 0) - R(0, -1));
 
 
            ''',
@@ -258,7 +258,7 @@ DηRtoV_CUDA = cp.ElementwiseKernel(
             STENCIL(R);
             STENCIL(om_v);
 
-            R = om_v(0,0)*((R(0, 0) - R(-1, 0));
+            R = om_v(0,0)*(R(0, 0) - R(-1, 0));
 
 
            ''',
