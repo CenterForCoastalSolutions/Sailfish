@@ -208,7 +208,7 @@ divUVtoR_CUDA = cp.ElementwiseKernel(
         STENCIL(on_u);
         STENCIL(om_v);
         
-        R = (((U(0, 1)*on_u(0, 1) - U(0, 0)*on_u(0, 0)) + ((V(0, 1)*om_v(0, 1) - V(0, 0)*om_v(0, 0))) * pm(0, 0) * pn(0, 0);
+        R = ( (U(0, 1)*on_u(0, 1) - U(0, 0)*on_u(0, 0)) + (V(0, 1)*om_v(0, 1) - V(0, 0)*om_v(0, 0)) ) * pm(0, 0) * pn(0, 0);
         
 
        ''',
