@@ -83,8 +83,8 @@ class T_IO:
 
 
         # Set switches to create NetCDF files.
-        self.LdefHIS = (self.nHIS > 0) and cp.any(list(self.Hout.values()))
-        self.LdefQCK = (self.nQCK > 0) and cp.any(list(self.Hout.values()))
+        self.LdefHIS = (self.nHIS > 0) and cp.any(cp.array(list(self.Hout.values())))
+        self.LdefQCK = (self.nQCK > 0) and cp.any(cp.array(list(self.Hout.values())))
 
 
 

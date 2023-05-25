@@ -112,12 +112,10 @@ class Boundary:
         LBC = []
         shp = (M + 1, L + 1)
 
+        # TODO: I think that this code can be simplified since ravel_multi_index takes an array as an input, so the for loops
+        # may be unnecessary
         # West/East
         for j in range(j0,M):
-            print ('XXXXXX', j, i0, shp)
-            import numpy as np
-            idxFlat = np.ravel_multi_index((j, i0), shp, mode = 'raise')
-            print('sdsdsds')
             idxFlat  = cp.ravel_multi_index((cp.array([j]), cp.array([i0])    ), shp)
             idxFlat1 = cp.ravel_multi_index((cp.array([j]), cp.array([i0])    ), shp)
             idxFlat2 = cp.ravel_multi_index((cp.array([j]), cp.array([i0 + 1])), shp)
