@@ -238,7 +238,7 @@ DξRtoU_CUDA = cp.ElementwiseKernel(
 
 
            ''',
-    name = 'DξRtoU_CUDA',
+    name = 'DXRtoU_CUDA',
     options = ('-default-device',))
 
 
@@ -262,7 +262,7 @@ DηRtoV_CUDA = cp.ElementwiseKernel(
 
 
            ''',
-    name = 'DηRtoV_CUDA',
+    name = 'DERtoV_CUDA',
     options = ('-default-device',))
 
 
