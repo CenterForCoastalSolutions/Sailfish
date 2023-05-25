@@ -59,7 +59,7 @@ class CompTimes:
         # First, starting, and ending timestepping parameters
         self.ntfirst = 0      # Forward-Euler step
         self.ntstart = 0      # Start step
-        self.ntend   = 0      # End step
+        self.ntend   = 10000      # End step  TODO: READ this from the file
 
 
     def isInitialTimeStep(self):
