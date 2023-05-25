@@ -21,7 +21,9 @@ def computeZetaRHS(zeta, h, ubar, vbar, GRID):
 
     DU = ubar*RtoU(D, ubar)   # TODO: Remember to check if we can remove the extra parameter (ubar)
     DV = vbar*RtoV(D, vbar)
-    print(2, DU)
+    DU[:] = DU + 1
+    DV[:] = DV + 2
+    print(2, DU.shape, DU)
     a = divUVtoR(DU, DV, D, GRID)
     print (3,a)
     return divUVtoR(DU, DV, D, GRID)   # TODO: Remember to check if we can remove the extra parameter (D)
