@@ -126,9 +126,9 @@ class Boundary:
             bcIdx2 += [idxFlat2]
             LBC += [decodeLBC(val[iW])]
 
-            idxFlat  = cp.ravel_multi_index((cp.array([j]), cp.array([L  - 1)]), shp)
-            idxFlat1 = cp.ravel_multi_index((cp.array([j]), cp.array([L     )]), shp)
-            idxFlat2 = cp.ravel_multi_index((cp.array([j]), cp.array([L  - 1)]), shp)
+            idxFlat  = cp.ravel_multi_index((cp.array([j]), cp.array([L  - 1])), shp)
+            idxFlat1 = cp.ravel_multi_index((cp.array([j]), cp.array([L     ])), shp)
+            idxFlat2 = cp.ravel_multi_index((cp.array([j]), cp.array([L  - 1])), shp)
             bcIdx  += [idxFlat ]
             bcIdx1 += [idxFlat1]
             bcIdx2 += [idxFlat2]
@@ -136,17 +136,17 @@ class Boundary:
 
         # North/South
         for i in range(i0, L):
-            idxFlat  = cp.ravel_multi_index((cp.array([j0]),     cp.array([i)]), shp)
-            idxFlat1 = cp.ravel_multi_index((cp.array([j0]),     cp.array([i)]), shp)
-            idxFlat2 = cp.ravel_multi_index((cp.array([j0 + 1]), cp.array([i)]), shp)
+            idxFlat  = cp.ravel_multi_index((cp.array([j0]),     cp.array([i])), shp)
+            idxFlat1 = cp.ravel_multi_index((cp.array([j0]),     cp.array([i])), shp)
+            idxFlat2 = cp.ravel_multi_index((cp.array([j0 + 1]), cp.array([i])), shp)
             bcIdx  += [idxFlat ]
             bcIdx1 += [idxFlat1]
             bcIdx2 += [idxFlat2]
             LBC += [decodeLBC(val[iN])]
 
-            idxFlat  = cp.ravel_multi_index((cp.array([M - 1]),  cp.array([i)]), shp)
-            idxFlat1 = cp.ravel_multi_index((cp.array([M    ]),  cp.array([i)]), shp)
-            idxFlat2 = cp.ravel_multi_index((cp.array([M - 1]),  cp.array([i)]), shp)
+            idxFlat  = cp.ravel_multi_index((cp.array([M - 1]),  cp.array([i])), shp)
+            idxFlat1 = cp.ravel_multi_index((cp.array([M    ]),  cp.array([i])), shp)
+            idxFlat2 = cp.ravel_multi_index((cp.array([M - 1]),  cp.array([i])), shp)
             bcIdx  += [idxFlat ]
             bcIdx1 += [idxFlat1]
             bcIdx2 += [idxFlat2]
