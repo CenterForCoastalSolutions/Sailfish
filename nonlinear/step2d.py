@@ -21,12 +21,12 @@ def computeZetaRHS(zeta, h, ubar, vbar):
     DU = ubar*RtoU(D, ubar)
     DV = vbar*RtoV(D, vbar)
 
-    return DivUVtoR(DU, DV)
+    return divUVtoR(DU, DV)
 
 
 def computeMomentumRHS(h, gzeta):
-    rhs_ubar = 0.5 * g * RtoU(h) * DξU(gzeta + gzeta*gzeta)
-    rhs_vbar = 0.5 * g * RtoV(h) * DηV(gzeta + gzeta*gzeta)
+    rhs_ubar = 0.5 * g * RtoU(h) #* DξU(gzeta + gzeta*gzeta)
+    rhs_vbar = 0.5 * g * RtoV(h) #* DηV(gzeta + gzeta*gzeta)
 
     # if UV_ADV:
     #     #!---------------------------------------------------------------------------
