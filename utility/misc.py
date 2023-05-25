@@ -23,4 +23,5 @@ def msgError(str, error = 1000):
 
 
 def msgInfo(str, level = 0):
+    return
     print('INFO: ', str )
