@@ -213,8 +213,8 @@ divUVtoR_CUDA = cp.ElementwiseKernel(
 
 
 
-def divUVtoR(U, V, R):
-    return divUVtoR_CUDA(U, V, R, size=R.size)
+def divUVtoR(U, V, R, GRID):
+    return divUVtoR_CUDA(U, V, GRID.pm, GRID.pn, GRID.on_u, GRID.om_v,  R, size=R.size)
 
 
 

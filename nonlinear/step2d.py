@@ -6,7 +6,7 @@ from mod_constants import *
 from misc          import *
 
 
-def computeZetaRHS(zeta, h, ubar, vbar):
+def computeZetaRHS(zeta, h, ubar, vbar, GRID):
 
     #Apply mass point sources (volume vertical influx), if any
     # TODO: Implement XXXX
@@ -21,7 +21,7 @@ def computeZetaRHS(zeta, h, ubar, vbar):
     DU = ubar*RtoU(D, ubar)   # TODO: Remember to check if we can remove the extra parameter (ubar)
     DV = vbar*RtoV(D, vbar)
 
-    return divUVtoR(DU, DV, D)   # TODO: Remember to check if we can remove the extra parameter (D)
+    return divUVtoR(DU, DV, D, GRID)   # TODO: Remember to check if we can remove the extra parameter (D)
 
 
 def computeMomentumRHS(h, gzeta):
@@ -91,7 +91,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
     # During the first time-step, the predictor step is Forward-Euler. Otherwise, the predictor step is Leap-frog.
 
-    rhs_zeta_t1 = computeZetaRHS(zeta_t1, h, ubar_t1, vbar_t1)
+    rhs_zeta_t1 = computeZetaRHS(zeta_t1, h, ubar_t1, vbar_t1, GRID)
 
 
     if compTimes.isFirst2DStep():
@@ -174,7 +174,7 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
     # During the first time-step,the corrector step is Backward-Euler. Otherwise, the corrector step is Adams-Moulton.
 
-    rhs_zeta_t2 = computeZetaRHS(zeta_t2, h, ubar_t2, vbar_t2)
+    rhs_zeta_t2 = computeZetaRHS(zeta_t2, h, ubar_t2, vbar_t2, GRID)
 
     # Adams-Moulton order 3
     zeta_t2[:] = zeta_t1 + Δt*(AM3_2*rhs_zeta_t2 + AM3_2*rzeta_t1 + AM3_2*rzeta_t0)
