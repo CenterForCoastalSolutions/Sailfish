@@ -194,7 +194,7 @@ def RtoV(R, V):
 
 
 divUVtoR_CUDA = cp.ElementwiseKernel(
-    '''raw float64 _U, raw float64 _V, raw float64 pm, raw float64 pn, raw float64 on_u, raw float64 om_v, raw float64 varForStrides''',
+    '''raw float64 _U, raw float64 _V, raw float64 _pm, raw float64 _pn, raw float64 _on_u, raw float64 _om_v, raw float64 varForStrides''',
     'raw float64 _R',
     preamble=preamble2D,
     operation=r'''
@@ -203,6 +203,10 @@ divUVtoR_CUDA = cp.ElementwiseKernel(
         STENCIL(U);
         STENCIL(V);
         STENCIL(R);
+        STENCIL(pm);
+        STENCIL(pn);
+        STENCIL(on_u);
+        STENCIL(om_v);
         
         R = (((U(0, 1)*on_u(0, 1) - U(0, 0)*on_u(0, 0)) + ((V(0, 1)*om_v(0, 1) - V(0, 0)*om_v(0, 0))) * pm * pn;
         
