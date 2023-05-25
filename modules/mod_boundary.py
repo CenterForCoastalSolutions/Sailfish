@@ -115,6 +115,9 @@ class Boundary:
         # West/East
         for j in range(j0,M):
             print ('XXXXXX', j, i0, shp)
+            import numpy as np
+            idxFlat = np.ravel_multi_index((j, i0), shp)
+            print('sdsdsds')
             idxFlat  = cp.ravel_multi_index((j, i0    ), shp)
             idxFlat1 = cp.ravel_multi_index((j, i0    ), shp)
             idxFlat2 = cp.ravel_multi_index((j, i0 + 1), shp)
