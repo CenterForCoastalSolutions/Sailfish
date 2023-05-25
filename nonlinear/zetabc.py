@@ -5,10 +5,6 @@ def zetabc(zeta, compTimes, BOUNDARY):
     """This routine sets lateral boundary conditions for free-surface."""
 
 
-    # Set time-indices
-    dt2d = compTimes.get2DTimes()
-
-
     # Gradient/closed boundary condition.
     # "This boundary condition is extremely simple and consists of setting the gradient of a field to zero
     # at the edge. The outside value is set equal to the closest interior value"
@@ -18,7 +14,11 @@ def zetabc(zeta, compTimes, BOUNDARY):
     # Clamped boundary condition.
     # "Very simple BC that consist in setting the boundary value to a known exterior value"
     # zetaKout[BOUNDARY.zetaClampedBCIdx1] = BOUNDARY.zeta[BOUNDARY.zetaClampedBCIdx1]
-    msgInfo('Implement!!!')
+    msgInfo('Implement the real Clamped BC, here I am using a fake one!!!')
+    omega = 0.01  # s^-1
+    zeta[BOUNDARY.zetaClampedBCIdx1] = cp.sin(compTimes.time*omega)
+
+
 
 
 

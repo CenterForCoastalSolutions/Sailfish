@@ -208,7 +208,7 @@ divUVtoR_CUDA = cp.ElementwiseKernel(
         STENCIL(on_u);
         STENCIL(om_v);
         
-        R = ( (U(0, 1)*on_u(0, 1) - U(0, 0)*on_u(0, 0)) + (V(0, 1)*om_v(0, 1) - V(0, 0)*om_v(0, 0)) ) * pm(0, 0) * pn(0, 0);
+        R = ( (U(0, 1)*on_u(0, 1) - U(0, 0)*on_u(0, 0)) + (V(1, 0)*om_v(1, 0) - V(0, 0)*om_v(0, 0)) )*pm(0, 0)*pn(0, 0);
         
 
        ''',
@@ -222,37 +222,49 @@ def divUVtoR(U, V, R, GRID):
 
 
 
-# # rhs_ubar(i,j)=*on_u(i,j)* ((h(i-1,j)+ h(i ,j))* (gzeta(i-1,j)-   gzeta(i  ,j))+ (gzeta2(i - 1, j) -  gzeta2(i, j)))
-# #
-# #
-# # ((h(j, i-1)-
-# #
-# #
-# #
-# # cff1 = g
-# #
-# #
-# #
-# #
-# #
-# #
-# # R = cp.arange(0, 25, dtype=cp.float64)
-# # R = R.reshape(5, 5)
-# # V = cp.zeros_like(R)
-# # U = cp.zeros_like(R)
-# # V = RtoV(R, V)
-# # U = RtoU(R, U)
-# # print('this is R:')
-# # print(R)
-# #
-# # print('\nthis is U:')
-# # print(U)
-# #
-# #
-# # print('this is R:')
-# # print(R)
-#
-# print('\nthis is V:')
-# print(V)
-#
-# #def divUVtoR(u, v):
+
+DξRtoU_CUDA = cp.ElementwiseKernel(
+    '''raw float64 _R, raw float64 _on_u, raw float64 varForStrides''',
+    'raw float64 _U',
+    preamble = preamble2D,
+    operation = r'''
+            // Initializes the stencil variables that allow to access to relative elements.
+            initializeStrides(varForStrides.strides());
+            STENCIL(U);
+            STENCIL(R);
+            STENCIL(on_u);
+
+            R = on_u(0,0)*((R(0, 0) - R(0, -1));
+
+
+           ''',
+    name = 'DξRtoU_CUDA',
+    options = ('-default-device',))
+
+
+def DξRtoU(R, U, GRID):
+    return DξRtoU_CUDA(R, GRID.on_u, U, size=U.size)
+
+
+
+DηRtoV_CUDA = cp.ElementwiseKernel(
+    '''raw float64 _R, raw float64 _om_v, raw float64 varForStrides''',
+    'raw float64 _V',
+    preamble = preamble2D,
+    operation = r'''
+            // Initializes the stencil variables that allow to access to relative elements.
+            initializeStrides(varForStrides.strides());
+            STENCIL(V);
+            STENCIL(R);
+            STENCIL(om_v);
+
+            R = on_v(0,0)*((R(0, 0) - R(-1, 0));
+
+
+           ''',
+    name = 'DηRtoV_CUDA',
+    options = ('-default-device',))
+
+
+def DηRtoV(R, V, GRID):
+    return DηRtoV_CUDA(R, GRID.om_v, V, size=V.size)

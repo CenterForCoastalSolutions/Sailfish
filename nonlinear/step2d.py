@@ -21,17 +21,17 @@ def computeZetaRHS(zeta, h, ubar, vbar, GRID):
 
     DU = ubar*RtoU(D, ubar)   # TODO: Remember to check if we can remove the extra parameter (ubar)
     DV = vbar*RtoV(D, vbar)
-    DU[:] = DU + 1
-    DV[:] = DV + 2
-    print(2, DU.shape, DU)
-    a = divUVtoR(DU, DV, D, GRID)
-    print (3,a)
+    # DU[:] = DU + 1
+    # DV[:] = DV + 2
+    # print(2, DU.shape, DU)
+    # a = divUVtoR(DU, DV, D, GRID)
+    # print (3,a)
     return divUVtoR(DU, DV, D, GRID)   # TODO: Remember to check if we can remove the extra parameter (D)
 
 
 def computeMomentumRHS(h, gzeta):
-    rhs_ubar = 0.5 * g * RtoU(h) #* DξU(gzeta + gzeta*gzeta) # TODO: Recover!!!!
-    rhs_vbar = 0.5 * g * RtoV(h) #* DηV(gzeta + gzeta*gzeta)
+    rhs_ubar = -0.5*g*RtoU(h)*DξRtoU(gzeta + gzeta*gzeta)
+    rhs_vbar = -0.5*g*RtoV(h)*DηRtoV(gzeta + gzeta*gzeta)
 
     # if UV_ADV:
     #     #!---------------------------------------------------------------------------
@@ -153,8 +153,8 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     vbar_t2[:] = (vbar_t1*(D_t1V + Δt*rhs_vbar))/D_t2V
 
     # In the predictor step, save the rhs for future use.
-    rubar_t2[:] = rhs_ubar
-    rvbar_t2[:] = rhs_vbar
+    rubar_t1[:] = rhs_ubar
+    rvbar_t1[:] = rhs_vbar
 
 
     # Apply lateral boundary conditions.
@@ -210,7 +210,6 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # During the first time-step, the corrector step is Backward-Euler. Otherwise, the corrector step is Adams-Moulton.
     ubar_t2[:] = (ubar_t1*(D_t1U + Δt*(AM3_2*rhs_ubar + AM3_1*rubar_t1 + AM3_0*rubar_t0)))/D_t2U
     vbar_t2[:] = (vbar_t1*(D_t1V + Δt*(AM3_2*rhs_vbar + AM3_1*rvbar_t1 + AM3_0*rvbar_t0)))/D_t2V
-
 
 
     # Apply lateral boundary conditions.

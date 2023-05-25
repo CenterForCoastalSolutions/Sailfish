@@ -4,9 +4,6 @@ from misc import *
 def barotropicVelocityBC(ubar, vbar, compTimes, BOUNDARY):
     """"This subroutine sets lateral boundary conditions for vertically integrated (barotropic) velocities"""
 
-    # Set time-indices
-    dt2d = compTimes.get2DTimes()
-
 
     # closed boundary condition.
     ubar[BOUNDARY.ubarClosedBCIdx1] = 0.0
@@ -23,8 +20,6 @@ def barotropicVelocityBC(ubar, vbar, compTimes, BOUNDARY):
     # Gradient boundary condition.
     ubar[BOUNDARY.ubarGradientBCIdx1] = ubar[BOUNDARY.ubarGradientBCIdx2]
     vbar[BOUNDARY.vbarGradientBCIdx1] = vbar[BOUNDARY.vbarGradientBCIdx2]
-
-
 
 
 
