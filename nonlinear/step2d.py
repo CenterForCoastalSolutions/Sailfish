@@ -137,6 +137,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
 
     # Interpolate depth at points U, V
+    D_t1 = zeta_t1 + h
     D_t2 = zeta_t2 + h
     D_t1U = RtoU(D_t1)
     D_t1V = RtoV(D_t1)
