@@ -18,9 +18,10 @@ def computeZetaRHS(zeta, h, ubar, vbar, GRID):
     # compute the water column depth
     D = zeta + h
 
+    print(1, D)
     DU = ubar*RtoU(D, ubar)   # TODO: Remember to check if we can remove the extra parameter (ubar)
     DV = vbar*RtoV(D, vbar)
-
+    print(2, DU)
     return divUVtoR(DU, DV, D, GRID)   # TODO: Remember to check if we can remove the extra parameter (D)
 
 
@@ -118,7 +119,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
 
     # Apply free-surface lateral BC
-    zetabc(OCEAN, BOUNDARY)
+    zetabc(zeta_t2, compTimes, BOUNDARY)
 
 
 
@@ -186,7 +187,7 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
 
     # Apply free-surface lateral BC
-    zetabc(OCEAN, BOUNDARY)
+    zetabc(zeta_t2, compTimes, BOUNDARY)
 
 
     #compute right-hand-side for the 2D momentum equations
