@@ -16,7 +16,7 @@ def computeZetaRHS(zeta, h, ubar, vbar, GRID):
     # addForcings()
 
     # compute the water column depth
-    D = zeta + h.rave
+    D = zeta + h
 
 
     DU = ubar*RtoU(D, ubar)   # TODO: Remember to check if we can remove the extra parameter (ubar)

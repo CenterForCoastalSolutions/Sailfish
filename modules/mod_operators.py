@@ -168,7 +168,7 @@ RtoU_CUDA = cp.ElementwiseKernel(
     options=('-default-device',))
 
 def RtoU(R, U):
-    return RtoU_CUDA(R, U, size=R.size)
+    return RtoU_CUDA(R, U, size=R.size).ravel()
 
 
 
@@ -189,7 +189,7 @@ RtoV_CUDA = cp.ElementwiseKernel(
     options=('-default-device',))
 
 def RtoV(R, V):
-    return RtoV_CUDA(R, V, size=R.size)
+    return RtoV_CUDA(R, V, size=R.size).ravel()
 
 
 
@@ -218,7 +218,7 @@ divUVtoR_CUDA = cp.ElementwiseKernel(
 
 
 def divUVtoR(U, V, R, GRID):
-    return divUVtoR_CUDA(U, V, GRID.pm, GRID.pn, GRID.on_u, GRID.om_v,  R, size=R.size)
+    return divUVtoR_CUDA(U, V, GRID.pm, GRID.pn, GRID.on_u, GRID.om_v,  R, size=R.size).ravel()
 
 
 
@@ -243,7 +243,7 @@ DξRtoU_CUDA = cp.ElementwiseKernel(
 
 
 def DξRtoU(R, U, GRID):
-    return DξRtoU_CUDA(R, GRID.on_u, U, size=U.size)
+    return DξRtoU_CUDA(R, GRID.on_u, U, size=U.size).ravel()
 
 
 
@@ -267,4 +267,4 @@ DηRtoV_CUDA = cp.ElementwiseKernel(
 
 
 def DηRtoV(R, V, GRID):
-    return DηRtoV_CUDA(R, GRID.om_v, V, size=V.size)
+    return DηRtoV_CUDA(R, GRID.om_v, V, size=V.size).ravel()
