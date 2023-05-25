@@ -118,7 +118,7 @@ class Boundary:
             import numpy as np
             idxFlat = np.ravel_multi_index((j, i0), shp, mode = 'raise')
             print('sdsdsds')
-            idxFlat  = cp.ravel_multi_index(([j], [i0]    ), shp, mode = 'raise')
+            idxFlat  = cp.ravel_multi_index((cp.array([j]), cp.array([[i0])    ), shp, mode = 'raise')
             idxFlat1 = cp.ravel_multi_index((j, i0    ), shp)
             idxFlat2 = cp.ravel_multi_index((j, i0 + 1), shp)
             bcIdx  += [idxFlat ]
