@@ -83,6 +83,8 @@ def main2d(RunInterval, compTimes,  GRID, OCEAN, BOUNDARY):
         # during the auxiliary (nfast+1) time-step.
         step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY)
 
+        print('.... %.2f s    %.2f'  % (compTimes.time, OCEAN.zeta_t2.sum()))
+
 
 
 
