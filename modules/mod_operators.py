@@ -84,14 +84,14 @@ import cupy as cp
 #   z_w        Actual depths (m) at horizontal RHO-points and vertical W-points.
 
 
-import rmm
-pool = rmm.mr.PoolMemoryResource(
-    rmm.mr.ManagedMemoryResource(),
-    initial_pool_size=2**35,
-    maximum_pool_size=2**35
-)
-rmm.mr.set_current_device_resource(pool)
-cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
+# import rmm
+# pool = rmm.mr.PoolMemoryResource(
+#     rmm.mr.ManagedMemoryResource(),
+#     initial_pool_size=2**35,
+#     maximum_pool_size=2**35
+# )
+# rmm.mr.set_current_device_resource(pool)
+# cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
 
 
 
