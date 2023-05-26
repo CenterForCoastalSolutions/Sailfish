@@ -167,7 +167,7 @@ class Boundary:
         LBC    = cp.array(LBC,    dtype = int)
 
         # Sorts the indices to improve cache access.
-        sortIdx = cp.argsort(bcIdx)
+        sortIdx = cp.argsort(bcIdx.flatten())
 
         bcIdx  = bcIdx [sortIdx]
         bcIdx1 = bcIdx1[sortIdx]

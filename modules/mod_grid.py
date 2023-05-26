@@ -130,7 +130,7 @@ class Grid:
         self.pm     = cp.zeros(shape2D, dtype = cp.float64)
         self.pn     = cp.zeros(shape2D, dtype = cp.float64)
 
-        # if CURVGRID && UV_ADV:
+        # if CURVGRID && UV_ADV: TODO: Implement the if
         self.dmdη   = cp.zeros(shape2D, dtype = cp.float64)
         self.dndξ   = cp.zeros(shape2D, dtype = cp.float64)
 
