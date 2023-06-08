@@ -42,7 +42,7 @@ def step2d(isPredictorStep, compTimes, GRID, OCEAN):
     DV_t1 = vbar_t1*RtoV(D_i1)
 
 
-    know, Δt = compTimes.get2DTimes()
+    know, Δt = compTimes.getDeltaTime()
     kstp, krhs = compTimes.updateTimes(isPredictorStep) xxxx
 
     # Time step free-surface equation.

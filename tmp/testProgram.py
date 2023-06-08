@@ -14,6 +14,7 @@ import mod_io
 import mod_ocean
 import mod_comptimes
 import mod_physical_params
+import mod_operators
 
 from main2d import main2d
 
@@ -31,13 +32,14 @@ varInfoList = io_utils.VarInfoList(path = r'../modules')
 input = io_utils.Input(r'../utility/test.in', varInfoList)
 
 GRID           = mod_grid           .Grid(input)
+
 BOUNDARY       = mod_boundary       .Boundary(input, GRID)
 io             = mod_io             .T_IO(input)
 physicalParams = mod_physical_params.PhysicalParams(input, GRID)
 compTimes      = mod_comptimes      .CompTimes(input)
 OCEAN          = mod_ocean          .T_OCEAN(input, GRID)
 
-# mod_operators.initModule(GRID)
+mod_operators.initModule(GRID)
 
 
 v = OCEAN.zeta[0,:,:]
@@ -56,9 +58,9 @@ input.printReport()
 
 # Generates the mesh.
 ana_grid.ana_grid('Basin', GRID)
+GRID.updateMetrics()
 
-
-main2d(100000, compTimes,  GRID, OCEAN, BOUNDARY)
+main2d(compTimes,  GRID, OCEAN, BOUNDARY)
 
 
 pass

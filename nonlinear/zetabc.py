@@ -14,9 +14,9 @@ def zetabc(zeta, compTimes, BOUNDARY):
     # Clamped boundary condition.
     # "Very simple BC that consist in setting the boundary value to a known exterior value"
     # zetaKout[BOUNDARY.zetaClampedBCIdx1] = BOUNDARY.zeta[BOUNDARY.zetaClampedBCIdx1]
-    msgInfo('Implement the real Clamped BC, here I am using a fake one!!!')
-    omega = 0.01  # s^-1
-    zeta[BOUNDARY.zetaClampedBCIdx1] = cp.sin(compTimes.time*omega)
+    # msgInfo('Implement the real Clamped BC, here I am using a fake one!!!')
+    # omega = 0.01  # s^-1
+    # zeta[BOUNDARY.zetaClampedBCIdx1] = cp.sin(compTimes.time*omega)
 
 
 

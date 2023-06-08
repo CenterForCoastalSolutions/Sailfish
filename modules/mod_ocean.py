@@ -41,14 +41,14 @@ class T_OCEAN:
         self.vbar_t1 = self.vbar[1, :, :].ravel()
         self.vbar_t0 = self.vbar[0, :, :].ravel()
 
-        self.rzeta_t1 = self.zeta[1, :, :].ravel()
-        self.rzeta_t0 = self.zeta[0, :, :].ravel()
+        self.rzeta_t1 = self.rzeta[1, :, :].ravel()
+        self.rzeta_t0 = self.rzeta[0, :, :].ravel()
 
-        self.rubar_t1 = self.ubar[1, :, :].ravel()
-        self.rubar_t0 = self.ubar[0, :, :].ravel()
+        self.rubar_t1 = self.rubar[1, :, :].ravel()
+        self.rubar_t0 = self.rubar[0, :, :].ravel()
 
-        self.rvbar_t1 = self.vbar[1, :, :].ravel()
-        self.rvbar_t0 = self.vbar[0, :, :].ravel()
+        self.rvbar_t1 = self.rvbar[1, :, :].ravel()
+        self.rvbar_t0 = self.rvbar[0, :, :].ravel()
 
 
 

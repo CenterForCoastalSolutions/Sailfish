@@ -49,7 +49,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     DV_t1 = vbar_t1*RtoV(D_t1)
 
 
-    know, Δt = compTimes.get2DTimes()
+    know, Δt = compTimes.getDeltaTime()
     kstp, krhs = compTimes.updateTimes(isPredictorStep)
 
     # Free-surface equation.
@@ -158,7 +158,7 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     DV_t2 = vbar_t2*RtoV(D_t2)
 
 
-    know, Δt = compTimes.get2DTimes()
+    know, Δt = compTimes.getDeltaTime()
     kstp, krhs = compTimes.updateTimes(isPredictorStep)
 
     # Free-surface equation.

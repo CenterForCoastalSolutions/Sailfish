@@ -250,6 +250,12 @@ class Boundary:
         idx = ((self.vbarBC.LBC & bcClosed) != 0)
         self.vbarClosedBCIdx1 = self.vbarBC.bcIdx1[idx]
 
+        idx = ((self.ubarBC.LBC & bcClamped) != 0)
+        self.ubarClampedBCIdx1 = self.ubarBC.bcIdx1[idx]
+
+        idx = ((self.vbarBC.LBC & bcClamped) != 0)
+        self.vbarClampedBCIdx1 = self.vbarBC.bcIdx1[idx]
+
         idx = ((self.ubarBC.LBC & bcGradient) != 0)
         self.ubarGradientBCIdx1 = self.ubarBC.bcIdx1[idx]
         self.ubarGradientBCIdx2 = self.ubarBC.bcIdx2[idx]

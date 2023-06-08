@@ -6,8 +6,6 @@ from misc import *
 class CompTimes:
     def __init__(self, input):
 
-        self.keepRunning = True
-
         self.ntimes  = input.getVal('NTIMES',  dtype = int)            # Total number timesteps in current run. In 3D configurations, "ntimes"
                                                                   # is the total of baroclinic timesteps. In 2D configuration, "ntimes"
                                                                   # is the total of barotropic timesteps.
@@ -31,7 +29,7 @@ class CompTimes:
         self.tdays = 0.0     # (days)    Model time clock.
         self.time  = 0.0     # (seconds) Model time clock
 
-        self.dtfast = 0.0
+        self.dtfast = 0.01  # TODO: REMEMBER $$$$XXX
 
         self.TimeEnd  = 0    # (s)
         self.IMPtime  = 0    # (s) Impulse forcing time to process.
@@ -83,72 +81,16 @@ class CompTimes:
         self.time += self.dt
         # self.tdays = self.time * sec2day    TODO : Recover this
 
-        # I think that the best way to explain what these do is this:
-        # time step     Predictor?      kstp    krhs    knew
-        # 0                 y           0       2       1
-        # 0                 n           0       1       2
-        # 1                 y           1       2       0
-        # 1                 n           1       0       2
-        # 2                 y           0       2       1
-        # 2                 n           0       1       2
-        # 3                 y           1       2       0
-        # 3                 n           1       0       2
-        # ...
-        # Or, in other words, kstp has the parity of time step and the other two ocupy the other two spaces,
-        # interchanging them between predictor and corrector
-        # # In this function we compute kstp. krhs and knew are set in updateIndices().
-        # self.kstp = self.iic % 1
-        #
-        #
-        #
-        #
-        # xxxx
-        # time_string(time, time_code)
-        # if (step_counter == Rsteps):
-        #     self.keepRunning = False     TODO: Recover this
-
-        # return self.kstp
-
-
-    # TODO: remove
-    # def updateIndices(self, isPredictor):
-    #
-    #     if self.kstp == 0:
-    #         if isPredictor:
-    #             krhs = 2
-    #             knew = 1
-    #         else:
-    #             krhs = 1
-    #             knew = 2
-    #
-    #     else:
-    #         if isPredictor:
-    #             krhs = 2
-    #             knew = 0
-    #         else:
-    #             krhs = 0
-    #             knew = 2
 
 
 
+    def getDeltaTime(self):
+        # This function is used in the 2D functions. It takes into account that all predictor except for time = 0 do leapfrog and hence, the
 
-
-
-
-    def get2DTimes(self):
-        # This function is used in the 2D functions.
-
-        if self.isFirst2DStep():
-            know = self.krhs
-            dt2d = self.dtfast
-
-        elif self.is2DPredictorStep:
-            know = self.krhs
-            dt2d = 2.0*self.dtfast
+        if self.is2DPredictorStep:
+            return 2.0*self.dtfast
 
         else:
-            know = self.kstp
-            dt2d = self.dtfast
+            return self.dtfast
 
 
-        return  dt2d

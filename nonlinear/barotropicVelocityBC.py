@@ -1,4 +1,5 @@
 from misc import *
+import cupy as cp
 
 
 def barotropicVelocityBC(ubar, vbar, compTimes, BOUNDARY):
@@ -14,10 +15,13 @@ def barotropicVelocityBC(ubar, vbar, compTimes, BOUNDARY):
     # # Clamped boundary condition.
     # ubarKout[kout, idxuClampedBC] = BOUNDARY.ubar[idxuClampedBC]
     # vbarKout[kout, idxvClampedBC] = BOUNDARY.vbar[idxvClampedBC]
-    msgInfo('Implement this')
+    omega = 0.2  # s^-1
+    ubar[BOUNDARY.ubarClampedBCIdx1] = 1.01*cp.sin(compTimes.time*omega)
+    msgInfo('Implement the real Clamped BC, here I am using a fake one!!!')
 
 
-    # Gradient boundary condition.
+    #
+    # # Gradient boundary condition.
     ubar[BOUNDARY.ubarGradientBCIdx1] = ubar[BOUNDARY.ubarGradientBCIdx2]
     vbar[BOUNDARY.vbarGradientBCIdx1] = vbar[BOUNDARY.vbarGradientBCIdx2]
 

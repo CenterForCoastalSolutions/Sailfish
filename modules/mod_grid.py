@@ -185,8 +185,8 @@ class Grid:
 
         self.pmon_u = (self.pm[:-1,:] + self.pm[1:,:])/(self.pn[:-1,:] + self.pn[1:,:])
         self.pnom_u = (self.pn[:-1,:] + self.pn[1:,:])/(self.pm[:-1,:] + self.pm[1:,:])
-        self.om_u = 2.0/(self.pm[:-1,:] + self.pm[1:,:])
-        self.on_u = 2.0/(self.pn[:-1,:] + self.pn[1:,:])
+        self.om_u[1:,:] = 2.0/(self.pm[:-1,:] + self.pm[1:,:])
+        self.on_u[1:,:] = 2.0/(self.pn[:-1,:] + self.pn[1:,:])
 
 
 
@@ -195,8 +195,8 @@ class Grid:
 
         self.pmon_v = (self.pm[:,:-1] + self.pm[:,1:]) / (self.pn[:,:-1] + self.pn[:,1:])
         self.pnom_v = (self.pn[:,:-1] + self.pn[:,1:]) / (self.pm[:,:-1] + self.pm[:,1:])
-        self.om_v = 2.0 / (self.pm[:,:-1] + self.pm[:,1:])
-        self.on_v = 2.0 / (self.pn[:,:-1] + self.pn[:,1:])
+        self.om_v[:,1:] = 2.0 / (self.pm[:,:-1] + self.pm[:,1:])
+        self.on_v[:,1:] = 2.0 / (self.pn[:,:-1] + self.pn[:,1:])
 
 
         # Compute m/n, 1/m, and 1/n at horizontal PSI-points.
@@ -292,8 +292,11 @@ class Grid:
         # Compute grid spacing range.
 
 
+        return      # TODO: remove this
+
+
         rmask = self.rmask
-        dtfast = compTimes.dtfast
+        # dtfast = compTimes.dtfast
 
         grd = cp.sqrt(self.om_r[rmask]*self.on_r[rmask])
 
@@ -351,16 +354,16 @@ class Grid:
 
         # where c=SQRT(g*h) is gravity wave speed, and dx, dy are grid spacing in each direction.
 
-        Cg = dtfast * cp.sqrt(g * cp.abs(h) * (self.pm*self.pm + self.pn*self.pn))
-
-        Cg_min = cp.min(Cg[rmask])
-        Cg_max = cp.max(Cg[rmask])
-
-        Cg_Coriolis_min = dt*cp.min(cp.abs(f[rmask]))
-        Cg_Coriolis_max = dt*cp.max(cp.abs(f[rmask]))
-
-        Cg_min = min(Cg_min, Cg_Coriolis_min)
-        Cg_max = max(Cg_max, Cg_Coriolis_max)
+        # Cg = dtfast * cp.sqrt(g * cp.abs(h) * (self.pm*self.pm + self.pn*self.pn))
+        #
+        # Cg_min = cp.min(Cg[rmask])
+        # Cg_max = cp.max(Cg[rmask])
+        #
+        # Cg_Coriolis_min = dt*cp.min(cp.abs(f[rmask]))
+        # Cg_Coriolis_max = dt*cp.max(cp.abs(f[rmask]))
+        #
+        # Cg_min = min(Cg_min, Cg_Coriolis_min)
+        # Cg_max = max(Cg_max, Cg_Coriolis_max)
 
 
     def printReport(self):
