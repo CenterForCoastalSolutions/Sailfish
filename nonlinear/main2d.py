@@ -34,6 +34,7 @@ def main2d(compTimes,  GRID, OCEAN, BOUNDARY):
 
     import time
     t1 = time.time()
+    print('TTTT', t1)
 
     # Main loop
     # ----------
