@@ -1,4 +1,5 @@
 import sys
+import cProfile
 
 # import mod_operators
 
@@ -46,9 +47,8 @@ v = OCEAN.zeta[0,:,:]
 # bc_2d.bc_r2d([v], BOUNDARY)
 
 
-kout = 0
-zetabc(OCEAN.zeta_t2, compTimes, BOUNDARY)
-barotropicVelocityBC(OCEAN.ubar_t2, OCEAN.vbar_t2, compTimes, BOUNDARY)
+# zetabc(OCEAN.zeta_t2, compTimes, BOUNDARY)
+# barotropicVelocityBC(OCEAN.ubar_t2, OCEAN.vbar_t2, compTimes, BOUNDARY)
 
 
 # Print report of all input parameters read.
@@ -60,7 +60,7 @@ input.printReport()
 ana_grid.ana_grid('Basin', GRID)
 GRID.updateMetrics()
 
-main2d(compTimes,  GRID, OCEAN, BOUNDARY)
+# main2d(compTimes,  GRID, OCEAN, BOUNDARY)
 
-
+cProfile.run('main2d(compTimes,  GRID, OCEAN, BOUNDARY)')
 pass
