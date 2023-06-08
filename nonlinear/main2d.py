@@ -86,7 +86,7 @@ def main2d(compTimes,  GRID, OCEAN, BOUNDARY):
 
 
     t2 = time.time()
-    print(t2 - t1)
+    print('Time ->', t2 - t1)
     exitProgram()
 
 
