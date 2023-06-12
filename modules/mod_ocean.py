@@ -86,6 +86,16 @@ class T_OCEAN:
         self.rvbar_t1 = temp
 
 
+    def getVars(self):
+        return (self.zeta_t2, self.zeta_t1, self.zeta_t0,
+                self.ubar_t2, self.ubar_t1, self.ubar_t0,
+                self.vbar_t2, self.vbar_t1, self.vbar_t0,
+                self.rzeta_t1, self.rzeta_t0,
+                self.rubar_t1, self.rubar_t0,
+                self.rvbar_t1, self.rvbar_t0)
+
+
+
 
 
 # Set array initialization range.
