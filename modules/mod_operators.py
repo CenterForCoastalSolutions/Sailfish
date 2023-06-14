@@ -107,6 +107,18 @@ RtoU_CUDA = cp.ElementwiseKernel(
 
 
 def RtoU(R):
+    mempool = cupy.get_default_memory_pool()
+    pinned_mempool = cupy.get_default_pinned_memory_pool()
+
+    # Create an array on CPU.
+    # NumPy allocates 400 bytes in CPU (not managed by CuPy memory pool).
+    a_cpu = numpy.ndarray(100, dtype=numpy.float32)
+    print('nbytes', a_cpu.nbytes)  # 400
+
+    # You can access statistics of these memory pools.
+    print(mempool.used_bytes())  # 0
+    print(mempool.total_bytes())  # 0
+    print(pinned_mempool.n_free_blocks())  # 0
 
     res = cp.zeros(shp)
     res[:,1:] = RtoU_CUDA(R.reshape(shp)[:,1:], G.on_u[:,1:], size=G.on_u[:,1:].size).reshape(G.on_u[:,1:].shape)
