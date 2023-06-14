@@ -45,7 +45,8 @@ preamble2D = r'''
                 }
                 T &operator()(size_t const j, size_t const i) const
                 {
-                    return *p; //*(p + j*strideJ + i*strideI);
+                    if (j*strideJ + i*strideI>3000*3000) printf("% i **** %i\n", i, j);
+                    return *(p + j*strideJ + i*strideI);
                 }
                 T operator=(T val) const
                 {
