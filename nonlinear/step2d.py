@@ -18,6 +18,9 @@ import time
 
 # In this module, t2, t1 and t0 refer to
 
+cp.set_allocator(cp.MemoryPool().malloc)
+
+
 
 def computeZetaRHS(zeta, h, ubar, vbar):
 
