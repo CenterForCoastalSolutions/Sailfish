@@ -112,7 +112,7 @@ def RtoU(R):
 
     # Create an array on CPU.
     # NumPy allocates 400 bytes in CPU (not managed by CuPy memory pool).
-    a_cpu = numpy.ndarray(100, dtype=numpy.float32)
+    a_cpu = cp.ndarray(100, dtype=cp.float32)
     print('nbytes', a_cpu.nbytes)  # 400
 
     # You can access statistics of these memory pools.
