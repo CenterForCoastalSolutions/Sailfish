@@ -107,8 +107,8 @@ RtoU_CUDA = cp.ElementwiseKernel(
 
 
 def RtoU(R):
-    mempool = cupy.get_default_memory_pool()
-    pinned_mempool = cupy.get_default_pinned_memory_pool()
+    mempool = cp.get_default_memory_pool()
+    pinned_mempool = cp.get_default_pinned_memory_pool()
 
     # Create an array on CPU.
     # NumPy allocates 400 bytes in CPU (not managed by CuPy memory pool).
