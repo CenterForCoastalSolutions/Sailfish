@@ -18,7 +18,7 @@ import time
 
 # In this module, t2, t1 and t0 refer to
 
-cp.cuda.set_allocator(cp.cuda.MemoryPool().malloc)
+# cp.cuda.set_allocator(cp.cuda.MemoryPool().malloc)
 
 
 
