@@ -140,7 +140,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     #compute right-hand-side for the 2D momentum equations
     rhs_ubar, rhs_vbar = computeMomentumRHS(h, gzeta)
 
-
+    print('time step: ', compTimes.iic)
     # Interpolate depth at points U, V
     D_t1 = zeta_t1 + h
     D_t2 = zeta_t2 + h
