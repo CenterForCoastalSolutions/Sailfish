@@ -45,7 +45,7 @@ preamble2D = r'''
                 }
                 T &operator()(size_t const j, size_t const i) const
                 {
-                    return 0.0; //*(p + j*strideJ + i*strideI);
+                    return *p; //*(p + j*strideJ + i*strideI);
                 }
                 T operator=(T val) const
                 {
