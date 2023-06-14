@@ -70,12 +70,12 @@ def main2d(compTimes,  GRID, OCEAN, BOUNDARY):
         # ==============   predictor scheme.
         step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY)
 
-        # if compTimes.iic % 500 == 0:
-        #     plt.clf()
-        #     plt.imshow(OCEAN.zeta_t2.reshape(GRID.M+1, GRID.M+1).get())
-        #     plt.colorbar()
-        #     plt.pause(1)
-        #     print('.... %.2f s    %.2f' % (compTimes.time, OCEAN.zeta_t2.sum()))
+        if compTimes.iic % 500 == 0:
+            plt.clf()
+            plt.imshow(OCEAN.zeta_t2.reshape(GRID.M+1, GRID.M+1).get())
+            plt.colorbar()
+            plt.pause(1)
+            print('.... %.2f s    %.2f' % (compTimes.time, OCEAN.zeta_t2.sum()))
 
 
 
