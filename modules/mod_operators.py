@@ -49,7 +49,7 @@ preamble2D = r'''
                 }
                 T operator=(T val) const
                 {
-                    return 0.0; //(*p = val);
+                    return (*p = val);
                 }
             };
             '''
