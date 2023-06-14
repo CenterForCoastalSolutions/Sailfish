@@ -120,7 +120,7 @@ def RtoU(R):
     print(mempool.total_bytes())  # 0
     print(pinned_mempool.n_free_blocks())  # 0
     print('max:', mempool.get_limit())
-    print('max2:', pinned_mempool.get_limit())
+    # print('max2:', pinned_mempool.get_limit())
     res = cp.zeros(shp)
 
     a = R.reshape(shp)[:, 1:]
