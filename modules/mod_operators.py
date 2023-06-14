@@ -2,15 +2,15 @@ import mod_grid
 import cupy as cp
 
 
-import rmm
-pool = rmm.mr.PoolMemoryResource(
-    rmm.mr.ManagedMemoryResource(),
-    initial_pool_size=5*(2**34),
-    maximum_pool_size=5*(2**34)
-)
-rmm.mr.set_current_device_resource(pool)
-cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
-
+# import rmm
+# pool = rmm.mr.PoolMemoryResource(
+#     rmm.mr.ManagedMemoryResource(),
+#     initial_pool_size=5*(2**30),
+#     maximum_pool_size=5*(2**30)
+# )
+# rmm.mr.set_current_device_resource(pool)
+# cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
+#
 
 G = None   # GRID
 shp = None
