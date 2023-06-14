@@ -43,7 +43,7 @@ preamble2D = r'''
                 Stencil(T *_p): p(_p)
                 {
                 }
-                T &operator()(size_t const j, size_t const i) const
+                T &operator()(int const j, int const i) const
                 {
                     if (j*strideJ + i*strideI>3000*3000) printf("% i **** %i\n", (int)i, (int)j);
                     return *(p + j*strideJ + i*strideI);
