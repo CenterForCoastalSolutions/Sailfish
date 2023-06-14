@@ -45,7 +45,7 @@ preamble2D = r'''
                 }
                 T &operator()(int const j, int const i) const
                 {
-                    if (j*strideJ + i*strideI>3000*3000) printf("% i **** %i\n", (int)i, (int)j);
+                    # if (j*strideJ + i*strideI>3000*3000) printf("% i **** %i\n", (int)i, (int)j);
                     return *(p + j*strideJ + i*strideI);
                 }
                 T operator=(T val) const
@@ -108,32 +108,32 @@ RtoU_CUDA = cp.ElementwiseKernel(
 
 
 def RtoU(R):
-    mempool = cp.get_default_memory_pool()
-    pinned_mempool = cp.get_default_pinned_memory_pool()
-
-    # Create an array on CPU.
-    # NumPy allocates 400 bytes in CPU (not managed by CuPy memory pool).
-    a_cpu = cp.ndarray(100, dtype=cp.float32)
-    print('nbytes', a_cpu.nbytes)  # 400
-
-    # You can access statistics of these memory pools.
-    print(mempool.used_bytes())  # 0
-    print(mempool.total_bytes())  # 0
-    print(pinned_mempool.n_free_blocks())  # 0
-    print('max:', mempool.get_limit())
-    # print('max2:', pinned_mempool.get_limit())
+    # mempool = cp.get_default_memory_pool()
+    # pinned_mempool = cp.get_default_pinned_memory_pool()
+    #
+    # # Create an array on CPU.
+    # # NumPy allocates 400 bytes in CPU (not managed by CuPy memory pool).
+    # a_cpu = cp.ndarray(100, dtype=cp.float32)
+    # print('nbytes', a_cpu.nbytes)  # 400
+    #
+    # # You can access statistics of these memory pools.
+    # print(mempool.used_bytes())  # 0
+    # print(mempool.total_bytes())  # 0
+    # print(pinned_mempool.n_free_blocks())  # 0
+    # print('max:', mempool.get_limit())
+    # # print('max2:', pinned_mempool.get_limit())
     res = cp.zeros(shp)
-
-    a = R.reshape(shp)[:, 1:]
-    print(mempool.used_bytes())
-    b = G.on_u[:, 1:]
-    print(mempool.used_bytes())
-    c = RtoU_CUDA(a, b, size=G.on_u[:, 1:].size)
-    print(mempool.used_bytes())
-
-    res[:, 1:] = c.reshape(G.on_u[:, 1:].shape)
-    print(mempool.used_bytes())
-    # res[:,1:] = RtoU_CUDA(R.reshape(shp)[:,1:], G.on_u[:,1:], size=G.on_u[:,1:].size).reshape(G.on_u[:,1:].shape)
+    #
+    # a = R.reshape(shp)[:, 1:]
+    # print(mempool.used_bytes())
+    # b = G.on_u[:, 1:]
+    # print(mempool.used_bytes())
+    # c = RtoU_CUDA(a, b, size=G.on_u[:, 1:].size)
+    # print(mempool.used_bytes())
+    #
+    # res[:, 1:] = c.reshape(G.on_u[:, 1:].shape)
+    # print(mempool.used_bytes())
+    res[1:,:] = RtoU_CUDA(R.reshape(shp)[1:,:], G.on_u[1:,:], size=G.on_u[1:,:].size).reshape(G.on_u[1:,:].shape)
     return res.ravel()
 
 
@@ -159,7 +159,7 @@ RtoV_CUDA = cp.ElementwiseKernel(
 def RtoV(R):
 
     res = cp.zeros(shp)
-    res[1:,:] = RtoV_CUDA(R.reshape(shp)[1:,:], G.on_u[1:,:], size=G.on_u[1:,:].size).reshape(G.on_u[1:,:].shape)
+    res[:,1:] = RtoV_CUDA(R.reshape(shp)[:,1:], G.on_u[:,1:], size=G.on_u[:,1:].size).reshape(G.on_u[:,1:].shape)
     return res.ravel()
 
 
