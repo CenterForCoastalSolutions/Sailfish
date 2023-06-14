@@ -4,6 +4,8 @@ from barotropicVelocityBC import barotropicVelocityBC
 from zetabc               import zetabc
 from mod_constants import *
 from misc          import *
+import time
+
 #
 # import rmm
 # pool = rmm.mr.PoolMemoryResource(
@@ -29,6 +31,7 @@ def computeZetaRHS(zeta, h, ubar, vbar):
     # compute the water column depth
     D = zeta + h
 
+    time.sleep(10)
     DU = ubar*RtoU(D)
     DV = vbar*RtoV(D)
 
