@@ -32,13 +32,13 @@ def computeZetaRHS(zeta, h, ubar, vbar):
     D = zeta + h
 
     print('Here1')
-    time.sleep(5)
+    # time.sleep(5)
     DU = ubar*RtoU(D)
     print('Here2')
-    time.sleep(5)
+    # time.sleep(5)
     DV = vbar*RtoV(D)
     print('Here3')
-    time.sleep(5)
+    # time.sleep(5)
 
     return divUVtoR(DU, DV)
 
