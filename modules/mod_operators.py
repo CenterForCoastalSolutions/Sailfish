@@ -119,7 +119,7 @@ def RtoU(R):
     print(mempool.used_bytes())  # 0
     print(mempool.total_bytes())  # 0
     print(pinned_mempool.n_free_blocks())  # 0
-    print('max:', cp.cuda.get_limit())
+    print('max:', mempool.get_limit())
     res = cp.zeros(shp)
     res[:,1:] = RtoU_CUDA(R.reshape(shp)[:,1:], G.on_u[:,1:], size=G.on_u[:,1:].size).reshape(G.on_u[:,1:].shape)
     return res.ravel()
