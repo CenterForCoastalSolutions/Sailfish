@@ -41,6 +41,7 @@ compTimes      = mod_comptimes      .CompTimes(input)
 OCEAN          = mod_ocean          .T_OCEAN(input, GRID)
 
 mod_operators.initModule(GRID)
+mod_operators.initOperators((1,), (1,), (10, *(GRID.h.shape)))    # TODO: Change 10 by the Z dimension
 
 
 v = OCEAN.zeta[0,:,:]

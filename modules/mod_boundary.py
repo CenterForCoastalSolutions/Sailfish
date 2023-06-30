@@ -1,4 +1,5 @@
 import cupy as cp
+import os
 from misc import *
 # import mod_param
 # import mod_ncparam
@@ -20,6 +21,8 @@ from misc import *
 #
 #       LBC[idx, isFsur].gradient
 
+setBC = None
+copyBC = None
 
 bcAcquire            = 1 << 0       # Read lateral boundary data from files
 bcChapman_explicit   = 1 << 1
@@ -213,6 +216,15 @@ class Boundary:
 
 
     def __init__(self, input, GRID):
+
+        global setBC, copyBC
+
+        filename = os.path.join(exePath, r'modules/mod_BC.c')
+        with open(filename, 'r') as file:
+            code = file.read()
+        moduleBC = cp.RawModule(code=code, options=('-default-device',))
+        setBC  = moduleBC.get_function('setBC')
+        copyBC = moduleBC.get_function('copyBC')
 
         self.GRID = GRID
 

@@ -1,14 +1,21 @@
 from misc import *
+import math
 import cupy as cp
+import mod_boundary
 
 
 def barotropicVelocityBC(ubar, vbar, compTimes, BOUNDARY):
     """"This subroutine sets lateral boundary conditions for vertically integrated (barotropic) velocities"""
 
+    # import mod_operators
+
 
     # closed boundary condition.
-    ubar[BOUNDARY.ubarClosedBCIdx1] = 0.0
-    vbar[BOUNDARY.vbarClosedBCIdx1] = 0.0
+    # ubar[BOUNDARY.ubarClosedBCIdx1] = 0.0
+    # vbar[BOUNDARY.vbarClosedBCIdx1] = 0.0
+
+    mod_boundary.setBC((BOUNDARY.ubarClosedBCIdx1.size//512 + 1,), (512,), (ubar, BOUNDARY.ubarClosedBCIdx1, BOUNDARY.ubarClosedBCIdx1.size, 0.0))
+    mod_boundary.setBC((BOUNDARY.vbarClosedBCIdx1.size//512 + 1,), (512,), (vbar, BOUNDARY.vbarClosedBCIdx1, BOUNDARY.vbarClosedBCIdx1.size, 0.0))
 
 
 
@@ -16,14 +23,21 @@ def barotropicVelocityBC(ubar, vbar, compTimes, BOUNDARY):
     # ubarKout[kout, idxuClampedBC] = BOUNDARY.ubar[idxuClampedBC]
     # vbarKout[kout, idxvClampedBC] = BOUNDARY.vbar[idxvClampedBC]
     omega = 0.2  # s^-1
-    ubar[BOUNDARY.ubarClampedBCIdx1] = 1.01*cp.sin(compTimes.time*omega)
-    msgInfo('Implement the real Clamped BC, here I am using a fake one!!!')
+    val = 1.01*math.sin(compTimes.time*omega)
+    mod_boundary.setBC((BOUNDARY.ubarClampedBCIdx1.size//512 + 1,), (512,), (ubar, BOUNDARY.ubarClampedBCIdx1, BOUNDARY.ubarClampedBCIdx1.size, val))
+    # msgInfo('Implement the real Clamped BC, here I am using a fake one!!!')    TODO: Remove
 
 
     #
     # # Gradient boundary condition.
-    ubar[BOUNDARY.ubarGradientBCIdx1] = ubar[BOUNDARY.ubarGradientBCIdx2]
-    vbar[BOUNDARY.vbarGradientBCIdx1] = vbar[BOUNDARY.vbarGradientBCIdx2]
+    # ubar[BOUNDARY.ubarGradientBCIdx1] = ubar[BOUNDARY.ubarGradientBCIdx2]
+    # vbar[BOUNDARY.vbarGradientBCIdx1] = vbar[BOUNDARY.vbarGradientBCIdx2]
+
+    mod_boundary.copyBC((BOUNDARY.ubarGradientBCIdx1.size//512 + 1,), (512,), (ubar, BOUNDARY.ubarGradientBCIdx1, BOUNDARY.ubarGradientBCIdx2, BOUNDARY.ubarGradientBCIdx1.size))
+    mod_boundary.copyBC((BOUNDARY.vbarGradientBCIdx1.size//512 + 1,), (512,), (vbar, BOUNDARY.vbarGradientBCIdx1, BOUNDARY.ubarGradientBCIdx2, BOUNDARY.vbarGradientBCIdx1.size))
+
+    # mod_operators.copyBC(ubar, BOUNDARY.ubarGradientBCIdx1, BOUNDARY.ubarGradientBCIdx2, ubar, size = BOUNDARY.ubarGradientBCIdx1.size)
+    # mod_operators.copyBC(vbar, BOUNDARY.vbarGradientBCIdx1, BOUNDARY.vbarGradientBCIdx2, vbar, size = BOUNDARY.vbarGradientBCIdx1.size)
 
 
 

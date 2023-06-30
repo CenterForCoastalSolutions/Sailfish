@@ -1,6 +1,7 @@
 import sys
 
 
+exePath = r'D:\projects\src\oceangpu'
 
 # Execution termination errors.
 exit_flag = {0: 'No error', 1: 'Blows up', 2: 'Input error', 3: 'Output error', 4: 'IO error',
@@ -23,5 +24,4 @@ def msgError(str, error = 1000):
 
 
 def msgInfo(str, level = 0):
-    return
     print('INFO: ', str )

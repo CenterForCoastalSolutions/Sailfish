@@ -1,5 +1,8 @@
+import os.path
+
 import mod_grid
 import cupy as cp
+from misc import *
 
 
 # import rmm
@@ -14,15 +17,20 @@ import cupy as cp
 
 G = None   # GRID
 shp = None
+om_v = None
+on_u = None
+sz = None
 
 
 def initModule(GRID):
     # Initialize some global variables that are used extensively in the module.
 
-    global G, shp
+    global G, shp, on_u, om_v, sz
     G = GRID
+    on_u = G.on_u
+    om_v = G.om_v
     shp = G.on_u.shape   # I chosen on_u, but it could've been any other array.
-
+    sz  = G.on_u.size
 
 
 preamble2D = r'''
@@ -31,22 +39,21 @@ preamble2D = r'''
 
             void initializeStrides(const ptrdiff_t *strides)
             {
-                strideI = 1;
+                //strideI = 1;
                 strideJ = strides[0]/strides[1];
             }
 
             template<typename T>
             class Stencil
             {
-                T *p;    
+                T * const p;   
             public:
-                Stencil(T *_p): p(_p)
+                Stencil(T * _p): p(_p)
                 {
                 }
                 T &operator()(int const j, int const i) const
                 {
-                    //if (j*strideJ + i*strideI>3000*3000) printf("% i **** %i\n", (int)i, (int)j);
-                    return *(p + j*strideJ + i*strideI);
+                    return *(p + j*strideJ + i);
                 }
                 T operator=(T val) const
                 {
@@ -69,9 +76,9 @@ preamble3D = r'''
             template<typename T>
             class Stencil
             {
-                T *p;    
+                T * const p;    
             public:
-                Stencil(T *_p): p(_p)
+                Stencil(T * _p): p(_p)
                 {
                 }
                 T &operator()(size_t const k, size_t const j, size_t const i) const
@@ -85,6 +92,154 @@ preamble3D = r'''
             };
             '''
 
+# -------------------------------------------------------------
+
+
+
+
+
+
+
+
+loaded_from_source = r'''#define STENCIL(var) Stencil<double>  var((double *)(&(_##var[i])))
+ptrdiff_t strideJ, strideI;
+
+template<typename T>
+class Stencil
+{
+    T * const p;   
+public:
+    Stencil(T * _p): p(_p)
+    {
+    }
+    T &operator()(int const j, int const i) const
+    {
+        return *(p + j*strideJ + i);
+    }
+    T operator=(T val) const
+    {
+        return (*p = val);
+    }
+};
+
+extern "C" {
+
+double RtoU(const double *_R, const unsigned int i)
+{
+    
+    // Initializes the stencil variables that allow to access to relative elements.
+    STENCIL(R);
+    
+    if ((i % strideJ)==0) return 0.0;       
+                   
+    return (R(0, 0) + R(-1, 0)) * 0.5;
+
+}
+
+double RtoV(const double *_R, const unsigned int i)
+{
+       
+    STENCIL(R);
+    
+    if ((i/strideJ)==0) return 0.0;
+            
+    return (R(0, 0) + R(0, -1)) * 0.5;
+}
+
+double DERtoU(const double *_R, const double *_on_u, const unsigned int i)
+{
+    STENCIL(R);
+    STENCIL(on_u);
+    
+    if ((i % strideJ)==0) return 0.0; 
+
+    return on_u(0,0)*(R(0, 0) - R(0, -1));
+}
+
+double DNRtoV(const double *_R, const double *_om_v, const unsigned int i)
+{
+    STENCIL(R);
+    STENCIL(om_v);
+    
+    if ((i / strideJ)==0) return 0.0; 
+
+    return om_v(0,0)*(R(0, 0) - R(-1, 0));    
+}
+
+__global__ void computeMomentumRHS(const double *_h, const double *_gzeta, double *_gzeta2, const double *_on_u, const double *_om_v,
+                                   const double *_rhs_ubar, const double *_rhs_vbar)
+{
+    unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+    strideJ = 502;
+    
+    if ((i % strideJ)==0 || (i/strideJ)==0) return;
+    
+    //STENCIL(h);
+    //STENCIL(gzeta);
+    STENCIL(rhs_ubar);
+    STENCIL(rhs_vbar);
+    
+    
+    double g = 9.8; 
+    // printf("%li %li %li %li %p***\n", i, blockDim.x, blockIdx.x, threadIdx.x, _h);
+    // rhs_ubar = RtoU(_h,i); 
+    rhs_ubar = 0.5*g*(RtoU(_h,i)*DERtoU(_gzeta,_on_u,i) + DERtoU(_gzeta2,_on_u,i));
+    rhs_vbar = 0.5*g*(RtoV(_h,i)*DNRtoV(_gzeta,_om_v,i) + DNRtoV(_gzeta2,_om_v,i));
+}   
+
+}
+'''
+
+# module = cp.RawModule(code=loaded_from_source, options=('-default-device',))
+filename = os.path.join(exePath, r'modules/mod_operators.c')
+with open(filename, 'r') as file:
+    code = file.read()
+module = cp.RawModule(code=code, options=('-default-device',))
+computeMomentumRHS = module.get_function('computeMomentumRHS')
+initOperators = module.get_function('initOperators')
+
+
+# -------------------------------------------------------------
+copyBC = cp.ElementwiseKernel(
+    '''raw float64 _R, raw int32 i1, raw int32 i2, raw float64 varForStrides''',
+    '',
+    preamble='',
+    operation=r'''
+        // Initializes the stencil variables that allow to access to relative elements.
+        // initializeStrides(varForStrides.strides());
+
+        // STENCIL(R);
+
+        //printf("44444 - %i\n",  i);
+        int ii1 = i1[i];
+        int ii2 = i2[i];
+        
+        //printf("44444 - %i  %i  %i\n", ii1, ii2, i);
+
+        *((double *)&(_R[ii1])) = _R[ii2];
+
+       ''',
+    name='copyBC',
+    options=('-default-device', '--dopt=on'))
+
+setBC = cp.ElementwiseKernel(
+    '''raw float64 _R, raw int32 i1''',
+    '',
+    preamble='',
+    operation=r'''
+        int ii1 = i1[i];
+
+        *((double *)&(_R[ii1])) = 0.0;
+
+       ''',
+    name='setBC',
+    options=('-default-device', '--dopt=on'))
+
+
+# -------------------------------------------------------------
+
+
+
 RtoU_CUDA = cp.ElementwiseKernel(
     '''raw float64 _R, raw float64 varForStrides''',
     'raw float64 _U',
@@ -92,15 +247,17 @@ RtoU_CUDA = cp.ElementwiseKernel(
     operation=r'''
         // Initializes the stencil variables that allow to access to relative elements.
         initializeStrides(varForStrides.strides());
+        
         STENCIL(R);
         STENCIL(U);
-
+        
+        if ((i % strideJ)==0) { U = 0.0; return; };        
+                       
         U = (R(0, 0) + R(-1, 0)) * 0.5;
 
        ''',
     name='RtoU_CUDA',
-    options=('-default-device',))
-
+    options=('-default-device', '--dopt=on'))
 
 
 
@@ -108,33 +265,8 @@ RtoU_CUDA = cp.ElementwiseKernel(
 
 
 def RtoU(R):
-    # mempool = cp.get_default_memory_pool()
-    # pinned_mempool = cp.get_default_pinned_memory_pool()
-    #
-    # # Create an array on CPU.
-    # # NumPy allocates 400 bytes in CPU (not managed by CuPy memory pool).
-    # a_cpu = cp.ndarray(100, dtype=cp.float32)
-    # print('nbytes', a_cpu.nbytes)  # 400
-    #
-    # # You can access statistics of these memory pools.
-    # print(mempool.used_bytes())  # 0
-    # print(mempool.total_bytes())  # 0
-    # print(pinned_mempool.n_free_blocks())  # 0
-    # print('max:', mempool.get_limit())
-    # # print('max2:', pinned_mempool.get_limit())
-    res = cp.zeros(shp)
-    #
-    # a = R.reshape(shp)[:, 1:]
-    # print(mempool.used_bytes())
-    # b = G.on_u[:, 1:]
-    # print(mempool.used_bytes())
-    # c = RtoU_CUDA(a, b, size=G.on_u[:, 1:].size)
-    # print(mempool.used_bytes())
-    #
-    # res[:, 1:] = c.reshape(G.on_u[:, 1:].shape)
-    # print(mempool.used_bytes())
-    res[1:,:] = RtoU_CUDA(R.reshape(shp)[1:,:], G.on_u[1:,:], size=G.on_u[1:,:].size).reshape(G.on_u[1:,:].shape)
-    return res.ravel()
+
+    return RtoU_CUDA.__call__(R, on_u, size=sz)
 
 
 
@@ -145,22 +277,25 @@ RtoV_CUDA = cp.ElementwiseKernel(
     operation=r'''
         // Initializes the stencil variables that allow to access to relative elements.
         initializeStrides(varForStrides.strides());
+        
         STENCIL(R);
         STENCIL(V);
-
+        
+        if ((i/strideJ)==0) { V = 0.0; return; };
+                
         V = (R(0, 0) + R(0, -1)) * 0.5;
 
        ''',
     name='RtoV_CUDA',
-    options=('-default-device',))
+    options=('-default-device', '--dopt=on'))
 
 
 
 def RtoV(R):
 
-    res = cp.zeros(shp)
-    res[:,1:] = RtoV_CUDA(R.reshape(shp)[:,1:], G.on_u[:,1:], size=G.on_u[:,1:].size).reshape(G.on_u[:,1:].shape)
-    return res.ravel()
+    # res = cp.zeros(shp[0]*shp[1])
+    # res[:,1:] = RtoV_CUDA(R.reshape(shp)[:,1:], G.on_u[:,1:], size=G.on_u[:,1:].size).reshape(G.on_u[:,1:].shape)
+    return RtoV_CUDA(R, on_u, size=sz)
 
 
 
@@ -171,6 +306,7 @@ divUVtoR_CUDA = cp.ElementwiseKernel(
     operation=r'''
         // Initializes the stencil variables that allow to access to relative elements.
         initializeStrides(varForStrides.strides());
+        
         STENCIL(U);
         STENCIL(V);
         STENCIL(R);
@@ -178,20 +314,20 @@ divUVtoR_CUDA = cp.ElementwiseKernel(
         STENCIL(pn);
         STENCIL(on_u);
         STENCIL(om_v);
+
+        if ((i % strideJ)==0 || (i/strideJ)==0) { R = 0.0; return; };
         
         R = ( (U(0, 1)*on_u(0, 1) - U(0, 0)*on_u(0, 0)) + (V(1, 0)*om_v(1, 0) - V(0, 0)*om_v(0, 0)) )*pm(0, 0)*pn(0, 0);
         
 
        ''',
     name='RtoV_CUDA',
-    options=('-default-device',))
+    options=('-default-device', '--dopt=on'))
 
 
 
 def divUVtoR(U, V):
-    res = cp.zeros(shp)
-    res[1:,1:] = divUVtoR_CUDA(U.reshape(shp)[1:,1:], V.reshape(shp)[1:,1:], G.pm[:1,:1], G.pn[1:,1:], G.on_u[1:,1:], G.om_v[1:,1:],  G.on_u, size=G.om_v[1:,1:].size).reshape(G.om_v[1:,1:].shape)
-    return res.ravel()
+    return divUVtoR_CUDA(U, V, G.pm, G.pn, on_u, om_v, on_u, size=sz)
 
 
 
@@ -204,23 +340,23 @@ DξRtoU_CUDA = cp.ElementwiseKernel(
     operation = r'''
             // Initializes the stencil variables that allow to access to relative elements.
             initializeStrides(varForStrides.strides());
+            
             STENCIL(U);
             STENCIL(R);
             STENCIL(on_u);
+            
+            if ((i % strideJ)==0) { U = 0.0; return; };
 
             U = on_u(0,0)*(R(0, 0) - R(0, -1));
-
 
            ''',
     name = 'DXRtoU_CUDA',
     options = ('-default-device',))
 
 
-def DξRtoU(R):
-    res = cp.zeros(shp)
-    res[:,1:] =  DξRtoU_CUDA(R.reshape(shp)[:,1:], G.on_u[:,1:], G.on_u, size=G.on_u[:,1:].size).reshape(G.on_u[:,1:].shape)
-    return res.ravel()
 
+def DξRtoU(R):
+    return DξRtoU_CUDA(R, on_u, on_u, size=sz)
 
 
 
@@ -232,9 +368,12 @@ DηRtoV_CUDA = cp.ElementwiseKernel(
     operation = r'''
             // Initializes the stencil variables that allow to access to relative elements.
             initializeStrides(varForStrides.strides());
+            
             STENCIL(V);
             STENCIL(R);
             STENCIL(om_v);
+            
+            if ((i/strideJ)==0) { V = 0.0; return; };
 
             V = om_v(0,0)*(R(0, 0) - R(-1, 0));
 
@@ -245,6 +384,4 @@ DηRtoV_CUDA = cp.ElementwiseKernel(
 
 
 def DηRtoV(R):
-    res = cp.zeros(shp)
-    res[1:,:] = DηRtoV_CUDA(R.reshape(shp)[1:,:], G.om_v[1:,:], G.om_v, size=G.om_v[1:,:].size).reshape(G.om_v[1:,:].shape)
-    return res.ravel()
+    return DηRtoV_CUDA(R, om_v, om_v, size=sz)

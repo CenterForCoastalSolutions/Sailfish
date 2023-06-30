@@ -3,14 +3,15 @@ import cupy as cp
 
 def zetabc(zeta, compTimes, BOUNDARY):
     """This routine sets lateral boundary conditions for free-surface."""
-
+    import mod_operators
 
     # Gradient/closed boundary condition.
     # "This boundary condition is extremely simple and consists of setting the gradient of a field to zero
     # at the edge. The outside value is set equal to the closest interior value"
-    zeta[BOUNDARY.zetaClosedOrGradientBCIdx1] = zeta[BOUNDARY.zetaClosedOrGradientBCIdx2]
 
+    # zeta[BOUNDARY.zetaClosedOrGradientBCIdx1] = zeta[BOUNDARY.zetaClosedOrGradientBCIdx2]
 
+    mod_operators.copyBC(zeta, BOUNDARY.zetaClosedOrGradientBCIdx1, BOUNDARY.zetaClosedOrGradientBCIdx2, zeta, size=BOUNDARY.zetaClosedOrGradientBCIdx1.size)
     # Clamped boundary condition.
     # "Very simple BC that consist in setting the boundary value to a known exterior value"
     # zetaKout[BOUNDARY.zetaClampedBCIdx1] = BOUNDARY.zeta[BOUNDARY.zetaClampedBCIdx1]

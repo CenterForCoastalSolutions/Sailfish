@@ -20,8 +20,7 @@ import time
 
 # cp.cuda.set_allocator(cp.cuda.MemoryPool().malloc)
 
-
-
+# @cp.fuse
 def computeZetaRHS(zeta, h, ubar, vbar):
 
     #Apply mass point sources (volume vertical influx), if any
@@ -34,21 +33,24 @@ def computeZetaRHS(zeta, h, ubar, vbar):
     # compute the water column depth
     D = zeta + h
 
-    print('Here1')
-    # time.sleep(5)
     DU = ubar*RtoU(D)
-    print('Here2')
-    # time.sleep(5)
     DV = vbar*RtoV(D)
-    print('Here3')
-    # time.sleep(5)
 
     return divUVtoR(DU, DV)
 
 
-def computeMomentumRHS(h, gzeta):
+# computeMomentumRHS = cp.ElementwiseKernel(
+#     'float64 h, float64 gzeta',
+#     'float64 rx, float64 ry',
+#     'z = (x - y) * (x - y)',
+#     'computeMomentumRHS')
+
+
+
+
+def computeMomentumRHS2(h, gzeta):
     rhs_ubar = 0.5*g*(RtoU(h)*DξRtoU(gzeta) + DξRtoU(gzeta*gzeta))
-    rhs_vbar = 0.5*g*(RtoV(h)*DηRtoV(gzeta) + DξRtoU(gzeta*gzeta))
+    rhs_vbar = 0.5*g*(RtoV(h)*DηRtoV(gzeta) + DηRtoV(gzeta*gzeta))
 
 
     # if UV_ADV:
@@ -149,16 +151,25 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
 
     #compute right-hand-side for the 2D momentum equations
-    rhs_ubar, rhs_vbar = computeMomentumRHS(h, gzeta)
+    # rhs_ubar, rhs_vbar = computeMomentumRHS2(h, gzeta)
+
+    rhs_ubar = cp.zeros(gzeta.shape)
+    rhs_vbar = cp.zeros(gzeta.shape)
+    computeMomentumRHS((502,), (502,), (h, gzeta, gzeta*gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
+
 
     print('time step: ', compTimes.iic)
     # Interpolate depth at points U, V
     D_t1 = zeta_t1 + h
     D_t2 = zeta_t2 + h
-    D_t1U = RtoU(D_t1)
-    D_t1V = RtoV(D_t1)
-    D_t2U = RtoU(D_t2)
-    D_t2V = RtoV(D_t2)
+    D_t1U = RtoU_CUDA(D_t1, GRID.on_u, size=GRID.on_u.size)
+    D_t1V = RtoV_CUDA(D_t1, GRID.om_v, size=GRID.om_v.size)
+    D_t2U = RtoU_CUDA(D_t2, GRID.on_u, size=GRID.on_u.size)
+    D_t2V = RtoV_CUDA(D_t2, GRID.om_v, size=GRID.om_v.size)
+    # D_t1U = RtoU(D_t1)
+    # D_t1V = RtoV(D_t1)
+    # D_t2U = RtoU(D_t2)
+    # D_t2V = RtoV(D_t2)
 
 
     # During the first time-step, the predictor step is Forward-Euler
@@ -213,16 +224,26 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
 
     #compute right-hand-side for the 2D momentum equations
-    rhs_ubar, rhs_vbar = computeMomentumRHS(h, gzeta)
+
+    # rhs_ubar, rhs_vbar = computeMomentumRHS2(h, gzeta)
+
+
+    rhs_ubar = cp.zeros(gzeta.shape)
+    rhs_vbar = cp.zeros(gzeta.shape)
+    computeMomentumRHS((502,), (502,), (h, gzeta, gzeta*gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
 
 
     # And interpolate them at points U, V
     D_t1 = zeta_t1 + h
     D_t2 = zeta_t2 + h
-    D_t1U = RtoU(D_t1)
-    D_t1V = RtoV(D_t1)
-    D_t2U = RtoU(D_t2)
-    D_t2V = RtoV(D_t2)
+    D_t1U = RtoU_CUDA(D_t1, GRID.on_u, size=GRID.on_u.size)
+    D_t1V = RtoV_CUDA(D_t1, GRID.om_v, size=GRID.om_v.size)
+    D_t2U = RtoU_CUDA(D_t2, GRID.on_u, size=GRID.on_u.size)
+    D_t2V = RtoV_CUDA(D_t2, GRID.om_v, size=GRID.om_v.size)
+    # D_t1U = RtoU(D_t1)
+    # D_t1V = RtoV(D_t1)
+    # D_t2U = RtoU(D_t2)
+    # D_t2V = RtoV(D_t2)
     # #     // XXXXX
     # D_t1U = D_t1
     # D_t1V = D_t1
