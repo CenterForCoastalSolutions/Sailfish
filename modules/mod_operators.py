@@ -324,10 +324,13 @@ divUVtoR_CUDA = cp.ElementwiseKernel(
     name='RtoV_CUDA',
     options=('-default-device', '--dopt=on'))
 
-
-
+import numba.cuda
+# @numba.cuda.jit
+# @numba.cuda.jit('float64[:](float64[:], float64[:])', device=True, inline=True)
 def divUVtoR(U, V):
-    return divUVtoR_CUDA(U, V, G.pm, G.pn, on_u, om_v, on_u, size=sz)
+    res: cp.ndarray = cp.zeros(U.shape, dtype = cp.float64)
+    res[:] = divUVtoR_CUDA(U, V, G.pm, G.pn, on_u, om_v, on_u, size=sz)
+    return res
 
 
 

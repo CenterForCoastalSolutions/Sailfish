@@ -21,6 +21,8 @@ import time
 # cp.cuda.set_allocator(cp.cuda.MemoryPool().malloc)
 
 # @cp.fuse
+# import numba.cuda
+# @numba.cuda.jit('float64(float64, float64, float64, float64)', device=True, inline=True)
 def computeZetaRHS(zeta, h, ubar, vbar):
 
     #Apply mass point sources (volume vertical influx), if any
@@ -117,7 +119,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # =================================
 
     # During the first time-step, the predictor step is Forward-Euler. Otherwise, the predictor step is Leap-frog.
-    rhs_zeta_t1 = computeZetaRHS(zeta_t1, h, ubar_t1, vbar_t1)
+    rhs_zeta_t1 = computeZetaRHS[512, (502*502)//512 + 1](zeta_t1, h, ubar_t1, vbar_t1)
 
 
     if compTimes.isFirst2DStep():
