@@ -119,7 +119,11 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # =================================
 
     # During the first time-step, the predictor step is Forward-Euler. Otherwise, the predictor step is Leap-frog.
-    rhs_zeta_t1 = computeZetaRHS[512, (502*502)//512 + 1](zeta_t1, h, ubar_t1, vbar_t1)
+    # rhs_zeta_t1 = computeZetaRHS(zeta_t1, h, ubar_t1, vbar_t1)
+    rhs_zeta_t1 = cp.zeros(zeta_t1.shape)
+    computeZetaRHS3((GRID.on_u.shape[0],), (GRID.on_u.shape[1],),
+                        (zeta_t1, h, ubar_t1, vbar_t1, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rhs_zeta_t1))
+
 
 
     if compTimes.isFirst2DStep():
@@ -157,9 +161,9 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
     rhs_ubar = cp.zeros(gzeta.shape)
     rhs_vbar = cp.zeros(gzeta.shape)
-    computeMomentumRHS((502,), (502,), (h, gzeta, gzeta*gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
+    # computeMomentumRHS((GRID.on_u.shape[0],), (GRID.on_u.shape[1],), (h, gzeta, gzeta*gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
 
-
+    computeMomentumRHS3((GRID.on_u.shape[0],), (GRID.on_u.shape[1],), (h, gzeta, gzeta * gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
     print('time step: ', compTimes.iic)
     # Interpolate depth at points U, V
     D_t1 = zeta_t1 + h
@@ -211,7 +215,10 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
     # During the first time-step,the corrector step is Backward-Euler. Otherwise, the corrector step is Adams-Moulton.
 
-    rhs_zeta_t2 = computeZetaRHS(zeta_t2, h, ubar_t2, vbar_t2)
+    # rhs_zeta_t2 = computeZetaRHS(zeta_t2, h, ubar_t2, vbar_t2)
+    rhs_zeta_t2 = cp.zeros(zeta_t1.shape)
+    computeZetaRHS3((GRID.on_u.shape[0],), (GRID.on_u.shape[1],),
+                    (zeta_t2, h, ubar_t2, vbar_t2, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rhs_zeta_t2))
 
     # Adams-Moulton order 3
     zeta_t2[:] = zeta_t1 + Δt*(AM3_2*rhs_zeta_t2 + AM3_2*rzeta_t1 + AM3_2*rzeta_t0)
@@ -232,7 +239,7 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
     rhs_ubar = cp.zeros(gzeta.shape)
     rhs_vbar = cp.zeros(gzeta.shape)
-    computeMomentumRHS((502,), (502,), (h, gzeta, gzeta*gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
+    computeMomentumRHS3((GRID.on_u.shape[0],), (GRID.on_u.shape[1],), (h, gzeta, gzeta*gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
 
 
     # And interpolate them at points U, V

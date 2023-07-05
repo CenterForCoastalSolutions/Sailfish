@@ -76,8 +76,8 @@ def main2d(compTimes,  GRID, OCEAN, BOUNDARY):
         #     plt.colorbar()
         #     plt.pause(1)
         #     print('.... %.2f s    %.2f' % (compTimes.time, OCEAN.zeta_t2.sum()))
-
-
+        #
+        #
 
         # if compTimes.iif < nfast + 1: TODO: Keep this extra step???
 

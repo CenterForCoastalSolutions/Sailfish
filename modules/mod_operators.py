@@ -32,6 +32,8 @@ def initModule(GRID):
     shp = G.on_u.shape   # I chosen on_u, but it could've been any other array.
     sz  = G.on_u.size
 
+    initializeCPPKernels((1,), (1,), (1, shp[0], shp[1]))
+
 
 preamble2D = r'''
             #define STENCIL(var) Stencil<double>  var((double *)(&(_##var[i])))
@@ -197,6 +199,22 @@ with open(filename, 'r') as file:
 module = cp.RawModule(code=code, options=('-default-device',))
 computeMomentumRHS = module.get_function('computeMomentumRHS')
 initOperators = module.get_function('initOperators')
+
+
+
+filename = os.path.join(exePath, r'modules/mod_cppkernels.cpp')
+with open(filename, 'r') as file:
+    code = file.read()
+moduleCPPKernels = cp.RawModule(code=code, options=('-default-device', '--dopt=on', '--std=c++17'))
+initializeCPPKernels = moduleCPPKernels.get_function('initialize')
+
+computeMomentumRHS3 = moduleCPPKernels.get_function('computeMomentumRHS')
+computeZetaRHS3     = moduleCPPKernels.get_function('computeZetaRHS')
+
+
+
+
+# initOperators = moduleCPPKernels.get_function('initOperators')
 
 
 # -------------------------------------------------------------

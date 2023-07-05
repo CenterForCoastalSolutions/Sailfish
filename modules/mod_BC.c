@@ -1,4 +1,7 @@
+// This module defines two kernels that help with setting up Boundary Conditions.
+
 extern "C" {
+
 
     __global__ void setBC(double *var, const unsigned int *idx, const unsigned int size, const double val)
     {
