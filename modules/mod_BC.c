@@ -11,6 +11,7 @@ extern "C" {
         var[idx[i]] = val;
     }
 
+    // XXX JMG TODO: Zero copy
     __global__ void copyBC(double *var, const unsigned int *idx1, const unsigned int *idx2, const unsigned int size)
     {
         const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
@@ -18,6 +19,8 @@ extern "C" {
         if ( i >= size) return;
         var[idx1[i]] = var[idx2[i]];
     }
+
+
 
 
 

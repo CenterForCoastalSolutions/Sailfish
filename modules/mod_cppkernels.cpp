@@ -406,9 +406,7 @@ void computeMomentumRHS(const double *_h, const double *_gzeta, double *_gzeta2,
     STENCIL(on_u);
     STENCIL(om_v);
 
-//    printf("HERERERE!!! %i %f\n", i,  0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta2,on_u)));
-//rhs_ubar = 1.3;
-//rhs_ubar = 1.3*RtoU(h);
+
     rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta2,on_u));
     rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta2,om_v));
 }
@@ -438,4 +436,30 @@ void computeZetaRHS(const double *_zeta, const double *_h, double *_ubar, const 
     auto DV = vbar*RtoV(D);
 
     res = divUVtoR(DU, DV, on_u, om_v, pn, pm);
+}
+
+
+
+
+extern "C"  __global__
+void aaa(const double Dt, const double *_zeta_t0, const double *_zeta_t1, const double *_zeta_t2,
+         const double *_rhs_zeta_t1, const double *_rzeta_t1, const double *_gzeta)
+{
+    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+
+    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
+
+    STENCIL(zeta_t0);
+    STENCIL(zeta_t1);
+    STENCIL(zeta_t2);
+    STENCIL(rhs_zeta_t1);
+    STENCIL(rzeta_t1);
+    STENCIL(gzeta);
+
+    zeta_t2 = zeta_t0(0,0) + 2.0*Dt*rhs_zeta_t1(0,0);
+
+    double weight = 4.0/25.0;
+    gzeta = (1 - weight)*zeta_t1(0,0) + weight*0.5*(zeta_t2(0,0) + zeta_t0(0,0));
+
+    rzeta_t1 = rhs_zeta_t1(0,0);
 }

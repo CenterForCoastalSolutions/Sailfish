@@ -139,13 +139,72 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
         # If is not the first time step, the predictor consists of a leapfrog time step where the RHS is computed at tn
         # and time derivatives are centered at tn (f(tn+1) - f(tn-1))/2*dtfast.
 
-        zeta_t2[:] = zeta_t0 + 2*Δt*rhs_zeta_t1   # The 2*Δt comes from leapfrog doing a central time derivative.
+        # zeta_t2[:] = zeta_t0 + 2*Δt*rhs_zeta_t1   # The 2*Δt comes from leapfrog doing a central time derivative.
+        #
+        # weight = 4.0/25.0
+        # gzeta = (1 - weight)*zeta_t1 + weight*0.5*(zeta_t2 + zeta_t0)
+        #
+        # # In the predictor step, save the rhs for future use.
+        # rzeta_t1[:] = rhs_zeta_t1
 
-        weight = 4.0/25.0
-        gzeta = (1 - weight)*zeta_t1 + weight*0.5*(zeta_t2 + zeta_t0)
 
-        # In the predictor step, save the rhs for future use.
-        rzeta_t1[:] = rhs_zeta_t1
+        # aaa = cp.RawKernel(
+        #     code = """
+        #     #define STENCIL(var) Stencil<double>  var((double *)(&(_##var[i])))
+        #     ptrdiff_t strideJ, strideI;
+        #
+        #     void initializeStrides(const ptrdiff_t *strides)
+        #     {
+        #         //strideI = 1;
+        #         strideJ = strides[0]/strides[1];
+        #     }
+        #
+        #     template<typename T>
+        #     class Stencil
+        #     {
+        #         T * const p;
+        #     public:
+        #         Stencil(T * _p): p(_p)
+        #         {
+        #         }
+        #         T &operator()(int const j, int const i) const
+        #         {
+        #             return *(p + j*strideJ + i);
+        #         }
+        #         T operator=(T val) const
+        #         {
+        #             return (*p = val);
+        #         }
+        #     };
+        #
+        #     void aaa(const double Dt, const double *_zeta_t0, const double *_zeta_t1, const double *_zeta_t2,
+        #     const double *_rhs_zeta_t1, const double *_rzeta_t1, const double *_gzeta)
+        #     {
+        #         const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+        #
+        #         if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
+        #
+        #         STENCIL(_zeta_t0);
+        #         STENCIL(_zeta_t1);
+        #         STENCIL(_zeta_t2);
+        #         STENCIL(_rhs_zeta_t1);
+        #         STENCIL(_rzeta_t1);
+        #         STENCIL(_gzeta);
+        #
+        #         zeta_t2 = zeta_t0(0,0) + 2.0*Dt*rhs_zeta_t1(0,0);
+        #
+        #         weight = 4.0/25.0;
+        #         gzeta = (1 - weight)*zeta_t1(0,0) + weight*0.5*(zeta_t2(0,0) + zeta_t0(0,0));
+        #
+        #         rzeta_t1 = rhs_zeta_t1(0,0);
+        #     }
+        #     """,
+        #     name = 'aaa')
+        gzeta = cp.zeros(zeta_t1.shape)
+        aaa(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,),
+            (Δt, zeta_t0, zeta_t1, zeta_t2, rhs_zeta_t1, rzeta_t1, gzeta))
+
+
 
 
     # Apply free-surface lateral BC

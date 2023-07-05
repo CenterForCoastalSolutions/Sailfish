@@ -210,6 +210,7 @@ initializeCPPKernels = moduleCPPKernels.get_function('initialize')
 
 computeMomentumRHS3 = moduleCPPKernels.get_function('computeMomentumRHS')
 computeZetaRHS3     = moduleCPPKernels.get_function('computeZetaRHS')
+aaa     = moduleCPPKernels.get_function('aaa')
 
 
 
