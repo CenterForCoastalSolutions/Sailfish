@@ -238,7 +238,7 @@ copyBC = cp.ElementwiseKernel(
 
        ''',
     name='copyBC',
-    options=('-default-device', '--dopt=on'))
+    options=('-default-device',))
 
 setBC = cp.ElementwiseKernel(
     '''raw float64 _R, raw int32 i1''',
