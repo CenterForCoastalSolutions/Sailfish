@@ -2,6 +2,7 @@ import sys
 
 
 exePath = r'D:\projects\src\oceangpu'
+exePath = r'/home/jo.gonzalez/src/Sailfish'
 
 blockSize = 512
 
