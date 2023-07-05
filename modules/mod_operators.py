@@ -271,7 +271,7 @@ RtoU_CUDA = cp.ElementwiseKernel(
         
         if ((i % strideJ)==0) { U = 0.0; return; };        
                        
-        U = (R(0, 0) + R(-1, 0)) * 0.5;
+        U = (R(0, 0) + R(0, -1)) * 0.5;
 
        ''',
     name='RtoU_CUDA',
@@ -301,7 +301,7 @@ RtoV_CUDA = cp.ElementwiseKernel(
         
         if ((i/strideJ)==0) { V = 0.0; return; };
                 
-        V = (R(0, 0) + R(0, -1)) * 0.5;
+        V = (R(0, 0) + R(-1, 0)) * 0.5;
 
        ''',
     name='RtoV_CUDA',
