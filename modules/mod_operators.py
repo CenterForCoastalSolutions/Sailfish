@@ -251,7 +251,7 @@ setBC = cp.ElementwiseKernel(
 
        ''',
     name='setBC',
-    options=('-default-device', '--dopt=on'))
+    options=('-default-device',))
 
 
 # -------------------------------------------------------------
@@ -275,7 +275,7 @@ RtoU_CUDA = cp.ElementwiseKernel(
 
        ''',
     name='RtoU_CUDA',
-    options=('-default-device', '--dopt=on'))
+    options=('-default-device',))
 
 
 
@@ -305,7 +305,7 @@ RtoV_CUDA = cp.ElementwiseKernel(
 
        ''',
     name='RtoV_CUDA',
-    options=('-default-device', '--dopt=on'))
+    options=('-default-device',))
 
 
 
@@ -340,7 +340,7 @@ divUVtoR_CUDA = cp.ElementwiseKernel(
 
        ''',
     name='RtoV_CUDA',
-    options=('-default-device', '--dopt=on'))
+    options=('-default-device',))
 
 import numba.cuda
 # @numba.cuda.jit
