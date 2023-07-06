@@ -121,7 +121,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # During the first time-step, the predictor step is Forward-Euler. Otherwise, the predictor step is Leap-frog.
     # rhs_zeta_t1 = computeZetaRHS(zeta_t1, h, ubar_t1, vbar_t1)
     rhs_zeta_t1 = cp.zeros(zeta_t1.shape)
-    computeZetaRHS3(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,),
+    computeZetaRHS3(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,),
                         (zeta_t1, h, ubar_t1, vbar_t1, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rhs_zeta_t1))
 
 
@@ -150,7 +150,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
 
         gzeta = cp.zeros(zeta_t1.shape)
-        aaa(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,),
+        aaa(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,),
             (Δt, zeta_t0, zeta_t1, zeta_t2, rhs_zeta_t1, rzeta_t1, gzeta))
 
 
@@ -171,7 +171,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     rhs_vbar = cp.zeros(gzeta.shape)
     # computeMomentumRHS((GRID.on_u.shape[0],), (GRID.on_u.shape[1],), (h, gzeta, gzeta*gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
 
-    computeMomentumRHS3(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,),
+    computeMomentumRHS3(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,),
                         (h, gzeta, gzeta * gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
     print('time step: ', compTimes.iic)
     # Interpolate depth at points U, V
@@ -192,8 +192,8 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # step is Leap-frog and the corrector step is Adams-Moulton.
     # TODO: I don't think this comment is correct.
 
-    Pred(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,), (Δt, ubar_t1, ubar_t2, rhs_ubar, D_t1U, D_t2U))
-    Pred(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,), (Δt, vbar_t1, vbar_t2, rhs_vbar, D_t1V, D_t2V))
+    Pred(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,), (Δt, ubar_t1, ubar_t2, rhs_ubar, D_t1U, D_t2U))
+    Pred(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,), (Δt, vbar_t1, vbar_t2, rhs_vbar, D_t1V, D_t2V))
     # ubar_t2[:] = (ubar_t1*D_t1U + Δt*rhs_ubar)/D_t2U
     # vbar_t2[:] = (vbar_t1*D_t1V + Δt*rhs_vbar)/D_t2V
 
@@ -228,16 +228,16 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
     # rhs_zeta_t2 = computeZetaRHS(zeta_t2, h, ubar_t2, vbar_t2)
     rhs_zeta_t2 = cp.zeros(zeta_t1.shape)
-    computeZetaRHS3(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,),
+    computeZetaRHS3(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,),
                     (zeta_t2, h, ubar_t2, vbar_t2, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rhs_zeta_t2))
 
     # Adams-Moulton order 3
     # zeta_t2[:] = zeta_t1 + Δt*(AM3_2*rhs_zeta_t2 + AM3_1*rzeta_t1 + AM3_0*rzeta_t0)
-    AdamsMoultonCorr3rd(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,),
+    AdamsMoultonCorr3rd(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,),
                         (Δt, zeta_t2, rzeta_t0, rzeta_t1, rhs_zeta_t2))
 
     gzeta = cp.zeros(zeta_t1.shape)
-    bbb(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,),
+    bbb(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,),
         (zeta_t1, zeta_t2, gzeta))
     # weight = 2.0/5.0
     # gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1
@@ -255,7 +255,7 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
     rhs_ubar = cp.zeros(gzeta.shape)
     rhs_vbar = cp.zeros(gzeta.shape)
-    computeMomentumRHS3(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,),
+    computeMomentumRHS3(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,),
                         (h, gzeta, gzeta*gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
 
 
@@ -280,7 +280,7 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # During the first time-step, the corrector step is Backward-Euler. Otherwise, the corrector step is Adams-Moulton.
     # ubar_t2[:] = (ubar_t1*D_t1U + Δt*(AM3_2*rhs_ubar + AM3_1*rubar_t1 + AM3_0*rubar_t0))/D_t2U
     # vbar_t2[:] = (vbar_t1*D_t1V + Δt*(AM3_2*rhs_vbar + AM3_1*rvbar_t1 + AM3_0*rvbar_t0))/D_t2V
-    AdamsMoultonCorr3rd(((GRID.on_u.shape[0] * GRID.on_u.shape[1]) // 512 + 1,), (512,),
+    AdamsMoultonCorr3rd(((GRID.on_u.shape[0] * GRID.on_u.shape[1]) // blockSize + 1,), (blockSize,),
                         (Δt, vbar_t2, rvbar_t0, rvbar_t1, rhs_vbar))
 
 

@@ -4,7 +4,7 @@ import sys
 # exePath = r'D:\projects\src\oceangpu'
 exePath = r'/home/jo.gonzalez/src/Sailfish'
 
-blockSize = 512
+blockSize = 1024
 
 # Execution termination errors.
 exit_flag = {0: 'No error', 1: 'Blows up', 2: 'Input error', 3: 'Output error', 4: 'IO error',
