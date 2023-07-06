@@ -205,7 +205,7 @@ initOperators = module.get_function('initOperators')
 filename = os.path.join(exePath, r'modules/mod_cppkernels.cpp')
 with open(filename, 'r') as file:
     code = file.read()
-moduleCPPKernels = cp.RawModule(code=code, options=('-default-device', '--std=c++17'))
+moduleCPPKernels = cp.RawModule(code=code, options=('-default-device', '--dopt', '--std=c++17'))
 initializeCPPKernels = moduleCPPKernels.get_function('initialize')
 
 computeMomentumRHS3 = moduleCPPKernels.get_function('computeMomentumRHS')
@@ -218,43 +218,6 @@ Pred = moduleCPPKernels.get_function('Pred')
 
 
 # initOperators = moduleCPPKernels.get_function('initOperators')
-
-
-# -------------------------------------------------------------
-copyBC = cp.ElementwiseKernel(
-    '''raw float64 _R, raw int32 i1, raw int32 i2, raw float64 varForStrides''',
-    '',
-    preamble='',
-    operation=r'''
-        // Initializes the stencil variables that allow to access to relative elements.
-        // initializeStrides(varForStrides.strides());
-
-        // STENCIL(R);
-
-        //printf("44444 - %i\n",  i);
-        int ii1 = i1[i];
-        int ii2 = i2[i];
-        
-        //printf("44444 - %i  %i  %i\n", ii1, ii2, i);
-
-        *((double *)&(_R[ii1])) = _R[ii2];
-
-       ''',
-    name='copyBC',
-    options=('-default-device',))
-
-setBC = cp.ElementwiseKernel(
-    '''raw float64 _R, raw int32 i1''',
-    '',
-    preamble='',
-    operation=r'''
-        int ii1 = i1[i];
-
-        *((double *)&(_R[ii1])) = 0.0;
-
-       ''',
-    name='setBC',
-    options=('-default-device',))
 
 
 # -------------------------------------------------------------
