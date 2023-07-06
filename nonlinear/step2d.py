@@ -324,8 +324,8 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
 
     # During the first time-step, the corrector step is Backward-Euler. Otherwise, the corrector step is Adams-Moulton.
-    ubar_t2[:] = (ubar_t1*D_t1U + Δt*(AM3_2*rhs_ubar + AM3_1*rubar_t1 + AM3_0*rubar_t0))/D_t2U
-    vbar_t2[:] = (vbar_t1*D_t1V + Δt*(AM3_2*rhs_vbar + AM3_1*rvbar_t1 + AM3_0*rvbar_t0))/D_t2V
+    # ubar_t2[:] = (ubar_t1*D_t1U + Δt*(AM3_2*rhs_ubar + AM3_1*rubar_t1 + AM3_0*rubar_t0))/D_t2U
+    # vbar_t2[:] = (vbar_t1*D_t1V + Δt*(AM3_2*rhs_vbar + AM3_1*rvbar_t1 + AM3_0*rvbar_t0))/D_t2V
     AdamsMoultonCorr3rd(((GRID.on_u.shape[0] * GRID.on_u.shape[1]) // 512 + 1,), (512,),
                         (Δt, vbar_t2, rvbar_t0, rvbar_t1, rhs_vbar))
 
