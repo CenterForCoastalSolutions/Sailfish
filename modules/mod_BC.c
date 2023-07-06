@@ -8,6 +8,7 @@ extern "C" {
         const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
         if ( i >= size) return;
+
         var[idx[i]] = val;
     }
 
@@ -17,6 +18,7 @@ extern "C" {
         const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
         if ( i >= size) return;
+
         var[idx1[i]] = var[idx2[i]];
     }
 
