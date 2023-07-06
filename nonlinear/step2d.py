@@ -23,22 +23,22 @@ import time
 # @cp.fuse
 # import numba.cuda
 # @numba.cuda.jit('float64(float64, float64, float64, float64)', device=True, inline=True)
-def computeZetaRHS(zeta, h, ubar, vbar):
-
-    #Apply mass point sources (volume vertical influx), if any
-    # TODO: Implement XXXX
-    # if LwSrc:
-    #     ij = SOURCES.IJsrc   # This has to be precomputed as i + j*width
-    #     zeta[knew,:,:].ravel()[ij] += SOURCES.Qbar*pm.ravel()[ij]*pn.ravel()[ij]*dtfast
-    # addForcings()
-
-    # compute the water column depth
-    D = zeta + h
-
-    DU = ubar*RtoU(D)
-    DV = vbar*RtoV(D)
-
-    return divUVtoR(DU, DV)
+# def computeZetaRHS(zeta, h, ubar, vbar):
+#
+#     #Apply mass point sources (volume vertical influx), if any
+#     # TODO: Implement XXXX
+#     # if LwSrc:
+#     #     ij = SOURCES.IJsrc   # This has to be precomputed as i + j*width
+#     #     zeta[knew,:,:].ravel()[ij] += SOURCES.Qbar*pm.ravel()[ij]*pn.ravel()[ij]*dtfast
+#     # addForcings()
+#
+#     # compute the water column depth
+#     D = zeta + h
+#
+#     DU = ubar*RtoU(D)
+#     DV = vbar*RtoV(D)
+#
+#     return divUVtoR(DU, DV)
 
 
 # computeMomentumRHS = cp.ElementwiseKernel(
@@ -50,9 +50,9 @@ def computeZetaRHS(zeta, h, ubar, vbar):
 
 
 
-def computeMomentumRHS2(h, gzeta):
-    rhs_ubar = 0.5*g*(RtoU(h)*DξRtoU(gzeta) + DξRtoU(gzeta*gzeta))
-    rhs_vbar = 0.5*g*(RtoV(h)*DηRtoV(gzeta) + DηRtoV(gzeta*gzeta))
+# def computeMomentumRHS2(h, gzeta):
+#     rhs_ubar = 0.5*g*(RtoU(h)*DξRtoU(gzeta) + DξRtoU(gzeta*gzeta))
+#     rhs_vbar = 0.5*g*(RtoV(h)*DηRtoV(gzeta) + DηRtoV(gzeta*gzeta))
 
 
     # if UV_ADV:
@@ -95,7 +95,7 @@ def computeMomentumRHS2(h, gzeta):
 
     # compute the water column depth at times "new" and "stp"
 
-    return rhs_ubar, rhs_vbar
+    # return rhs_ubar, rhs_vbar
 
 
 
@@ -243,8 +243,10 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # step is Leap-frog and the corrector step is Adams-Moulton.
     # TODO: I don't think this comment is correct.
 
-    ubar_t2[:] = (ubar_t1*D_t1U + Δt*rhs_ubar)/D_t2U
-    vbar_t2[:] = (vbar_t1*D_t1V + Δt*rhs_vbar)/D_t2V
+    Pred(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,), (Δt, ubar_t1, ubar_t2, rhs_ubar, D_t1U, D_t2U))
+    Pred(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,), (Δt, vbar_t1, vbar_t2, rhs_vbar, D_t1V, D_t2V))
+    # ubar_t2[:] = (ubar_t1*D_t1U + Δt*rhs_ubar)/D_t2U
+    # vbar_t2[:] = (vbar_t1*D_t1V + Δt*rhs_vbar)/D_t2V
 
     # In the predictor step, save the rhs for future use.
     rubar_t1[:] = rhs_ubar

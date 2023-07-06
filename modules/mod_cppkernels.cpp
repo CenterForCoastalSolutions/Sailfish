@@ -466,6 +466,24 @@ void aaa(const double Dt, const double *_zeta_t0, const double *_zeta_t1, const 
 
 
 
+extern "C"  __global__
+void Pred(const double Dt, const double *_v_t1, const double *_v_t2, const double *_rhs, const double *_D_t1, const double *_D_t2)
+{
+    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+
+    if (i >= sz2D) return;
+
+    STENCIL(v_t1);
+    STENCIL(v_t2);
+    STENCIL(D_t1);
+    STENCIL(D_t2);
+    STENCIL(rhs);
+
+    v_t2 = (v_t1(0,0)*D_t1(0,0) + Dt*rhs(0,0))/D_t2(0,0);
+
+}
+
+
 
 extern "C"  __global__
 void AdamsMoultonCorr3rd(const double Dt, const double *_v_t2, const double *_rhs_t0, const double *_rhs_t1, const double *_rhs_t2)
