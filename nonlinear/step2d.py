@@ -281,7 +281,9 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
                     (zeta_t2, h, ubar_t2, vbar_t2, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rhs_zeta_t2))
 
     # Adams-Moulton order 3
-    zeta_t2[:] = zeta_t1 + Δt*(AM3_2*rhs_zeta_t2 + AM3_2*rzeta_t1 + AM3_2*rzeta_t0)
+    # zeta_t2[:] = zeta_t1 + Δt*(AM3_2*rhs_zeta_t2 + AM3_1*rzeta_t1 + AM3_0*rzeta_t0)
+    AdamsMoultonCorr3rd(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,),
+                        (Δt, zeta_t2, rzeta_t0, rzeta_t1, rhs_zeta_t2))
 
     weight = 2.0/5.0
     gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1
@@ -324,6 +326,8 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # During the first time-step, the corrector step is Backward-Euler. Otherwise, the corrector step is Adams-Moulton.
     ubar_t2[:] = (ubar_t1*D_t1U + Δt*(AM3_2*rhs_ubar + AM3_1*rubar_t1 + AM3_0*rubar_t0))/D_t2U
     vbar_t2[:] = (vbar_t1*D_t1V + Δt*(AM3_2*rhs_vbar + AM3_1*rvbar_t1 + AM3_0*rvbar_t0))/D_t2V
+    AdamsMoultonCorr3rd(((GRID.on_u.shape[0] * GRID.on_u.shape[1]) // 512 + 1,), (512,),
+                        (Δt, vbar_t2, rvbar_t0, rvbar_t1, rhs_vbar))
 
 
     # Apply lateral boundary conditions.

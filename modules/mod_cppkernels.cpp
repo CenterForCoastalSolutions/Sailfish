@@ -416,7 +416,7 @@ extern "C"  __global__
 void computeZetaRHS(const double *_zeta, const double *_h, double *_ubar, const double *_vbar, const double *_on_u, const double *_om_v, const double *_pn, const double *_pm, double *_res)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-
+//TODO: also (i % szJ) == N || (i/szJ) == M)
     if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
 
     STENCIL(h);
@@ -462,4 +462,26 @@ void aaa(const double Dt, const double *_zeta_t0, const double *_zeta_t1, const 
     gzeta = (1 - weight)*zeta_t1(0,0) + weight*0.5*(zeta_t2(0,0) + zeta_t0(0,0));
 
     rzeta_t1 = rhs_zeta_t1(0,0);
+}
+
+
+
+
+extern "C"  __global__
+void AdamsMoultonCorr3rd(const double Dt, const double *_v_t2, const double *_rhs_t0, const double *_rhs_t1, const double *_rhs_t2)
+{
+    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+    // Adams-Moulton 3rd order coefficients
+    constexpr double AM3_2 =  5.0 / 12.0;
+    constexpr double AM3_1 =  8.0 / 12.0;
+    constexpr double AM3_0 = -1.0 / 12.0;
+
+    if (i >= sz2D) return;
+
+    STENCIL(rhs_t0);
+    STENCIL(rhs_t1);
+    STENCIL(rhs_t2);
+    STENCIL(v_t2);
+
+    v_t2 = v_t2(0,0) + Dt*(AM3_2*rhs_t2(0,0) + AM3_1*rhs_t1(0,0) + AM3_0*rhs_t0(0,0));
 }
