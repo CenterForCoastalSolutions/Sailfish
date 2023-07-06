@@ -205,7 +205,7 @@ initOperators = module.get_function('initOperators')
 filename = os.path.join(exePath, r'modules/mod_cppkernels.cpp')
 with open(filename, 'r') as file:
     code = file.read()
-moduleCPPKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--compiler-options --dopt=on', '--std=c++17'))
+moduleCPPKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--compiler-options', '--dopt=on', '--std=c++17'))
 initializeCPPKernels = moduleCPPKernels.get_function('initialize')
 
 computeMomentumRHS3 = moduleCPPKernels.get_function('computeMomentumRHS')
