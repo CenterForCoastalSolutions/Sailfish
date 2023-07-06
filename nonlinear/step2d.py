@@ -177,14 +177,18 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # Interpolate depth at points U, V
     D_t1 = zeta_t1 + h
     D_t2 = zeta_t2 + h
-    D_t1U = RtoU_CUDA(D_t1, GRID.on_u, size=GRID.on_u.size)
-    D_t1V = RtoV_CUDA(D_t1, GRID.om_v, size=GRID.om_v.size)
-    D_t2U = RtoU_CUDA(D_t2, GRID.on_u, size=GRID.on_u.size)
-    D_t2V = RtoV_CUDA(D_t2, GRID.om_v, size=GRID.om_v.size)
+    # D_t1U = RtoU_CUDA(D_t1, GRID.on_u, size=GRID.on_u.size)
+    # D_t1V = RtoV_CUDA(D_t1, GRID.om_v, size=GRID.om_v.size)
+    # D_t2U = RtoU_CUDA(D_t2, GRID.on_u, size=GRID.on_u.size)
+    # D_t2V = RtoV_CUDA(D_t2, GRID.om_v, size=GRID.om_v.size)
     # D_t1U = RtoU(D_t1)
     # D_t1V = RtoV(D_t1)
     # D_t2U = RtoU(D_t2)
     # D_t2V = RtoV(D_t2)
+    D_t1U = D_t1
+    D_t1V = D_t1
+    D_t2U = D_t2
+    D_t2V = D_t2
 
 
     # During the first time-step, the predictor step is Forward-Euler
