@@ -236,8 +236,11 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     AdamsMoultonCorr3rd(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,),
                         (Δt, zeta_t2, rzeta_t0, rzeta_t1, rhs_zeta_t2))
 
-    weight = 2.0/5.0
-    gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1
+    gzeta = cp.zeros(zeta_t1.shape)
+    bbb(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//512 + 1,), (512,),
+        (zeta_t1, zeta_t2, gzeta))
+    # weight = 2.0/5.0
+    # gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1
 
 
 

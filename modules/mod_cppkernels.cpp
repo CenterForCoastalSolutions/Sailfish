@@ -458,13 +458,28 @@ void aaa(const double Dt, const double *_zeta_t0, const double *_zeta_t1, const 
 
     zeta_t2 = zeta_t0(0,0) + 2.0*Dt*rhs_zeta_t1(0,0);
 
-    double weight = 4.0/25.0;
+    constexpr double weight = 4.0/25.0;
     gzeta = (1 - weight)*zeta_t1(0,0) + weight*0.5*(zeta_t2(0,0) + zeta_t0(0,0));
 
     rzeta_t1 = rhs_zeta_t1(0,0);
 }
 
 
+extern "C"  __global__
+void bbb(const double *_zeta_t1, const double *_zeta_t2, const double *_gzeta)
+{
+    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+
+    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
+
+    STENCIL(zeta_t1);
+    STENCIL(zeta_t2);
+    STENCIL(gzeta);
+
+
+    constexpr double weight = 2.0/5.0;
+    gzeta  = (1 - weight)*zeta_t2(0,0) + weight*zeta_t1(0,0);
+}
 
 extern "C"  __global__
 void Pred(const double Dt, const double *_v_t1, const double *_v_t2, const double *_rhs, const double *_D_t1, const double *_D_t2)
