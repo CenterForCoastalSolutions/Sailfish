@@ -212,18 +212,13 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     from mod_operators import grsz, bksz
 
     # Aliases
-    zeta_t2, zeta_t1, zeta_t0 = (OCEAN.zeta_t2, OCEAN.zeta_t1, OCEAN.zeta_t0)
-    ubar_t2, ubar_t1, ubar_t0 = (OCEAN.ubar_t2, OCEAN.ubar_t1, OCEAN.ubar_t0)
-    vbar_t2, vbar_t1, vbar_t0 = (OCEAN.vbar_t2, OCEAN.vbar_t1, OCEAN.vbar_t0)
+    zeta_t2, zeta_t1, zeta_t0    = (OCEAN.zeta_t2, OCEAN.zeta_t1, OCEAN.zeta_t0)
+    ubar_t2, ubar_t1, ubar_t0    = (OCEAN.ubar_t2, OCEAN.ubar_t1, OCEAN.ubar_t0)
+    vbar_t2, vbar_t1, vbar_t0    = (OCEAN.vbar_t2, OCEAN.vbar_t1, OCEAN.vbar_t0)
     rzeta_t2, rzeta_t1, rzeta_t0 = (OCEAN.rzeta_t2, OCEAN.rzeta_t1, OCEAN.rzeta_t0)
     rubar_t2, rubar_t1, rubar_t0 = (OCEAN.rubar_t2, OCEAN.rubar_t1, OCEAN.rubar_t0)
     rvbar_t2, rvbar_t1, rvbar_t0 = (OCEAN.rvbar_t2, OCEAN.rvbar_t1, OCEAN.rvbar_t0)
-    zeta_t2, zeta_t1, zeta_t0 = (OCEAN.zeta_t2, OCEAN.zeta_t1, OCEAN.zeta_t0)
-    ubar_t2, ubar_t1, ubar_t0 = (OCEAN.ubar_t2, OCEAN.ubar_t1, OCEAN.ubar_t0)
-    vbar_t2, vbar_t1, vbar_t0 = (OCEAN.vbar_t2, OCEAN.vbar_t1, OCEAN.vbar_t0)
-    rzeta_t2, rzeta_t1, rzeta_t0 = (OCEAN.rzeta_t2, OCEAN.rzeta_t1, OCEAN.rzeta_t0)
-    rubar_t2, rubar_t1, rubar_t0 = (OCEAN.rubar_t2, OCEAN.rubar_t1, OCEAN.rubar_t0)
-    rvbar_t2, rvbar_t1, rvbar_t0 = (OCEAN.rvbar_t2, OCEAN.rvbar_t1, OCEAN.rvbar_t0)
+
     # zeta_t2, zeta_t1, zeta_t0, ubar_t2, ubar_t1, ubar_t0, vbar_t2, vbar_t1, vbar_t0, \
     # rzeta_t1, rzeta_t0, rubar_t1, rubar_t0, rvbar_t1, rvbar_t0 = OCEAN.getVars()
     h = GRID.h.ravel()
@@ -236,12 +231,12 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # During the first time-step,the corrector step is Backward-Euler. Otherwise, the corrector step is Adams-Moulton.
 
     # rhs_zeta_t2 = computeZetaRHS(zeta_t2, h, ubar_t2, vbar_t2)
-    rhs_zeta_t2 = cp.zeros(zeta_t1.shape)
-    computeZetaRHS3(grsz, bksz, (zeta_t2, h, ubar_t2, vbar_t2, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rhs_zeta_t2))
+    # rhs_zeta_t2 = cp.zeros(zeta_t1.shape)
+    computeZetaRHS3(grsz, bksz, (zeta_t2, h, ubar_t2, vbar_t2, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rzeta_t1))
 
     # Adams-Moulton order 3
     # zeta_t2[:] = zeta_t1 + Δt*(AM3_2*rhs_zeta_t2 + AM3_1*rzeta_t1 + AM3_0*rzeta_t0)
-    AdamsMoultonCorr3rd(grsz, bksz, (Δt, zeta_t2, rzeta_t0, rzeta_t1, rhs_zeta_t2))
+    AdamsMoultonCorr3rd(grsz, bksz, (Δt, zeta_t2, rzeta_t0, rzeta_t1, rzeta_t2))
 
     # gzeta = cp.zeros(zeta_t1.shape)
     bbb(grsz, bksz, (zeta_t1, zeta_t2, gzeta))
