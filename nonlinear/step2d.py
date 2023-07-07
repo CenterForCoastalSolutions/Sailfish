@@ -195,7 +195,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
     Pred(grsz, bksz, (Δt, ubar_t1, ubar_t2, rubar_t1, D_t1U, D_t2U))
     Pred(grsz, bksz, (Δt, vbar_t1, vbar_t2, rvbar_t1, D_t1V, D_t2V))
-    vbar_t2.reshape(402,402)[1,:] = 0.0
+    # vbar_t2.reshape(402,402)[1,:] = 0.0
     # ubar_t2[:] = (ubar_t1*D_t1U + Δt*rhs_ubar)/D_t2U
     # vbar_t2[:] = (vbar_t1*D_t1V + Δt*rhs_vbar)/D_t2V
 
