@@ -513,6 +513,37 @@ void Pred(const double Dt, const double *_v_t1, const double *_v_t2, const doubl
 
 }
 
+extern "C"  __global__
+void Pred2(const double Dt, const double *_u_t1, const double *_u_t2, const double *_v_t1, const double *_v_t2,
+           const double *_rhsu, const double *_rhsv, const double *_h,
+           const double *_zeta_t1, const double *_zeta_t2)
+{
+    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+
+    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
+
+    STENCIL(u_t1);
+    STENCIL(u_t2);
+    STENCIL(v_t1);
+    STENCIL(v_t2);
+    STENCIL(zeta_t1);
+    STENCIL(zeta_t2);
+    STENCIL(h);
+    STENCIL(rhsu);
+    STENCIL(rhsv);
+
+    auto D_t1 = zeta_t1 + h;
+    auto D_t2 = zeta_t2 + h;
+    auto D_t1U = RtoU(D_t1);
+    auto D_t1V = RtoV(D_t1);
+    auto D_t2U = RtoU(D_t2);
+    auto D_t2V = RtoV(D_t2);
+
+    u_t2 = (u_t1(0,0)*D_t1U(0,0) + Dt*rhsu(0,0))/D_t2U(0,0);
+    v_t2 = (v_t1(0,0)*D_t1V(0,0) + Dt*rhsv(0,0))/D_t2V(0,0);
+
+}
+
 
 
 extern "C"  __global__
@@ -532,4 +563,43 @@ void AdamsMoultonCorr3rd(const double Dt, const double *_v_t2, const double *_rh
     STENCIL(v_t2);
 
     v_t2 = v_t2(0,0) + Dt*(AM3_2*rhs_t2(0,0) + AM3_1*rhs_t1(0,0) + AM3_0*rhs_t0(0,0));
+}
+
+
+
+extern "C"  __global__
+void AdamsMoultonCorr3rd2(const double Dt, const double *_u_t2, const double *_v_t2,
+                          const double *_rhsu_t0, const double *_rhsu_t1, const double *_rhsu_t2,
+                          const double *_rhsv_t0, const double *_rhsv_t1, const double *_rhsv_t2,
+                          const double *_h, const double *_zeta_t1, const double *_zeta_t2)
+{
+    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+    // Adams-Moulton 3rd order coefficients
+    constexpr double AM3_2 =  5.0 / 12.0;
+    constexpr double AM3_1 =  8.0 / 12.0;
+    constexpr double AM3_0 = -1.0 / 12.0;
+
+    if (i >= sz2D) return;
+
+    STENCIL(rhsu_t0);
+    STENCIL(rhsu_t1);
+    STENCIL(rhsu_t2);
+    STENCIL(rhsv_t0);
+    STENCIL(rhsv_t1);
+    STENCIL(rhsv_t2);
+    STENCIL(u_t2);
+    STENCIL(v_t2);
+    STENCIL(zeta_t1);
+    STENCIL(zeta_t2);
+    STENCIL(h);
+
+    auto D_t1 = zeta_t1 + h;
+    auto D_t2 = zeta_t2 + h;
+    auto D_t1U = RtoU(D_t1);
+    auto D_t1V = RtoV(D_t1);
+    auto D_t2U = RtoU(D_t2);
+    auto D_t2V = RtoV(D_t2);
+
+    u_t2 = (u_t2(0,0)*D_t1U + Dt*(AM3_2*rhsu_t2(0,0) + AM3_1*rhsu_t1(0,0) + AM3_0*rhsu_t0(0,0)))/D_t2U;
+    v_t2 = (v_t2(0,0)*D_t1V + Dt*(AM3_2*rhsv_t2(0,0) + AM3_1*rhsv_t1(0,0) + AM3_0*rhsv_t0(0,0)))/D_t2V;
 }

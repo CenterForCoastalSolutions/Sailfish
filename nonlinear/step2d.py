@@ -195,6 +195,8 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
     Pred(grsz, bksz, (Δt, ubar_t1, ubar_t2, rubar_t1, D_t1U, D_t2U))
     Pred(grsz, bksz, (Δt, vbar_t1, vbar_t2, rvbar_t1, D_t1V, D_t2V))
+
+    # Pred2(grsz, bksz, (Δt, ubar_t1, ubar_t2, vbar_t1, vbar_t2, rubar_t1, rvbar_t1, h, zeta_t1, zeta_t2))
     # vbar_t2.reshape(402,402)[1,:] = 0.0
     # ubar_t2[:] = (ubar_t1*D_t1U + Δt*rhs_ubar)/D_t2U
     # vbar_t2[:] = (vbar_t1*D_t1V + Δt*rhs_vbar)/D_t2V
@@ -262,12 +264,12 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
 
     # And interpolate them at points U, V
-    D_t1 = zeta_t1 + h
-    D_t2 = zeta_t2 + h
-    D_t1U = RtoU_CUDA(D_t1, GRID.on_u, size=GRID.on_u.size)
-    D_t1V = RtoV_CUDA(D_t1, GRID.om_v, size=GRID.om_v.size)
-    D_t2U = RtoU_CUDA(D_t2, GRID.on_u, size=GRID.on_u.size)
-    D_t2V = RtoV_CUDA(D_t2, GRID.om_v, size=GRID.om_v.size)
+    # D_t1 = zeta_t1 + h
+    # D_t2 = zeta_t2 + h
+    # D_t1U = RtoU_CUDA(D_t1, GRID.on_u, size=GRID.on_u.size)
+    # D_t1V = RtoV_CUDA(D_t1, GRID.om_v, size=GRID.om_v.size)
+    # D_t2U = RtoU_CUDA(D_t2, GRID.on_u, size=GRID.on_u.size)
+    # D_t2V = RtoV_CUDA(D_t2, GRID.om_v, size=GRID.om_v.size)
     # D_t1U = RtoU(D_t1)
     # D_t1V = RtoV(D_t1)
     # D_t2U = RtoU(D_t2)
@@ -280,10 +282,16 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
 
     # During the first time-step, the corrector step is Backward-Euler. Otherwise, the corrector step is Adams-Moulton.
-    # ubar_t2[:] = (ubar_t1*D_t1U + Δt*(AM3_2*rhs_ubar + AM3_1*rubar_t1 + AM3_0*rubar_t0))/D_t2U
-    # vbar_t2[:] = (vbar_t1*D_t1V + Δt*(AM3_2*rhs_vbar + AM3_1*rvbar_t1 + AM3_0*rvbar_t0))/D_t2V
-    AdamsMoultonCorr3rd(grsz, bksz, (Δt, ubar_t2, rubar_t0, rubar_t1, rubar_t2))
-    AdamsMoultonCorr3rd(grsz, bksz, (Δt, vbar_t2, rvbar_t0, rvbar_t1, rvbar_t2))
+    # ubar_t2[:] = (ubar_t1*D_t1U + Δt*(AM3_2*rubar_t2 + AM3_1*rubar_t1 + AM3_0*rubar_t0))/D_t2U
+    # vbar_t2[:] = (vbar_t1*D_t1V + Δt*(AM3_2*rvbar_t2 + AM3_1*rvbar_t1 + AM3_0*rvbar_t0))/D_t2V
+    # AdamsMoultonCorr3rd(grsz, bksz, (Δt, ubar_t2, rubar_t0, rubar_t1, rubar_t2))
+    # AdamsMoultonCorr3rd(grsz, bksz, (Δt, vbar_t2, rvbar_t0, rvbar_t1, rvbar_t2))
+
+    AdamsMoultonCorr3rd2(grsz, bksz, (Δt, ubar_t1, vbar_t1,
+                                      rubar_t0, rubar_t1, rubar_t2,
+                                      rvbar_t0, rvbar_t1, rvbar_t2,
+                                      h, zeta_t1, zeta_t2))
+
     # vbar_t2.reshape(402, 402)[1, :] = 0.0
     # vbar_t2.reshape(402, 402)[:,0] = 0.0
     # ubar_t2.reshape(402, 402)[1, :] = 0.0

@@ -217,7 +217,9 @@ computeZetaRHS3     = moduleCPPKernels.get_function('computeZetaRHS')
 aaa     = moduleCPPKernels.get_function('aaa')
 bbb     = moduleCPPKernels.get_function('bbb')
 AdamsMoultonCorr3rd = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
-Pred = moduleCPPKernels.get_function('Pred')
+AdamsMoultonCorr3rd2 = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
+Pred  = moduleCPPKernels.get_function('Pred')
+Pred2 = moduleCPPKernels.get_function('Pred2')
 
 
 
