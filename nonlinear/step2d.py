@@ -218,6 +218,12 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     rzeta_t2, rzeta_t1, rzeta_t0 = (OCEAN.rzeta_t2, OCEAN.rzeta_t1, OCEAN.rzeta_t0)
     rubar_t2, rubar_t1, rubar_t0 = (OCEAN.rubar_t2, OCEAN.rubar_t1, OCEAN.rubar_t0)
     rvbar_t2, rvbar_t1, rvbar_t0 = (OCEAN.rvbar_t2, OCEAN.rvbar_t1, OCEAN.rvbar_t0)
+    zeta_t2, zeta_t1, zeta_t0 = (OCEAN.zeta_t2, OCEAN.zeta_t1, OCEAN.zeta_t0)
+    ubar_t2, ubar_t1, ubar_t0 = (OCEAN.ubar_t2, OCEAN.ubar_t1, OCEAN.ubar_t0)
+    vbar_t2, vbar_t1, vbar_t0 = (OCEAN.vbar_t2, OCEAN.vbar_t1, OCEAN.vbar_t0)
+    rzeta_t2, rzeta_t1, rzeta_t0 = (OCEAN.rzeta_t2, OCEAN.rzeta_t1, OCEAN.rzeta_t0)
+    rubar_t2, rubar_t1, rubar_t0 = (OCEAN.rubar_t2, OCEAN.rubar_t1, OCEAN.rubar_t0)
+    rvbar_t2, rvbar_t1, rvbar_t0 = (OCEAN.rvbar_t2, OCEAN.rvbar_t1, OCEAN.rvbar_t0)
     # zeta_t2, zeta_t1, zeta_t0, ubar_t2, ubar_t1, ubar_t0, vbar_t2, vbar_t1, vbar_t0, \
     # rzeta_t1, rzeta_t0, rubar_t1, rubar_t0, rvbar_t1, rvbar_t0 = OCEAN.getVars()
     h = GRID.h.ravel()

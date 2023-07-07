@@ -8,8 +8,10 @@ def barotropicVelocityBC(ubar, vbar, compTimes, BOUNDARY):
     """"This subroutine sets lateral boundary conditions for vertically integrated (barotropic) velocities"""
 
     # closed boundary condition.
-    mod_boundary.setBC((BOUNDARY.ubarClosedBCIdx1.size//blockSize + 1,), (blockSize,), (ubar, BOUNDARY.ubarClosedBCIdx1, BOUNDARY.ubarClosedBCIdx1.size, 0.0))
-    mod_boundary.setBC((BOUNDARY.vbarClosedBCIdx1.size//blockSize + 1,), (blockSize,), (vbar, BOUNDARY.vbarClosedBCIdx1, BOUNDARY.vbarClosedBCIdx1.size, 0.0))
+    mod_boundary.setBC((BOUNDARY.ubarClosedBCIdx1.size//blockSize + 1,), (blockSize,),
+                       (ubar, BOUNDARY.ubarClosedBCIdx1, BOUNDARY.ubarClosedBCIdx1.size, 0.0))
+    mod_boundary.setBC((BOUNDARY.vbarClosedBCIdx1.size//blockSize + 1,), (blockSize,),
+                       (vbar, BOUNDARY.vbarClosedBCIdx1, BOUNDARY.vbarClosedBCIdx1.size, 0.0))
 
 
 
@@ -18,12 +20,15 @@ def barotropicVelocityBC(ubar, vbar, compTimes, BOUNDARY):
     # vbarKout[kout, idxvClampedBC] = BOUNDARY.vbar[idxvClampedBC]
     omega = 0.2  # s^-1
     val = 1.01*math.sin(compTimes.time*omega)
-    mod_boundary.setBC((BOUNDARY.ubarClampedBCIdx1.size//blockSize + 1,), (blockSize,), (ubar, BOUNDARY.ubarClampedBCIdx1, BOUNDARY.ubarClampedBCIdx1.size, val))
+    mod_boundary.setBC((BOUNDARY.ubarClampedBCIdx1.size//blockSize + 1,), (blockSize,),
+                       (ubar, BOUNDARY.ubarClampedBCIdx1, BOUNDARY.ubarClampedBCIdx1.size, val))
     # msgInfo('Implement the real Clamped BC, here I am using a fake one!!!')    TODO: Remove
 
 
-    # mod_boundary.copyBC((BOUNDARY.ubarGradientBCIdx1.size//blockSize + 1,), (blockSize,), (ubar, BOUNDARY.ubarGradientBCIdx1, BOUNDARY.ubarGradientBCIdx2, BOUNDARY.ubarGradientBCIdx1.size))
-    # mod_boundary.copyBC((BOUNDARY.vbarGradientBCIdx1.size//blockSize + 1,), (blockSize,), (vbar, BOUNDARY.vbarGradientBCIdx1, BOUNDARY.ubarGradientBCIdx2, BOUNDARY.vbarGradientBCIdx1.size))
+    mod_boundary.copyBC((BOUNDARY.ubarGradientBCIdx1.size//blockSize + 1,), (blockSize,),
+                        (ubar, BOUNDARY.ubarGradientBCIdx1, BOUNDARY.ubarGradientBCIdx2, BOUNDARY.ubarGradientBCIdx1.size))
+    mod_boundary.copyBC((BOUNDARY.vbarGradientBCIdx1.size//blockSize + 1,), (blockSize,),
+                        (vbar, BOUNDARY.vbarGradientBCIdx1, BOUNDARY.ubarGradientBCIdx2, BOUNDARY.vbarGradientBCIdx1.size))
 
 
 
