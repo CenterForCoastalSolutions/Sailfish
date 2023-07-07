@@ -212,7 +212,9 @@ with open(filename, 'r') as file:
 moduleCPPKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--std=c++17'))
 initializeCPPKernels = moduleCPPKernels.get_function('initialize')
 
-computeMomentumRHS3 = moduleCPPKernels.get_function('computeMomentumRHS')
+# computeMomentumRHS3 = moduleCPPKernels.get_function('computeMomentumRHS')
+computeMomentumRHSCorr = moduleCPPKernels.get_function('computeMomentumRHSCorr')
+computeMomentumRHSPred = moduleCPPKernels.get_function('computeMomentumRHSPred')
 computeZetaRHS3     = moduleCPPKernels.get_function('computeZetaRHS')
 aaa     = moduleCPPKernels.get_function('aaa')
 bbb     = moduleCPPKernels.get_function('bbb')

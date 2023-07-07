@@ -6,10 +6,6 @@ from mod_constants import *
 from misc          import *
 import time
 
-
-
-gzeta    = cp.zeros(4002*4002)
-
 #
 # import rmm
 # pool = rmm.mr.PoolMemoryResource(
@@ -126,7 +122,6 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
     # During the first time-step, the predictor step is Forward-Euler. Otherwise, the predictor step is Leap-frog.
     # rhs_zeta_t1 = computeZetaRHS(zeta_t1, h, ubar_t1, vbar_t1)
-    rzeta_t1[:] = 0.0
     computeZetaRHS3(grsz, bksz, (zeta_t1, h, ubar_t1, vbar_t1, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rzeta_t1))
 
     if compTimes.isFirst2DStep():
@@ -153,7 +148,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
 
         # gzeta = cp.zeros(zeta_t1.shape)
-        aaa(grsz, bksz, (Δt, zeta_t0, zeta_t1, zeta_t2, rzeta_t1, gzeta))
+        aaa(grsz, bksz, (Δt, zeta_t0, zeta_t1, zeta_t2, rzeta_t1))
 
 
 
@@ -173,7 +168,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # rvbar_t1[:] = 0.0
     # computeMomentumRHS((GRID.on_u.shape[0],), (GRID.on_u.shape[1],), (h, gzeta, gzeta*gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
 
-    computeMomentumRHS3(grsz, bksz, (h, gzeta, GRID.on_u, GRID.om_v, rubar_t1, rvbar_t1, g))
+    computeMomentumRHSPred(grsz, bksz, (h, GRID.on_u, GRID.om_v, rubar_t1, rvbar_t1, zeta_t1, zeta_t2, g))
     print('time step: ', compTimes.iic)
     # Interpolate depth at points U, V
     D_t1 = zeta_t1 + h
@@ -232,8 +227,6 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
     # During the first time-step,the corrector step is Backward-Euler. Otherwise, the corrector step is Adams-Moulton.
 
-    # rhs_zeta_t2 = computeZetaRHS(zeta_t2, h, ubar_t2, vbar_t2)
-    # rhs_zeta_t2 = cp.zeros(zeta_t1.shape)
     computeZetaRHS3(grsz, bksz, (zeta_t2, h, ubar_t2, vbar_t2, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rzeta_t1))
 
     # Adams-Moulton order 3
@@ -241,7 +234,7 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     AdamsMoultonCorr3rd(grsz, bksz, (Δt, zeta_t2, rzeta_t0, rzeta_t1, rzeta_t2))
 
     # gzeta = cp.zeros(zeta_t1.shape)
-    bbb(grsz, bksz, (zeta_t1, zeta_t2, gzeta))
+    # bbb(grsz, bksz, (zeta_t1, zeta_t2))
     # weight = 2.0/5.0
     # gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1
 
@@ -260,7 +253,7 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # rhs_vbar = cp.zeros(gzeta.shape)
     # rhs_ubar[:] = 0.0
     # rhs_vbar[:] = 0.0
-    computeMomentumRHS3(grsz, bksz, (h, gzeta, GRID.on_u, GRID.om_v, rubar_t2, rvbar_t2, g))
+    computeMomentumRHSCorr(grsz, bksz, (h, GRID.on_u, GRID.om_v, rubar_t2, rvbar_t2, zeta_t0, zeta_t1, zeta_t2, g))
 
 
     # And interpolate them at points U, V

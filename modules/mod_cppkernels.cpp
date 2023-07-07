@@ -391,8 +391,9 @@ auto divUVtoR(const T1 &U, const T2 &V, const Expr<double, void, opStencil> &on_
 
 
 extern "C"  __global__
-void computeMomentumRHS(const double *_h, const double *_gzeta, const double *_on_u, const double *_om_v,
-                        const double *_rhs_ubar, const double *_rhs_vbar, const double g)
+void computeMomentumRHSPred(const double *_h, const double *_on_u, const double *_om_v,
+                            const double *_rhs_ubar, const double *_rhs_vbar,
+                            const double *_zeta_t1, const double *_zeta_t2, const double g)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -408,15 +409,52 @@ void computeMomentumRHS(const double *_h, const double *_gzeta, const double *_o
     }
 
     STENCIL(h);
-    STENCIL(gzeta);
-//    STENCIL(gzeta2);
-
     STENCIL(on_u);
     STENCIL(om_v);
+    STENCIL(zeta_t1);
+    STENCIL(zeta_t2);
 
-    auto gzeta2 = gzeta*gzeta;
-    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta2,on_u));
-    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta2,om_v));
+
+    constexpr double weight = 2.0/5.0;
+    auto gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1;
+
+//    auto gzeta2 = gzeta*gzeta;
+    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta,on_u));
+    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta,om_v));
+}
+
+
+extern "C"  __global__
+void computeMomentumRHSCorr(const double *_h, const double *_on_u, const double *_om_v,
+                            const double *_rhs_ubar, const double *_rhs_vbar,
+                            const double *_zeta_t0, const double *_zeta_t1, const double *_zeta_t2, const double g)
+{
+    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+
+    STENCIL(rhs_ubar);
+    STENCIL(rhs_vbar);
+
+//    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
+    if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D)
+    {
+//        rhs_ubar = 0.0;
+//        rhs_vbar = 0.0;
+        return;
+    }
+
+    STENCIL(h);
+    STENCIL(on_u);
+    STENCIL(om_v);
+    STENCIL(zeta_t0);
+    STENCIL(zeta_t1);
+    STENCIL(zeta_t2);
+
+    constexpr double weight = 4.0/25.0;
+    auto gzeta = (1 - weight)*zeta_t1 + weight*0.5*(zeta_t2 + zeta_t0);
+
+//    auto gzeta2 = gzeta*gzeta;
+    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta,on_u));
+    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta,om_v));
 }
 
 
@@ -460,7 +498,7 @@ void computeZetaRHS(const double *_zeta, const double *_h, double *_ubar, const 
 
 extern "C"  __global__
 void aaa(const double Dt, const double *_zeta_t0, const double *_zeta_t1, const double *_zeta_t2,
-         const double *_rzeta_t1, const double *_gzeta)
+         const double *_rzeta_t1)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -470,17 +508,15 @@ void aaa(const double Dt, const double *_zeta_t0, const double *_zeta_t1, const 
     STENCIL(zeta_t1);
     STENCIL(zeta_t2);
     STENCIL(rzeta_t1);
-    STENCIL(gzeta);
 
     zeta_t2 = zeta_t0(0,0) + 2.0*Dt*rzeta_t1(0,0);
 
-    constexpr double weight = 4.0/25.0;
-    gzeta = (1 - weight)*zeta_t1(0,0) + weight*0.5*(zeta_t2(0,0) + zeta_t0(0,0));
+
 }
 
 
 extern "C"  __global__
-void bbb(const double *_zeta_t1, const double *_zeta_t2, const double *_gzeta)
+void bbb(const double *_zeta_t1, const double *_zeta_t2)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -488,11 +524,10 @@ void bbb(const double *_zeta_t1, const double *_zeta_t2, const double *_gzeta)
 
     STENCIL(zeta_t1);
     STENCIL(zeta_t2);
-    STENCIL(gzeta);
 
 
-    constexpr double weight = 2.0/5.0;
-    gzeta  = (1 - weight)*zeta_t2(0,0) + weight*zeta_t1(0,0);
+//    constexpr double weight = 2.0/5.0;
+//    gzeta  = (1 - weight)*zeta_t2(0,0) + weight*zeta_t1(0,0);
 }
 
 
