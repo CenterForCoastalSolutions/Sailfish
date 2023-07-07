@@ -7,9 +7,8 @@ from misc          import *
 import time
 
 
-rhs_ubar = cp.zeros(402*402)
-rhs_vbar = cp.zeros(402*402)
-gzeta    = cp.zeros(402*402)
+
+gzeta    = cp.zeros(4002*4002)
 
 #
 # import rmm
