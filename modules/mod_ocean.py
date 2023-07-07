@@ -17,9 +17,9 @@ class T_OCEAN:
         L = GRID.L
 
         # RHS of the differential equations (like dzeta/dt = rzeta).
-        self.rubar = cp.zeros((2, M + 1, L + 1), dtype = cp.float64)
-        self.rvbar = cp.zeros((2, M + 1, L + 1), dtype = cp.float64)
-        self.rzeta = cp.zeros((2, M + 1, L + 1), dtype = cp.float64)
+        self.rubar = cp.zeros((3, M + 1, L + 1), dtype = cp.float64)
+        self.rvbar = cp.zeros((3, M + 1, L + 1), dtype = cp.float64)
+        self.rzeta = cp.zeros((3, M + 1, L + 1), dtype = cp.float64)
 
         # Nonlinear model state.
         self.ubar  = cp.zeros((3, M + 1, L + 1), dtype = cp.float64)
@@ -41,12 +41,15 @@ class T_OCEAN:
         self.vbar_t1 = self.vbar[1, :, :].ravel()
         self.vbar_t0 = self.vbar[0, :, :].ravel()
 
+        self.rzeta_t2 = self.rzeta[2, :, :].ravel()
         self.rzeta_t1 = self.rzeta[1, :, :].ravel()
         self.rzeta_t0 = self.rzeta[0, :, :].ravel()
 
+        self.rubar_t2 = self.rubar[2, :, :].ravel()
         self.rubar_t1 = self.rubar[1, :, :].ravel()
         self.rubar_t0 = self.rubar[0, :, :].ravel()
 
+        self.rvbar_t2 = self.rvbar[2, :, :].ravel()
         self.rvbar_t1 = self.rvbar[1, :, :].ravel()
         self.rvbar_t0 = self.rvbar[0, :, :].ravel()
 
@@ -75,15 +78,18 @@ class T_OCEAN:
 
         temp = self.rzeta_t0
         self.rzeta_t0 = self.rzeta_t1
-        self.rzeta_t1 = temp
+        self.rzeta_t1 = self.rzeta_t2
+        self.rzeta_t2 = temp
 
         temp = self.rubar_t0
         self.rubar_t0 = self.rubar_t1
-        self.rubar_t1 = temp
+        self.rubar_t1 = self.rubar_t2
+        self.rubar_t2 = temp
 
         temp = self.rvbar_t0
         self.rvbar_t0 = self.rvbar_t1
-        self.rvbar_t1 = temp
+        self.rvbar_t1 = self.rvbar_t2
+        self.rvbar_t2 = temp
 
 
     def getVars(self):

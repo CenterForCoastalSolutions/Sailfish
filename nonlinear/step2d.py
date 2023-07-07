@@ -6,6 +6,11 @@ from mod_constants import *
 from misc          import *
 import time
 
+
+rhs_ubar = cp.zeros(402*402)
+rhs_vbar = cp.zeros(402*402)
+gzeta    = cp.zeros(402*402)
+
 #
 # import rmm
 # pool = rmm.mr.PoolMemoryResource(
@@ -100,6 +105,8 @@ import time
 
 
 def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
+    from mod_operators import grsz, bksz
+    global gzeta
 
     # Aliases
     zeta_t2, zeta_t1, zeta_t0 = (OCEAN.zeta_t2, OCEAN.zeta_t1, OCEAN.zeta_t0)
@@ -120,19 +127,16 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
     # During the first time-step, the predictor step is Forward-Euler. Otherwise, the predictor step is Leap-frog.
     # rhs_zeta_t1 = computeZetaRHS(zeta_t1, h, ubar_t1, vbar_t1)
-    rhs_zeta_t1 = cp.zeros(zeta_t1.shape)
-    computeZetaRHS3(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,),
-                        (zeta_t1, h, ubar_t1, vbar_t1, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rhs_zeta_t1))
-
-
+    rzeta_t1[:] = 0.0
+    computeZetaRHS3(grsz, bksz, (zeta_t1, h, ubar_t1, vbar_t1, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rzeta_t1))
 
     if compTimes.isFirst2DStep():
         # The first time it performs a simple Euler time step. RHS is computed at tn and time derivatives are
         # (f(tn) - f(tn-1))/dtfast
 
-        zeta_t2[:] = zeta_t1 + Δt*rhs_zeta_t1
+        zeta_t2[:] = zeta_t1 + Δt*rzeta_t1
 
-        gzeta = 0.5*(zeta_t2 + zeta_t1)
+        gzeta[:] = 0.5*(zeta_t2 + zeta_t1)
 
 
     else:
@@ -149,9 +153,8 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
 
 
-        gzeta = cp.zeros(zeta_t1.shape)
-        aaa(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,),
-            (Δt, zeta_t0, zeta_t1, zeta_t2, rhs_zeta_t1, rzeta_t1, gzeta))
+        # gzeta = cp.zeros(zeta_t1.shape)
+        aaa(grsz, bksz, (Δt, zeta_t0, zeta_t1, zeta_t2, rzeta_t1, gzeta))
 
 
 
@@ -167,12 +170,11 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     #compute right-hand-side for the 2D momentum equations
     # rhs_ubar, rhs_vbar = computeMomentumRHS2(h, gzeta)
 
-    rhs_ubar = cp.zeros(gzeta.shape)
-    rhs_vbar = cp.zeros(gzeta.shape)
+    # rubar_t1[:] = 0.0
+    # rvbar_t1[:] = 0.0
     # computeMomentumRHS((GRID.on_u.shape[0],), (GRID.on_u.shape[1],), (h, gzeta, gzeta*gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
 
-    computeMomentumRHS3(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,),
-                        (h, gzeta, gzeta * gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
+    computeMomentumRHS3(grsz, bksz, (h, gzeta, GRID.on_u, GRID.om_v, rubar_t1, rvbar_t1, g))
     print('time step: ', compTimes.iic)
     # Interpolate depth at points U, V
     D_t1 = zeta_t1 + h
@@ -192,14 +194,15 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # step is Leap-frog and the corrector step is Adams-Moulton.
     # TODO: I don't think this comment is correct.
 
-    Pred(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,), (Δt, ubar_t1, ubar_t2, rhs_ubar, D_t1U, D_t2U))
-    Pred(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,), (Δt, vbar_t1, vbar_t2, rhs_vbar, D_t1V, D_t2V))
+    Pred(grsz, bksz, (Δt, ubar_t1, ubar_t2, rubar_t1, D_t1U, D_t2U))
+    Pred(grsz, bksz, (Δt, vbar_t1, vbar_t2, rvbar_t1, D_t1V, D_t2V))
+    vbar_t2.reshape(402,402)[1,:] = 0.0
     # ubar_t2[:] = (ubar_t1*D_t1U + Δt*rhs_ubar)/D_t2U
     # vbar_t2[:] = (vbar_t1*D_t1V + Δt*rhs_vbar)/D_t2V
 
-    # In the predictor step, save the rhs for future use.
-    rubar_t1[:] = rhs_ubar
-    rvbar_t1[:] = rhs_vbar
+    # # In the predictor step, save the rhs for future use.
+    # rubar_t1[:] = rhs_ubar
+    # rvbar_t1[:] = rhs_vbar
 
     # Apply lateral boundary conditions.
     barotropicVelocityBC(ubar_t2, vbar_t2, compTimes, BOUNDARY)
@@ -207,14 +210,15 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
 
 def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
+    from mod_operators import grsz, bksz
 
     # Aliases
     zeta_t2, zeta_t1, zeta_t0 = (OCEAN.zeta_t2, OCEAN.zeta_t1, OCEAN.zeta_t0)
     ubar_t2, ubar_t1, ubar_t0 = (OCEAN.ubar_t2, OCEAN.ubar_t1, OCEAN.ubar_t0)
     vbar_t2, vbar_t1, vbar_t0 = (OCEAN.vbar_t2, OCEAN.vbar_t1, OCEAN.vbar_t0)
-    rzeta_t1, rzeta_t0 = (OCEAN.rzeta_t1, OCEAN.rzeta_t0)
-    rubar_t1, rubar_t0 = (OCEAN.rubar_t1, OCEAN.rubar_t0)
-    rvbar_t1, rvbar_t0 = (OCEAN.rvbar_t1, OCEAN.rvbar_t0)
+    rzeta_t2, rzeta_t1, rzeta_t0 = (OCEAN.rzeta_t2, OCEAN.rzeta_t1, OCEAN.rzeta_t0)
+    rubar_t2, rubar_t1, rubar_t0 = (OCEAN.rubar_t2, OCEAN.rubar_t1, OCEAN.rubar_t0)
+    rvbar_t2, rvbar_t1, rvbar_t0 = (OCEAN.rvbar_t2, OCEAN.rvbar_t1, OCEAN.rvbar_t0)
     # zeta_t2, zeta_t1, zeta_t0, ubar_t2, ubar_t1, ubar_t0, vbar_t2, vbar_t1, vbar_t0, \
     # rzeta_t1, rzeta_t0, rubar_t1, rubar_t0, rvbar_t1, rvbar_t0 = OCEAN.getVars()
     h = GRID.h.ravel()
@@ -228,17 +232,14 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
     # rhs_zeta_t2 = computeZetaRHS(zeta_t2, h, ubar_t2, vbar_t2)
     rhs_zeta_t2 = cp.zeros(zeta_t1.shape)
-    computeZetaRHS3(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,),
-                    (zeta_t2, h, ubar_t2, vbar_t2, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rhs_zeta_t2))
+    computeZetaRHS3(grsz, bksz, (zeta_t2, h, ubar_t2, vbar_t2, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rhs_zeta_t2))
 
     # Adams-Moulton order 3
     # zeta_t2[:] = zeta_t1 + Δt*(AM3_2*rhs_zeta_t2 + AM3_1*rzeta_t1 + AM3_0*rzeta_t0)
-    AdamsMoultonCorr3rd(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,),
-                        (Δt, zeta_t2, rzeta_t0, rzeta_t1, rhs_zeta_t2))
+    AdamsMoultonCorr3rd(grsz, bksz, (Δt, zeta_t2, rzeta_t0, rzeta_t1, rhs_zeta_t2))
 
-    gzeta = cp.zeros(zeta_t1.shape)
-    bbb(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,),
-        (zeta_t1, zeta_t2, gzeta))
+    # gzeta = cp.zeros(zeta_t1.shape)
+    bbb(grsz, bksz, (zeta_t1, zeta_t2, gzeta))
     # weight = 2.0/5.0
     # gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1
 
@@ -253,10 +254,11 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # rhs_ubar, rhs_vbar = computeMomentumRHS2(h, gzeta)
 
 
-    rhs_ubar = cp.zeros(gzeta.shape)
-    rhs_vbar = cp.zeros(gzeta.shape)
-    computeMomentumRHS3(((GRID.on_u.shape[0]*GRID.on_u.shape[1])//blockSize + 1,), (blockSize,),
-                        (h, gzeta, gzeta*gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
+    # rhs_ubar = cp.zeros(gzeta.shape)
+    # rhs_vbar = cp.zeros(gzeta.shape)
+    # rhs_ubar[:] = 0.0
+    # rhs_vbar[:] = 0.0
+    computeMomentumRHS3(grsz, bksz, (h, gzeta, GRID.on_u, GRID.om_v, rubar_t2, rvbar_t2, g))
 
 
     # And interpolate them at points U, V
@@ -280,9 +282,17 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # During the first time-step, the corrector step is Backward-Euler. Otherwise, the corrector step is Adams-Moulton.
     # ubar_t2[:] = (ubar_t1*D_t1U + Δt*(AM3_2*rhs_ubar + AM3_1*rubar_t1 + AM3_0*rubar_t0))/D_t2U
     # vbar_t2[:] = (vbar_t1*D_t1V + Δt*(AM3_2*rhs_vbar + AM3_1*rvbar_t1 + AM3_0*rvbar_t0))/D_t2V
-    AdamsMoultonCorr3rd(((GRID.on_u.shape[0] * GRID.on_u.shape[1]) // blockSize + 1,), (blockSize,),
-                        (Δt, vbar_t2, rvbar_t0, rvbar_t1, rhs_vbar))
-
+    AdamsMoultonCorr3rd(grsz, bksz, (Δt, ubar_t2, rubar_t0, rubar_t1, rubar_t2))
+    AdamsMoultonCorr3rd(grsz, bksz, (Δt, vbar_t2, rvbar_t0, rvbar_t1, rvbar_t2))
+    # vbar_t2.reshape(402, 402)[1, :] = 0.0
+    # vbar_t2.reshape(402, 402)[:,0] = 0.0
+    # ubar_t2.reshape(402, 402)[1, :] = 0.0
+    # ubar_t2.reshape(402, 402)[:, 0] = 0.0
+    # vbar_t2.reshape(402, 402)[400, :] = 00.0
+    # ubar_t2.reshape(402, 402)[400, :] = 0.0
+    # zeta_t2.reshape(402, 402)[400, :] = 0.0
+    # zeta_t2.reshape(402, 402)[:,0] = 0.0
+    # zeta_t2.reshape(402, 402)[1, :] = 0.0
 
     # Apply lateral boundary conditions.
     barotropicVelocityBC(ubar_t2, vbar_t2, compTimes, BOUNDARY)

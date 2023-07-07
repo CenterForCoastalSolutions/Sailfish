@@ -15,22 +15,26 @@ from misc import *
 # cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
 
 
-G = None   # GRID
-shp = None
+G    = None   # GRID
+shp  = None
 om_v = None
 on_u = None
-sz = None
+sz   = None
+bksz = None
+grsz = None
 
 
 def initModule(GRID):
     # Initialize some global variables that are used extensively in the module.
 
-    global G, shp, on_u, om_v, sz
+    global G, shp, on_u, om_v, sz, bksz, grsz
     G = GRID
     on_u = G.on_u
     om_v = G.om_v
     shp = G.on_u.shape   # I chosen on_u, but it could've been any other array.
     sz  = G.on_u.size
+    bksz = (blockSize,)
+    grsz = (sz//blockSize + 1,)
 
     initializeCPPKernels((1,), (1,), (1, shp[0], shp[1]))
 
@@ -205,7 +209,7 @@ initOperators = module.get_function('initOperators')
 filename = os.path.join(exePath, r'modules/mod_cppkernels.cpp')
 with open(filename, 'r') as file:
     code = file.read()
-moduleCPPKernels = cp.RawModule(code=code, options=('--restrict', '--std=c++17'))
+moduleCPPKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--std=c++17'))
 initializeCPPKernels = moduleCPPKernels.get_function('initialize')
 
 computeMomentumRHS3 = moduleCPPKernels.get_function('computeMomentumRHS')
