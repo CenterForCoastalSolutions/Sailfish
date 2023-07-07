@@ -6,7 +6,6 @@ from misc import *
 from step2d import step2dPredictor, step2dCorrector
 
 import matplotlib.pyplot as plt
-# plt.ion()
 
 
 def main2d(compTimes,  GRID, OCEAN, BOUNDARY):
