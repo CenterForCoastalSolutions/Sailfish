@@ -213,15 +213,15 @@ moduleCPPKernels = cp.RawModule(code=code, options=('-default-device', '--restri
 initializeCPPKernels = moduleCPPKernels.get_function('initialize')
 
 # computeMomentumRHS3 = moduleCPPKernels.get_function('computeMomentumRHS')
-computeMomentumRHSCorr = moduleCPPKernels.get_function('computeMomentumRHSCorr')
-computeMomentumRHSPred = moduleCPPKernels.get_function('computeMomentumRHSPred')
-computeZetaRHS3     = moduleCPPKernels.get_function('computeZetaRHS')
-aaa     = moduleCPPKernels.get_function('aaa')
-bbb     = moduleCPPKernels.get_function('bbb')
-AdamsMoultonCorr3rd = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
-AdamsMoultonCorr3rd2 = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
-Pred  = moduleCPPKernels.get_function('Pred')
-Pred2 = moduleCPPKernels.get_function('Pred2')
+# computeMomentumRHSCorr = moduleCPPKernels.get_function('computeMomentumRHSCorr')
+# computeMomentumRHSPred = moduleCPPKernels.get_function('computeMomentumRHSPred')
+# computeZetaRHS3     = moduleCPPKernels.get_function('computeZetaRHS')
+# aaa     = moduleCPPKernels.get_function('aaa')
+# bbb     = moduleCPPKernels.get_function('bbb')
+# AdamsMoultonCorr3rd = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
+# AdamsMoultonCorr3rd2 = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
+# Pred  = moduleCPPKernels.get_function('Pred')
+# Pred2 = moduleCPPKernels.get_function('Pred2')
 
 
 

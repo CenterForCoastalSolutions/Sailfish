@@ -6,6 +6,22 @@ from mod_constants import *
 from misc          import *
 import time
 
+
+filename = os.path.join(exePath, r'nonlinear/step2d_kernels.cpp')
+with open(filename, 'r') as file:
+    code = file.read()
+moduleCPPKernels = cp.RawModule(code=code, options=('-default-device',  '--restrict', '--std=c++17'))
+
+computeMomentumRHSCorr = moduleCPPKernels.get_function('computeMomentumRHSCorr')
+computeMomentumRHSPred = moduleCPPKernels.get_function('computeMomentumRHSPred')
+computeZetaRHS3     = moduleCPPKernels.get_function('computeZetaRHS')
+aaa     = moduleCPPKernels.get_function('aaa')
+bbb     = moduleCPPKernels.get_function('bbb')
+AdamsMoultonCorr3rd = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
+AdamsMoultonCorr3rd2 = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
+Pred  = moduleCPPKernels.get_function('Pred')
+Pred2 = moduleCPPKernels.get_function('Pred2')
+
 #
 # import rmm
 # pool = rmm.mr.PoolMemoryResource(

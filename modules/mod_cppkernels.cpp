@@ -3,20 +3,27 @@
 #define STENCIL(var) class Expr<double, void, opStencil>  var((double *)(_##var + i))
 
 int sz2D, sz3D, szI, szJ, szK;
+double *on_u, *om_v, *pm, *pn;
 
 enum Op  {opValue, opStencil, opSum, opSub, opMul, opDiv, opRtoU, opRtoV,
           opDERtoU, opDNRtoV, opdivUVtoR};
 
 
-extern "C" __global__ void initialize(unsigned int sizeK, unsigned int sizeJ, unsigned int sizeI)
+extern "C" __global__ void initialize(unsigned int sizeK, unsigned int sizeJ, unsigned int sizeI,
+                                      double *_on_u, double *_om_v, double *_pm, double *_pn)
 {
-    printf("%i %i %i \n", sizeK, sizeJ, sizeI);
+    printf("Initialazing kernel information: %i %i %i \n", sizeK, sizeJ, sizeI);
     // Stores some global variables that are used a lot (instead of passing the as parameters on each function).
     szI  = sizeI;
     szJ  = sizeJ;
     szK  = sizeK;
     sz2D = szI*szJ;
     sz3D = szI*szJ*szK;
+
+    on_u = _on_u;
+    om_v = _om_v;
+    pn   = _pn;
+    pm   = _pm;
 }
 
 
@@ -42,29 +49,20 @@ public:
     {
         return *(p + j*szJ + i);
     }
-    L operator=(L val) const
+
+    // By design, we choose not to return a value from the assignment opertor.
+    void operator=(L val) const
     {
-//        printf("%p >-- %f\n",  p, expr.Eval(0,0));
-        return (*p = val);
+        *p = val;
     }
+
+    // By design, we choose not to return a value from the assignment opertor.
     template<typename T1>
     void operator=(const T1 &expr) const
     {
-////        *p = 1.0;
-//        expr;
-//        printf("%p -- %f\n",  p, 1.0); //*expr.Eval(0,0));
-//expr.Eval(0,0);
-////        printf("%p -sss- %f\n",  p, 1.0);
-
         *p = expr.Eval(0,0);
     }
 
-
-//    void operator=(const double val) const
-//    {
-////        printf("%p ->- %f\n",  p, val); //expr.Eval(0,0));
-//        *p = val;
-//    }
 
     L Eval(int const j, int const i) const
     {
@@ -95,18 +93,12 @@ class Expr<L, void, opRtoU>
 {
     L &expr;
 
-//    typedef decltype(expr.Eval(0,0)*expr.Eval(0,0)) ResType;   // The product is a simple way to remove the &
 public:
     typedef decltype(expr.Eval(0,0)*expr.Eval(0,0)) ResType;
 
     Expr(L _expr): expr(_expr)
     {
     }
-
-//    ~Expr()
-//    {
-//        printf("HERE!!!\n");
-//    }
 
     ResType operator()(int const j, int const i) const
     {
@@ -124,7 +116,6 @@ template<typename L>
 class Expr<L, void, opRtoV>
 {
     L &expr;
-//    typedef decltype(expr.Eval(0,0)*expr.Eval(0,0)) ResType;   // The product is a simple way to remove the &
 protected:
     typedef decltype(expr.Eval(0,0)*expr.Eval(0,0)) ResType;
 public:
@@ -148,7 +139,6 @@ template<typename L>
 class Expr<L, void, opDERtoU>
 {
     L &expr;
-//    typedef decltype(expr.Eval(0,0)*expr.Eval(0,0)) ResType;   // The product is a simple way to remove the &
 
 protected:
     typedef decltype(expr.Eval(0,0)*expr.Eval(0,0)) ResType;
@@ -176,7 +166,6 @@ template<typename L>
 class Expr<L, void, opDNRtoV>
 {
     L &expr;
-//    typedef decltype(expr.Eval(0,0)*expr.Eval(0,0)) ResType;   // The product is a simple way to remove the &
 
 protected:
     typedef decltype(expr.Eval(0,0)*expr.Eval(0,0)) ResType;
@@ -242,7 +231,6 @@ public:
 
     const L Eval(int const j, int const i) const
     {
-//        printf("-%f\n", val);
         return val;
     }
 
@@ -388,253 +376,253 @@ auto divUVtoR(const T1 &U, const T2 &V, const Expr<double, void, opStencil> &on_
 }
 
 
-
-
-extern "C"  __global__
-void computeMomentumRHSPred(const double *_h, const double *_on_u, const double *_om_v,
-                            const double *_rhs_ubar, const double *_rhs_vbar,
-                            const double *_zeta_t1, const double *_zeta_t2, const double g)
-{
-    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-
-    STENCIL(rhs_ubar);
-    STENCIL(rhs_vbar);
-
-//    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
-    if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D)
-    {
-//        rhs_ubar = 0.0;
-//        rhs_vbar = 0.0;
-        return;
-    }
-
-    STENCIL(h);
-    STENCIL(on_u);
-    STENCIL(om_v);
-    STENCIL(zeta_t1);
-    STENCIL(zeta_t2);
-
-
-    constexpr double weight = 2.0/5.0;
-    auto gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1;
-
-//    auto gzeta2 = gzeta*gzeta;
-    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta,on_u));
-    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta,om_v));
-}
-
-
-extern "C"  __global__
-void computeMomentumRHSCorr(const double *_h, const double *_on_u, const double *_om_v,
-                            const double *_rhs_ubar, const double *_rhs_vbar,
-                            const double *_zeta_t0, const double *_zeta_t1, const double *_zeta_t2, const double g)
-{
-    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-
-    STENCIL(rhs_ubar);
-    STENCIL(rhs_vbar);
-
-//    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
-    if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D)
-    {
-//        rhs_ubar = 0.0;
-//        rhs_vbar = 0.0;
-        return;
-    }
-
-    STENCIL(h);
-    STENCIL(on_u);
-    STENCIL(om_v);
-    STENCIL(zeta_t0);
-    STENCIL(zeta_t1);
-    STENCIL(zeta_t2);
-
-    constexpr double weight = 4.0/25.0;
-    auto gzeta = (1 - weight)*zeta_t1 + weight*0.5*(zeta_t2 + zeta_t0);
-
-//    auto gzeta2 = gzeta*gzeta;
-    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta,on_u));
-    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta,om_v));
-}
-
-
-extern "C"  __global__
-void computeZetaRHS(const double *_zeta, const double *_h, double *_ubar, const double *_vbar,
-                    const double *_on_u, const double *_om_v, const double *_pn, const double *_pm, double *_res)
-{
-    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-//TODO: also (i % szJ) == N || (i/szJ) == M)
-//    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
-
-    STENCIL(res);
-
-    if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D)
-    {
-//        res = 0.0;
-        return;
-    }
-
-    STENCIL(zeta);
-    STENCIL(h);
-    STENCIL(ubar);
-    STENCIL(vbar);
-    STENCIL(on_u);
-    STENCIL(om_v);
-    STENCIL(pn);
-    STENCIL(pm);
-
-
-    // compute the water column depth
-    auto D = zeta + h;
-
-    auto DU = ubar*RtoU(D);
-    auto DV = vbar*RtoV(D);
-
-    res = divUVtoR(DU, DV, on_u, om_v, pn, pm);
-}
-
-
-
-
-extern "C"  __global__
-void aaa(const double Dt, const double *_zeta_t0, const double *_zeta_t1, const double *_zeta_t2,
-         const double *_rzeta_t1)
-{
-    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-
-    if (((i % szI) == 0 || (i/szI) == 0) || i >= sz2D) return;
-
-    STENCIL(zeta_t0);
-    STENCIL(zeta_t1);
-    STENCIL(zeta_t2);
-    STENCIL(rzeta_t1);
-
-    zeta_t2 = zeta_t0(0,0) + 2.0*Dt*rzeta_t1(0,0);
-
-
-}
-
-
-extern "C"  __global__
-void bbb(const double *_zeta_t1, const double *_zeta_t2)
-{
-    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-
-    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
-
-    STENCIL(zeta_t1);
-    STENCIL(zeta_t2);
-
-
+//
+//
+//extern "C"  __global__
+//void computeMomentumRHSPred(const double *_h, const double *_on_u, const double *_om_v,
+//                            const double *_rhs_ubar, const double *_rhs_vbar,
+//                            const double *_zeta_t1, const double *_zeta_t2, const double g)
+//{
+//    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+//
+//    STENCIL(rhs_ubar);
+//    STENCIL(rhs_vbar);
+//
+////    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
+//    if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D)
+//    {
+////        rhs_ubar = 0.0;
+////        rhs_vbar = 0.0;
+//        return;
+//    }
+//
+//    STENCIL(h);
+//    STENCIL(on_u);
+//    STENCIL(om_v);
+//    STENCIL(zeta_t1);
+//    STENCIL(zeta_t2);
+//
+//
 //    constexpr double weight = 2.0/5.0;
-//    gzeta  = (1 - weight)*zeta_t2(0,0) + weight*zeta_t1(0,0);
-}
-
-
-extern "C"  __global__
-void Pred(const double Dt, const double *_v_t1, const double *_v_t2, const double *_rhs, const double *_D_t1, const double *_D_t2)
-{
-    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-
-    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
-
-    STENCIL(v_t1);
-    STENCIL(v_t2);
-    STENCIL(D_t1);
-    STENCIL(D_t2);
-    STENCIL(rhs);
-
-    v_t2 = (v_t1(0,0)*D_t1(0,0) + Dt*rhs(0,0))/D_t2(0,0);
-
-}
-
-extern "C"  __global__
-void Pred2(const double Dt, const double *_u_t1, const double *_u_t2, const double *_v_t1, const double *_v_t2,
-           const double *_rhsu, const double *_rhsv, const double *_h,
-           const double *_zeta_t1, const double *_zeta_t2)
-{
-    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-
-    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
-
-    STENCIL(u_t1);
-    STENCIL(u_t2);
-    STENCIL(v_t1);
-    STENCIL(v_t2);
-    STENCIL(zeta_t1);
-    STENCIL(zeta_t2);
-    STENCIL(h);
-    STENCIL(rhsu);
-    STENCIL(rhsv);
-
-    auto D_t1 = zeta_t1 + h;
-    auto D_t2 = zeta_t2 + h;
-    auto D_t1U = RtoU(D_t1);
-    auto D_t1V = RtoV(D_t1);
-    auto D_t2U = RtoU(D_t2);
-    auto D_t2V = RtoV(D_t2);
-
-    u_t2 = (u_t1(0,0)*D_t1U(0,0) + Dt*rhsu(0,0))/D_t2U(0,0);
-    v_t2 = (v_t1(0,0)*D_t1V(0,0) + Dt*rhsv(0,0))/D_t2V(0,0);
-
-}
-
-
-
-extern "C"  __global__
-void AdamsMoultonCorr3rd(const double Dt, const double *_v_t2, const double *_rhs_t0, const double *_rhs_t1, const double *_rhs_t2)
-{
-    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-    // Adams-Moulton 3rd order coefficients
-    constexpr double AM3_2 =  5.0 / 12.0;
-    constexpr double AM3_1 =  8.0 / 12.0;
-    constexpr double AM3_0 = -1.0 / 12.0;
-
-    if (i >= sz2D) return;
-
-    STENCIL(rhs_t0);
-    STENCIL(rhs_t1);
-    STENCIL(rhs_t2);
-    STENCIL(v_t2);
-
-    v_t2 = v_t2(0,0) + Dt*(AM3_2*rhs_t2(0,0) + AM3_1*rhs_t1(0,0) + AM3_0*rhs_t0(0,0));
-}
-
-
-
-extern "C"  __global__
-void AdamsMoultonCorr3rd2(const double Dt, const double *_u_t2, const double *_v_t2,
-                          const double *_rhsu_t0, const double *_rhsu_t1, const double *_rhsu_t2,
-                          const double *_rhsv_t0, const double *_rhsv_t1, const double *_rhsv_t2,
-                          const double *_h, const double *_zeta_t1, const double *_zeta_t2)
-{
-    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-    // Adams-Moulton 3rd order coefficients
-    constexpr double AM3_2 =  5.0 / 12.0;
-    constexpr double AM3_1 =  8.0 / 12.0;
-    constexpr double AM3_0 = -1.0 / 12.0;
-
-    if (i >= sz2D) return;
-
-    STENCIL(rhsu_t0);
-    STENCIL(rhsu_t1);
-    STENCIL(rhsu_t2);
-    STENCIL(rhsv_t0);
-    STENCIL(rhsv_t1);
-    STENCIL(rhsv_t2);
-    STENCIL(u_t2);
-    STENCIL(v_t2);
-    STENCIL(zeta_t1);
-    STENCIL(zeta_t2);
-    STENCIL(h);
-
-    auto D_t1 = zeta_t1 + h;
-    auto D_t2 = zeta_t2 + h;
-    auto D_t1U = RtoU(D_t1);
-    auto D_t1V = RtoV(D_t1);
-    auto D_t2U = RtoU(D_t2);
-    auto D_t2V = RtoV(D_t2);
-
-    u_t2 = (u_t2(0,0)*D_t1U + Dt*(AM3_2*rhsu_t2(0,0) + AM3_1*rhsu_t1(0,0) + AM3_0*rhsu_t0(0,0)))/D_t2U;
-    v_t2 = (v_t2(0,0)*D_t1V + Dt*(AM3_2*rhsv_t2(0,0) + AM3_1*rhsv_t1(0,0) + AM3_0*rhsv_t0(0,0)))/D_t2V;
-}
+//    auto gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1;
+//
+////    auto gzeta2 = gzeta*gzeta;
+//    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta,on_u));
+//    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta,om_v));
+//}
+//
+//
+//extern "C"  __global__
+//void computeMomentumRHSCorr(const double *_h, const double *_on_u, const double *_om_v,
+//                            const double *_rhs_ubar, const double *_rhs_vbar,
+//                            const double *_zeta_t0, const double *_zeta_t1, const double *_zeta_t2, const double g)
+//{
+//    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+//
+//    STENCIL(rhs_ubar);
+//    STENCIL(rhs_vbar);
+//
+////    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
+//    if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D)
+//    {
+////        rhs_ubar = 0.0;
+////        rhs_vbar = 0.0;
+//        return;
+//    }
+//
+//    STENCIL(h);
+//    STENCIL(on_u);
+//    STENCIL(om_v);
+//    STENCIL(zeta_t0);
+//    STENCIL(zeta_t1);
+//    STENCIL(zeta_t2);
+//
+//    constexpr double weight = 4.0/25.0;
+//    auto gzeta = (1 - weight)*zeta_t1 + weight*0.5*(zeta_t2 + zeta_t0);
+//
+////    auto gzeta2 = gzeta*gzeta;
+//    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta,on_u));
+//    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta,om_v));
+//}
+//
+//
+//extern "C"  __global__
+//void computeZetaRHS(const double *_zeta, const double *_h, double *_ubar, const double *_vbar,
+//                    const double *_on_u, const double *_om_v, const double *_pn, const double *_pm, double *_res)
+//{
+//    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+////TODO: also (i % szJ) == N || (i/szJ) == M)
+////    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
+//
+//    STENCIL(res);
+//
+//    if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D)
+//    {
+////        res = 0.0;
+//        return;
+//    }
+//
+//    STENCIL(zeta);
+//    STENCIL(h);
+//    STENCIL(ubar);
+//    STENCIL(vbar);
+//    STENCIL(on_u);
+//    STENCIL(om_v);
+//    STENCIL(pn);
+//    STENCIL(pm);
+//
+//
+//    // compute the water column depth
+//    auto D = zeta + h;
+//
+//    auto DU = ubar*RtoU(D);
+//    auto DV = vbar*RtoV(D);
+//
+//    res = divUVtoR(DU, DV, on_u, om_v, pn, pm);
+//}
+//
+//
+//
+//
+//extern "C"  __global__
+//void aaa(const double Dt, const double *_zeta_t0, const double *_zeta_t1, const double *_zeta_t2,
+//         const double *_rzeta_t1)
+//{
+//    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+//
+//    if (((i % szI) == 0 || (i/szI) == 0) || i >= sz2D) return;
+//
+//    STENCIL(zeta_t0);
+//    STENCIL(zeta_t1);
+//    STENCIL(zeta_t2);
+//    STENCIL(rzeta_t1);
+//
+//    zeta_t2 = zeta_t0(0,0) + 2.0*Dt*rzeta_t1(0,0);
+//
+//
+//}
+//
+//
+//extern "C"  __global__
+//void bbb(const double *_zeta_t1, const double *_zeta_t2)
+//{
+//    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+//
+//    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
+//
+//    STENCIL(zeta_t1);
+//    STENCIL(zeta_t2);
+//
+//
+////    constexpr double weight = 2.0/5.0;
+////    gzeta  = (1 - weight)*zeta_t2(0,0) + weight*zeta_t1(0,0);
+//}
+//
+//
+//extern "C"  __global__
+//void Pred(const double Dt, const double *_v_t1, const double *_v_t2, const double *_rhs, const double *_D_t1, const double *_D_t2)
+//{
+//    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+//
+//    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
+//
+//    STENCIL(v_t1);
+//    STENCIL(v_t2);
+//    STENCIL(D_t1);
+//    STENCIL(D_t2);
+//    STENCIL(rhs);
+//
+//    v_t2 = (v_t1(0,0)*D_t1(0,0) + Dt*rhs(0,0))/D_t2(0,0);
+//
+//}
+//
+//extern "C"  __global__
+//void Pred2(const double Dt, const double *_u_t1, const double *_u_t2, const double *_v_t1, const double *_v_t2,
+//           const double *_rhsu, const double *_rhsv, const double *_h,
+//           const double *_zeta_t1, const double *_zeta_t2)
+//{
+//    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+//
+//    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
+//
+//    STENCIL(u_t1);
+//    STENCIL(u_t2);
+//    STENCIL(v_t1);
+//    STENCIL(v_t2);
+//    STENCIL(zeta_t1);
+//    STENCIL(zeta_t2);
+//    STENCIL(h);
+//    STENCIL(rhsu);
+//    STENCIL(rhsv);
+//
+//    auto D_t1 = zeta_t1 + h;
+//    auto D_t2 = zeta_t2 + h;
+//    auto D_t1U = RtoU(D_t1);
+//    auto D_t1V = RtoV(D_t1);
+//    auto D_t2U = RtoU(D_t2);
+//    auto D_t2V = RtoV(D_t2);
+//
+//    u_t2 = (u_t1(0,0)*D_t1U(0,0) + Dt*rhsu(0,0))/D_t2U(0,0);
+//    v_t2 = (v_t1(0,0)*D_t1V(0,0) + Dt*rhsv(0,0))/D_t2V(0,0);
+//
+//}
+//
+//
+//
+//extern "C"  __global__
+//void AdamsMoultonCorr3rd(const double Dt, const double *_v_t2, const double *_rhs_t0, const double *_rhs_t1, const double *_rhs_t2)
+//{
+//    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+//    // Adams-Moulton 3rd order coefficients
+//    constexpr double AM3_2 =  5.0 / 12.0;
+//    constexpr double AM3_1 =  8.0 / 12.0;
+//    constexpr double AM3_0 = -1.0 / 12.0;
+//
+//    if (i >= sz2D) return;
+//
+//    STENCIL(rhs_t0);
+//    STENCIL(rhs_t1);
+//    STENCIL(rhs_t2);
+//    STENCIL(v_t2);
+//
+//    v_t2 = v_t2(0,0) + Dt*(AM3_2*rhs_t2(0,0) + AM3_1*rhs_t1(0,0) + AM3_0*rhs_t0(0,0));
+//}
+//
+//
+//
+//extern "C"  __global__
+//void AdamsMoultonCorr3rd2(const double Dt, const double *_u_t2, const double *_v_t2,
+//                          const double *_rhsu_t0, const double *_rhsu_t1, const double *_rhsu_t2,
+//                          const double *_rhsv_t0, const double *_rhsv_t1, const double *_rhsv_t2,
+//                          const double *_h, const double *_zeta_t1, const double *_zeta_t2)
+//{
+//    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+//    // Adams-Moulton 3rd order coefficients
+//    constexpr double AM3_2 =  5.0 / 12.0;
+//    constexpr double AM3_1 =  8.0 / 12.0;
+//    constexpr double AM3_0 = -1.0 / 12.0;
+//
+//    if (i >= sz2D) return;
+//
+//    STENCIL(rhsu_t0);
+//    STENCIL(rhsu_t1);
+//    STENCIL(rhsu_t2);
+//    STENCIL(rhsv_t0);
+//    STENCIL(rhsv_t1);
+//    STENCIL(rhsv_t2);
+//    STENCIL(u_t2);
+//    STENCIL(v_t2);
+//    STENCIL(zeta_t1);
+//    STENCIL(zeta_t2);
+//    STENCIL(h);
+//
+//    auto D_t1 = zeta_t1 + h;
+//    auto D_t2 = zeta_t2 + h;
+//    auto D_t1U = RtoU(D_t1);
+//    auto D_t1V = RtoV(D_t1);
+//    auto D_t2U = RtoU(D_t2);
+//    auto D_t2V = RtoV(D_t2);
+//
+//    u_t2 = (u_t2(0,0)*D_t1U + Dt*(AM3_2*rhsu_t2(0,0) + AM3_1*rhsu_t1(0,0) + AM3_0*rhsu_t0(0,0)))/D_t2U;
+//    v_t2 = (v_t2(0,0)*D_t1V + Dt*(AM3_2*rhsv_t2(0,0) + AM3_1*rhsv_t1(0,0) + AM3_0*rhsv_t0(0,0)))/D_t2V;
+//}
