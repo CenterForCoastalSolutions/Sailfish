@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="Most optimized version achived. Now I have to clean up the code.">
-      <change beforePath="$PROJECT_DIR$/modules/mod_operators.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_operators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utility/test.in" beforeDir="false" afterPath="$PROJECT_DIR$/utility/test.in" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,41 +121,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1675796239226</updated>
-    </task>
-    <task id="LOCAL-00150" summary="...">
-      <created>1688675825682</created>
-      <option name="number" value="00150" />
-      <option name="presentableId" value="LOCAL-00150" />
-      <option name="project" value="LOCAL" />
-      <updated>1688675825682</updated>
-    </task>
-    <task id="LOCAL-00151" summary="...">
-      <created>1688675956944</created>
-      <option name="number" value="00151" />
-      <option name="presentableId" value="LOCAL-00151" />
-      <option name="project" value="LOCAL" />
-      <updated>1688675956944</updated>
-    </task>
-    <task id="LOCAL-00152" summary="...">
-      <created>1688676268892</created>
-      <option name="number" value="00152" />
-      <option name="presentableId" value="LOCAL-00152" />
-      <option name="project" value="LOCAL" />
-      <updated>1688676268892</updated>
-    </task>
-    <task id="LOCAL-00153" summary="...">
-      <created>1688676600473</created>
-      <option name="number" value="00153" />
-      <option name="presentableId" value="LOCAL-00153" />
-      <option name="project" value="LOCAL" />
-      <updated>1688676600473</updated>
-    </task>
-    <task id="LOCAL-00154" summary="...">
-      <created>1688676713980</created>
-      <option name="number" value="00154" />
-      <option name="presentableId" value="LOCAL-00154" />
-      <option name="project" value="LOCAL" />
-      <updated>1688676713980</updated>
     </task>
     <task id="LOCAL-00155" summary="...">
       <created>1688676815805</created>
@@ -464,7 +430,42 @@
       <option name="project" value="LOCAL" />
       <updated>1689355327185</updated>
     </task>
-    <option name="localTasksCounter" value="199" />
+    <task id="LOCAL-00199" summary="Most optimized version achived. Now I have to clean up the code.">
+      <created>1689355353791</created>
+      <option name="number" value="00199" />
+      <option name="presentableId" value="LOCAL-00199" />
+      <option name="project" value="LOCAL" />
+      <updated>1689355353791</updated>
+    </task>
+    <task id="LOCAL-00200" summary="Most optimized version achived. Now I have to clean up the code.">
+      <created>1689355397657</created>
+      <option name="number" value="00200" />
+      <option name="presentableId" value="LOCAL-00200" />
+      <option name="project" value="LOCAL" />
+      <updated>1689355397657</updated>
+    </task>
+    <task id="LOCAL-00201" summary="Most optimized version achived. Now I have to clean up the code.">
+      <created>1689355451294</created>
+      <option name="number" value="00201" />
+      <option name="presentableId" value="LOCAL-00201" />
+      <option name="project" value="LOCAL" />
+      <updated>1689355451294</updated>
+    </task>
+    <task id="LOCAL-00202" summary="Most optimized version achived. Now I have to clean up the code.">
+      <created>1689355487580</created>
+      <option name="number" value="00202" />
+      <option name="presentableId" value="LOCAL-00202" />
+      <option name="project" value="LOCAL" />
+      <updated>1689355487580</updated>
+    </task>
+    <task id="LOCAL-00203" summary="Most optimized version achived. Now I have to clean up the code.">
+      <created>1689355593087</created>
+      <option name="number" value="00203" />
+      <option name="presentableId" value="LOCAL-00203" />
+      <option name="project" value="LOCAL" />
+      <updated>1689355593087</updated>
+    </task>
+    <option name="localTasksCounter" value="204" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
