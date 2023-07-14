@@ -184,7 +184,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # computeMomentumRHS((GRID.on_u.shape[0],), (GRID.on_u.shape[1],), (h, gzeta, gzeta*gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
 
     computeMomentumRHSPred(grsz, bksz, (h, GRID.on_u, GRID.om_v, rubar_t1, rvbar_t1, zeta_t1, zeta_t2, g))
-    print('time step: ', compTimes.iic)
+    # print('time step: ', compTimes.iic)
     # Interpolate depth at points U, V
     # D_t1 = zeta_t1 + h
     # D_t2 = zeta_t2 + h
