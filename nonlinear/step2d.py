@@ -7,20 +7,21 @@ from misc          import *
 import time
 
 
-filename = os.path.join(exePath, r'nonlinear/step2d_kernels.cpp')
-with open(filename, 'r') as file:
-    code = file.read()
-moduleCPPKernels = cp.RawModule(code=code, options=('-default-device',  '--restrict', '--std=c++17'))
-
-computeMomentumRHSCorr = moduleCPPKernels.get_function('computeMomentumRHSCorr')
-computeMomentumRHSPred = moduleCPPKernels.get_function('computeMomentumRHSPred')
-computeZetaRHS3     = moduleCPPKernels.get_function('computeZetaRHS')
-aaa     = moduleCPPKernels.get_function('aaa')
-bbb     = moduleCPPKernels.get_function('bbb')
-AdamsMoultonCorr3rd = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
-AdamsMoultonCorr3rd2 = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
-Pred  = moduleCPPKernels.get_function('Pred')
-Pred2 = moduleCPPKernels.get_function('Pred2')
+# filename = os.path.join(exePath, r'nonlinear/step2d_kernels.cpp')
+# filename = os.path.join(exePath, r'modules/mod_cppkernels.cpp')
+# with open(filename, 'r') as file:
+#     code = file.read()
+# moduleCPPKernels = cp.RawModule(code=code, options=('-default-device',  '--restrict', '--std=c++17'))
+#
+# computeMomentumRHSCorr = moduleCPPKernels.get_function('computeMomentumRHSCorr')
+# computeMomentumRHSPred = moduleCPPKernels.get_function('computeMomentumRHSPred')
+# computeZetaRHS3     = moduleCPPKernels.get_function('computeZetaRHS')
+# aaa     = moduleCPPKernels.get_function('aaa')
+# bbb     = moduleCPPKernels.get_function('bbb')
+# AdamsMoultonCorr3rd = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
+# AdamsMoultonCorr3rd2 = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
+# Pred  = moduleCPPKernels.get_function('Pred')
+# Pred2 = moduleCPPKernels.get_function('Pred2')
 
 #
 # import rmm
@@ -148,7 +149,6 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
         gzeta[:] = 0.5*(zeta_t2 + zeta_t1)
 
-
     else:
         # If is not the first time step, the predictor consists of a leapfrog time step where the RHS is computed at tn
         # and time derivatives are centered at tn (f(tn+1) - f(tn-1))/2*dtfast.
@@ -165,7 +165,6 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
         # gzeta = cp.zeros(zeta_t1.shape)
         aaa(grsz, bksz, (Δt, zeta_t0, zeta_t1, zeta_t2, rzeta_t1))
-
 
 
 
@@ -187,12 +186,12 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     computeMomentumRHSPred(grsz, bksz, (h, GRID.on_u, GRID.om_v, rubar_t1, rvbar_t1, zeta_t1, zeta_t2, g))
     print('time step: ', compTimes.iic)
     # Interpolate depth at points U, V
-    D_t1 = zeta_t1 + h
-    D_t2 = zeta_t2 + h
-    D_t1U = RtoU_CUDA(D_t1, GRID.on_u, size=GRID.on_u.size)
-    D_t1V = RtoV_CUDA(D_t1, GRID.om_v, size=GRID.om_v.size)
-    D_t2U = RtoU_CUDA(D_t2, GRID.on_u, size=GRID.on_u.size)
-    D_t2V = RtoV_CUDA(D_t2, GRID.om_v, size=GRID.om_v.size)
+    # D_t1 = zeta_t1 + h
+    # D_t2 = zeta_t2 + h
+    # D_t1U = D_t1RtoU_CUDA(D_t1, GRID.on_u, size=GRID.on_u.size)
+    # D_t1V = D_t1RtoV_CUDA(D_t1, GRID.om_v, size=GRID.om_v.size)
+    # D_t2U = D_t2RtoU_CUDA(D_t2, GRID.on_u, size=GRID.on_u.size)
+    # D_t2V = D_t2RtoV_CUDA(D_t2, GRID.om_v, size=GRID.om_v.size)
     # D_t1U = RtoU(D_t1)
     # D_t1V = RtoV(D_t1)
     # D_t2U = RtoU(D_t2)
@@ -204,10 +203,10 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # step is Leap-frog and the corrector step is Adams-Moulton.
     # TODO: I don't think this comment is correct.
 
-    Pred(grsz, bksz, (Δt, ubar_t1, ubar_t2, rubar_t1, D_t1U, D_t2U))
-    Pred(grsz, bksz, (Δt, vbar_t1, vbar_t2, rvbar_t1, D_t1V, D_t2V))
+    # Pred(grsz, bksz, (Δt, ubar_t1, ubar_t2, rubar_t1, D_t1U, D_t2U))
+    # Pred(grsz, bksz, (Δt, vbar_t1, vbar_t2, rvbar_t1, D_t1V, D_t2V))
 
-    # Pred2(grsz, bksz, (Δt, ubar_t1, ubar_t2, vbar_t1, vbar_t2, rubar_t1, rvbar_t1, h, zeta_t1, zeta_t2))
+    Pred2(grsz, bksz, (Δt, ubar_t1, ubar_t2, vbar_t1, vbar_t2, rubar_t1, rvbar_t1, h, zeta_t1, zeta_t2))
     # vbar_t2.reshape(402,402)[1,:] = 0.0
     # ubar_t2[:] = (ubar_t1*D_t1U + Δt*rhs_ubar)/D_t2U
     # vbar_t2[:] = (vbar_t1*D_t1V + Δt*rhs_vbar)/D_t2V

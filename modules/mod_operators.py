@@ -36,7 +36,7 @@ def initModule(GRID):
     bksz = (blockSize,)
     grsz = (sz//blockSize + 1,)
 
-    initializeCPPKernels((1,), (1,), (1, shp[0], shp[1]))
+    initializeCPPKernels((1,), (1,), (1, shp[0], shp[1], G.on_u, G.om_v, G.pn, G.pm))
 
 
 preamble2D = r'''
@@ -209,19 +209,19 @@ initOperators = module.get_function('initOperators')
 filename = os.path.join(exePath, r'modules/mod_cppkernels.cpp')
 with open(filename, 'r') as file:
     code = file.read()
-moduleCPPKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--std=c++17'))
+moduleCPPKernels = cp.RawModule(code=code, options=('-default-device', '-dopt=on', '--restrict', '--std=c++17'))
 initializeCPPKernels = moduleCPPKernels.get_function('initialize')
 
 # computeMomentumRHS3 = moduleCPPKernels.get_function('computeMomentumRHS')
-# computeMomentumRHSCorr = moduleCPPKernels.get_function('computeMomentumRHSCorr')
-# computeMomentumRHSPred = moduleCPPKernels.get_function('computeMomentumRHSPred')
-# computeZetaRHS3     = moduleCPPKernels.get_function('computeZetaRHS')
-# aaa     = moduleCPPKernels.get_function('aaa')
-# bbb     = moduleCPPKernels.get_function('bbb')
-# AdamsMoultonCorr3rd = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
-# AdamsMoultonCorr3rd2 = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
-# Pred  = moduleCPPKernels.get_function('Pred')
-# Pred2 = moduleCPPKernels.get_function('Pred2')
+computeMomentumRHSCorr = moduleCPPKernels.get_function('computeMomentumRHSCorr')
+computeMomentumRHSPred = moduleCPPKernels.get_function('computeMomentumRHSPred')
+computeZetaRHS3     = moduleCPPKernels.get_function('computeZetaRHS')
+aaa     = moduleCPPKernels.get_function('aaa')
+bbb     = moduleCPPKernels.get_function('bbb')
+AdamsMoultonCorr3rd = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
+AdamsMoultonCorr3rd2 = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
+Pred  = moduleCPPKernels.get_function('Pred')
+Pred2 = moduleCPPKernels.get_function('Pred2')
 
 
 
