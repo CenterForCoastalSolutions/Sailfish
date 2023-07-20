@@ -383,7 +383,7 @@ auto divUVtoR(const T1 &U, const T2 &V, const Expr<double, void, opStencil> &on_
 extern "C"  __global__
 void computeMomentumRHSPred(const double *_h,
                             const double *_rhs_ubar, const double *_rhs_vbar,
-                            const double *_zeta_t1, const double *_zeta_t2, const double g)
+                            const double *_zeta_t1, const double *_zeta_t2, const double g, const double weight)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -404,11 +404,9 @@ void computeMomentumRHSPred(const double *_h,
     STENCIL(zeta_t1);
     STENCIL(zeta_t2);
 
-
-    constexpr double weight = 2.0/5.0;
     auto gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1;
-
     auto gzeta2 = gzeta*gzeta;   // TODO : sqr expression.
+
     rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta2,on_u));
     rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta2,om_v));
 }
