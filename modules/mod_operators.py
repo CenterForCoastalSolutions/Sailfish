@@ -215,13 +215,11 @@ initializeCPPKernels = moduleCPPKernels.get_function('initialize')
 # computeMomentumRHS3 = moduleCPPKernels.get_function('computeMomentumRHS')
 computeMomentumRHSCorr = moduleCPPKernels.get_function('computeMomentumRHSCorr')
 computeMomentumRHSPred = moduleCPPKernels.get_function('computeMomentumRHSPred')
-computeZetaRHS3     = moduleCPPKernels.get_function('computeZetaRHS')
-aaa     = moduleCPPKernels.get_function('aaa')
-bbb     = moduleCPPKernels.get_function('bbb')
-AdamsMoultonCorr3rd = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
-AdamsMoultonCorr3rd2 = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
-Pred  = moduleCPPKernels.get_function('Pred')
-Pred2 = moduleCPPKernels.get_function('Pred2')
+computeZetaRHS         = moduleCPPKernels.get_function('computeZetaRHS')
+computeZetaPred        = moduleCPPKernels.get_function('computeZetaPred')
+AdamsMoultonCorr3rd    = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
+AdamsMoultonCorr3rd2   = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
+computeMomentumPred    = moduleCPPKernels.get_function('computeMomentumPred')
 
 
 

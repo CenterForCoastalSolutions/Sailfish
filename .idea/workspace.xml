@@ -3,8 +3,14 @@
   <component name="ChangeListManager">
     <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="Most optimized version achived. Now I have to clean up the code.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_boundary.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_boundary.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_cppkernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_cppkernels.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_operators.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_operators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/main2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main2d.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/step2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tmp/testProgram.py" beforeDir="false" afterPath="$PROJECT_DIR$/tmp/testProgram.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utility/misc.py" beforeDir="false" afterPath="$PROJECT_DIR$/utility/misc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utility/test.in" beforeDir="false" afterPath="$PROJECT_DIR$/utility/test.in" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,13 +128,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1675796239226</updated>
-    </task>
-    <task id="LOCAL-00157" summary="...">
-      <created>1688677212695</created>
-      <option name="number" value="00157" />
-      <option name="presentableId" value="LOCAL-00157" />
-      <option name="project" value="LOCAL" />
-      <updated>1688677212695</updated>
     </task>
     <task id="LOCAL-00158" summary="...">
       <created>1688677315606</created>
@@ -466,7 +465,14 @@
       <option name="project" value="LOCAL" />
       <updated>1689355825531</updated>
     </task>
-    <option name="localTasksCounter" value="206" />
+    <task id="LOCAL-00206" summary="Most optimized version achived. Now I have to clean up the code.">
+      <created>1689359767864</created>
+      <option name="number" value="00206" />
+      <option name="presentableId" value="LOCAL-00206" />
+      <option name="project" value="LOCAL" />
+      <updated>1689359767864</updated>
+    </task>
+    <option name="localTasksCounter" value="207" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -518,7 +524,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/modules/mod_boundary.py</url>
-          <line>214</line>
+          <line>224</line>
           <option name="timeStamp" value="86" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -535,6 +541,11 @@
           <url>file://$PROJECT_DIR$/modules/mod_operators.py</url>
           <line>214</line>
           <option name="timeStamp" value="151" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/modules/mod_boundary.py</url>
+          <line>240</line>
+          <option name="timeStamp" value="163" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

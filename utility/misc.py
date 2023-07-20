@@ -1,8 +1,8 @@
 import sys
 
 
-# exePath = r'D:\projects\src\oceangpu'
-exePath = r'/home/jo.gonzalez/src/Sailfish'
+exePath = r'D:\projects\src\oceangpu'
+# exePath = r'/home/jo.gonzalez/src/Sailfish'
 
 blockSize = 1024
 

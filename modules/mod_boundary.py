@@ -118,40 +118,50 @@ class Boundary:
         # TODO: I think that this code can be simplified since ravel_multi_index takes an array as an input, so the for loops
         # may be unnecessary
         # West/East
-        for j in range(j0,M):
-            idxFlat  = cp.ravel_multi_index((cp.array([j]), cp.array([i0])    ), shp)
-            idxFlat1 = cp.ravel_multi_index((cp.array([j]), cp.array([i0])    ), shp)
-            idxFlat2 = cp.ravel_multi_index((cp.array([j]), cp.array([i0 + 1])), shp)
-            bcIdx  += [idxFlat ]
-            bcIdx1 += [idxFlat1]
-            bcIdx2 += [idxFlat2]
-            LBC += [decodeLBC(val[iW])]
+        bcW = decodeLBC(val[iW])
+        bcE = decodeLBC(val[iE])
+        bcN = decodeLBC(val[iN])
+        bcS = decodeLBC(val[iS])
 
-            idxFlat  = cp.ravel_multi_index((cp.array([j]), cp.array([L  - 1])), shp)
-            idxFlat1 = cp.ravel_multi_index((cp.array([j]), cp.array([L     ])), shp)
-            idxFlat2 = cp.ravel_multi_index((cp.array([j]), cp.array([L  - 1])), shp)
-            bcIdx  += [idxFlat ]
-            bcIdx1 += [idxFlat1]
-            bcIdx2 += [idxFlat2]
-            LBC += [decodeLBC(val[iE])]
+        iRange = cp.arange(i0, L)
+        jRange = cp.arange(j0, M)
 
-        # North/South
-        for i in range(i0, L):
-            idxFlat  = cp.ravel_multi_index((cp.array([j0]),     cp.array([i])), shp)
-            idxFlat1 = cp.ravel_multi_index((cp.array([j0]),     cp.array([i])), shp)
-            idxFlat2 = cp.ravel_multi_index((cp.array([j0 + 1]), cp.array([i])), shp)
-            bcIdx  += [idxFlat ]
-            bcIdx1 += [idxFlat1]
-            bcIdx2 += [idxFlat2]
-            LBC += [decodeLBC(val[iN])]
+        idxFlat  = cp.ravel_multi_index((jRange, cp.array([i0    ])), shp)
+        idxFlat1 = cp.ravel_multi_index((jRange, cp.array([i0    ])), shp)
+        idxFlat2 = cp.ravel_multi_index((jRange, cp.array([i0 + 1])), shp)
+        bcIdx  += idxFlat.tolist()
+        bcIdx1 += idxFlat1.tolist()
+        bcIdx2 += idxFlat2.tolist()
+        LBC += [bcW]*(M-j0)
 
-            idxFlat  = cp.ravel_multi_index((cp.array([M - 1]),  cp.array([i])), shp)
-            idxFlat1 = cp.ravel_multi_index((cp.array([M    ]),  cp.array([i])), shp)
-            idxFlat2 = cp.ravel_multi_index((cp.array([M - 1]),  cp.array([i])), shp)
-            bcIdx  += [idxFlat ]
-            bcIdx1 += [idxFlat1]
-            bcIdx2 += [idxFlat2]
-            LBC += [decodeLBC(val[iS])]
+        idxFlat  = cp.ravel_multi_index((jRange, cp.array([L - 1])), shp)
+        idxFlat1 = cp.ravel_multi_index((jRange, cp.array([L    ])), shp)
+        idxFlat2 = cp.ravel_multi_index((jRange, cp.array([L - 1])), shp)
+        bcIdx  += idxFlat.tolist()
+        bcIdx1 += idxFlat1.tolist()
+        bcIdx2 += idxFlat2.tolist()
+        LBC += [bcE]*(M-j0)
+
+        idxFlat  = cp.ravel_multi_index((cp.array([i0    ]), iRange), shp)
+        idxFlat1 = cp.ravel_multi_index((cp.array([i0    ]), iRange), shp)
+        idxFlat2 = cp.ravel_multi_index((cp.array([i0 + 1]), iRange), shp)
+        bcIdx  += idxFlat.tolist()
+        bcIdx1 += idxFlat1.tolist()
+        bcIdx2 += idxFlat2.tolist()
+        LBC += [bcN]*(L-i0)
+
+        idxFlat  = cp.ravel_multi_index((cp.array([M - 1]), iRange), shp)
+        idxFlat1 = cp.ravel_multi_index((cp.array([M    ]), iRange), shp)
+        idxFlat2 = cp.ravel_multi_index((cp.array([M - 1]), iRange), shp)
+        bcIdx  += idxFlat.tolist()
+        bcIdx1 += idxFlat1.tolist()
+        bcIdx2 += idxFlat2.tolist()
+        LBC += [bcS]*(L-i0)
+
+
+
+
+
 
 
         # # Corners.
@@ -236,8 +246,6 @@ class Boundary:
         # When Flather or Shchepetkin conditions are used for the velocities, we will need to "acquire"
         # the values for the free surfaces too.
         for idx, idx1, idx2, bc in zip(*(self.ubarBC.unpack())):
-             # = idxBC.unpack()
-
             if checkLBC(bc, bcFlather) or checkLBC(bc, bcShchepetkin):
                 idxLocalZetaBC = self.getLocalBCIdx(self.zetaBC, idx)
                 self.zetaBC.LBC[idxLocalZetaBC] |= bcAcquire

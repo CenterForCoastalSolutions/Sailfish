@@ -3,16 +3,17 @@
 #define STENCIL(var) class Expr<double, void, opStencil>  var((double *)(_##var + i))
 
 int sz2D, sz3D, szI, szJ, szK;
-double *on_u, *om_v, *pm, *pn;
+double *_on_u, *_om_v, *_pm, *_pn;
 
 enum Op  {opValue, opStencil, opSum, opSub, opMul, opDiv, opRtoU, opRtoV,
           opDERtoU, opDNRtoV, opdivUVtoR};
 
 
 extern "C" __global__ void initialize(unsigned int sizeK, unsigned int sizeJ, unsigned int sizeI,
-                                      double *_on_u, double *_om_v, double *_pm, double *_pn)
+                                      double *on_u, double *om_v, double *pn, double *pm)
 {
     printf("Initialazing kernel information: %i %i %i \n", sizeK, sizeJ, sizeI);
+
     // Stores some global variables that are used a lot (instead of passing the as parameters on each function).
     szI  = sizeI;
     szJ  = sizeJ;
@@ -20,13 +21,11 @@ extern "C" __global__ void initialize(unsigned int sizeK, unsigned int sizeJ, un
     sz2D = szI*szJ;
     sz3D = szI*szJ*szK;
 
-    printf("11111\n");
+    _on_u = on_u;
+    _om_v = om_v;
+    _pn   = pn;
+    _pm   = pm;
 
-    on_u = _on_u;
-    om_v = _om_v;
-    pn   = _pn;
-    pm   = _pm;
-    printf("22222\n");
 }
 
 
@@ -382,14 +381,12 @@ auto divUVtoR(const T1 &U, const T2 &V, const Expr<double, void, opStencil> &on_
 
 
 extern "C"  __global__
-void computeMomentumRHSPred(const double *_h, const double *_on_u, const double *_om_v,
+void computeMomentumRHSPred(const double *_h,
                             const double *_rhs_ubar, const double *_rhs_vbar,
                             const double *_zeta_t1, const double *_zeta_t2, const double g)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
-    STENCIL(rhs_ubar);
-    STENCIL(rhs_vbar);
 
 //    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
     if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D)
@@ -399,6 +396,8 @@ void computeMomentumRHSPred(const double *_h, const double *_on_u, const double 
         return;
     }
 
+    STENCIL(rhs_ubar);
+    STENCIL(rhs_vbar);
     STENCIL(h);
     STENCIL(on_u);
     STENCIL(om_v);
@@ -409,21 +408,20 @@ void computeMomentumRHSPred(const double *_h, const double *_on_u, const double 
     constexpr double weight = 2.0/5.0;
     auto gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1;
 
-//    auto gzeta2 = gzeta*gzeta;
-    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta,on_u));
-    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta,om_v));
+    auto gzeta2 = gzeta*gzeta;   // TODO : sqr expression.
+    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta2,on_u));
+    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta2,om_v));
 }
 
 
 extern "C"  __global__
-void computeMomentumRHSCorr(const double *_h, const double *_on_u, const double *_om_v,
+void computeMomentumRHSCorr(const double *_h,
                             const double *_rhs_ubar, const double *_rhs_vbar,
                             const double *_zeta_t0, const double *_zeta_t1, const double *_zeta_t2, const double g)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
-    STENCIL(rhs_ubar);
-    STENCIL(rhs_vbar);
+
 
 //    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
     if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D)
@@ -433,6 +431,8 @@ void computeMomentumRHSCorr(const double *_h, const double *_on_u, const double 
         return;
     }
 
+    STENCIL(rhs_ubar);
+    STENCIL(rhs_vbar);
     STENCIL(h);
     STENCIL(on_u);
     STENCIL(om_v);
@@ -443,28 +443,26 @@ void computeMomentumRHSCorr(const double *_h, const double *_on_u, const double 
     constexpr double weight = 4.0/25.0;
     auto gzeta = (1 - weight)*zeta_t1 + weight*0.5*(zeta_t2 + zeta_t0);
 
-//    auto gzeta2 = gzeta*gzeta;
-    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta,on_u));
-    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta,om_v));
+    auto gzeta2 = gzeta*gzeta;
+    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta2,on_u));
+    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta2,om_v));
 }
 
 
 extern "C"  __global__
-void computeZetaRHS(const double *_zeta, const double *_h, double *_ubar, const double *_vbar,
-                    const double *_on_u, const double *_om_v, const double *_pn, const double *_pm, double *_res)
+void computeZetaRHS(const double *_zeta, const double *_h, double *_ubar, const double *_vbar, double *_res)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 //TODO: also (i % szJ) == N || (i/szJ) == M)
 //    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
 
-    STENCIL(res);
-
     if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D)
     {
-//        res = 0.0;
+
         return;
     }
 
+    STENCIL(res);
     STENCIL(zeta);
     STENCIL(h);
     STENCIL(ubar);
@@ -475,21 +473,23 @@ void computeZetaRHS(const double *_zeta, const double *_h, double *_ubar, const 
     STENCIL(pm);
 
 
-    // compute the water column depth
+    // Water column depth
     auto D = zeta + h;
 
+    // Fluxes.
     auto DU = ubar*RtoU(D);
     auto DV = vbar*RtoV(D);
 
     res = divUVtoR(DU, DV, on_u, om_v, pn, pm);
+
 }
 
 
 
 
 extern "C"  __global__
-void aaa(const double Dt, const double *_zeta_t0, const double *_zeta_t1, const double *_zeta_t2,
-         const double *_rzeta_t1)
+void computeZetaPred(const double Dt, const double *_zeta_t0, const double *_zeta_t1, const double *_zeta_t2,
+                     const double *_rzeta_t1)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -505,21 +505,6 @@ void aaa(const double Dt, const double *_zeta_t0, const double *_zeta_t1, const 
 
 }
 
-
-extern "C"  __global__
-void bbb(const double *_zeta_t1, const double *_zeta_t2)
-{
-    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-
-    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
-
-    STENCIL(zeta_t1);
-    STENCIL(zeta_t2);
-
-
-//    constexpr double weight = 2.0/5.0;
-//    gzeta  = (1 - weight)*zeta_t2(0,0) + weight*zeta_t1(0,0);
-}
 
 
 extern "C"  __global__
@@ -540,9 +525,9 @@ void Pred(const double Dt, const double *_v_t1, const double *_v_t2, const doubl
 }
 
 extern "C"  __global__
-void Pred2(const double Dt, const double *_u_t1, const double *_u_t2, const double *_v_t1, const double *_v_t2,
-           const double *_rhsu, const double *_rhsv, const double *_h,
-           const double *_zeta_t1, const double *_zeta_t2)
+void computeMomentumPred(const double Dt, const double *_u_t1, const double *_u_t2, const double *_v_t1, const double *_v_t2,
+                         const double *_rhsu, const double *_rhsv, const double *_h,
+                         const double *_zeta_t1, const double *_zeta_t2)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 

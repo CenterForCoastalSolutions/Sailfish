@@ -40,8 +40,7 @@ physicalParams = mod_physical_params.PhysicalParams(input, GRID)
 compTimes      = mod_comptimes      .CompTimes(input)
 OCEAN          = mod_ocean          .T_OCEAN(input, GRID)
 
-mod_operators.initModule(GRID)
-mod_operators.initOperators((1,), (1,), (10, *(GRID.h.shape)))    # TODO: Change 10 by the Z dimension
+    # TODO: Change 10 by the Z dimension
 
 
 v = OCEAN.zeta[0,:,:]
@@ -60,6 +59,9 @@ input.printReport()
 # Generates the mesh.
 ana_grid.ana_grid('Basin', GRID)
 GRID.updateMetrics()
+
+mod_operators.initModule(GRID)
+# mod_operators.initOperators((1,), (1,), (10, *(GRID.h.shape)))
 
 main2d(compTimes,  GRID, OCEAN, BOUNDARY)
 

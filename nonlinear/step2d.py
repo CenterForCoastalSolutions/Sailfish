@@ -139,7 +139,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
     # During the first time-step, the predictor step is Forward-Euler. Otherwise, the predictor step is Leap-frog.
     # rhs_zeta_t1 = computeZetaRHS(zeta_t1, h, ubar_t1, vbar_t1)
-    computeZetaRHS3(grsz, bksz, (zeta_t1, h, ubar_t1, vbar_t1, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rzeta_t1))
+    computeZetaRHS(grsz, bksz, (zeta_t1, h, ubar_t1, vbar_t1, rzeta_t1))
 
     if compTimes.isFirst2DStep():
         # The first time it performs a simple Euler time step. RHS is computed at tn and time derivatives are
@@ -152,19 +152,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     else:
         # If is not the first time step, the predictor consists of a leapfrog time step where the RHS is computed at tn
         # and time derivatives are centered at tn (f(tn+1) - f(tn-1))/2*dtfast.
-
-        # zeta_t2[:] = zeta_t0 + 2*Δt*rhs_zeta_t1   # The 2*Δt comes from leapfrog doing a central time derivative.
-        #
-        # weight = 4.0/25.0
-        # gzeta = (1 - weight)*zeta_t1 + weight*0.5*(zeta_t2 + zeta_t0)
-        #
-        # # In the predictor step, save the rhs for future use.
-        # rzeta_t1[:] = rhs_zeta_t1
-
-
-
-        # gzeta = cp.zeros(zeta_t1.shape)
-        aaa(grsz, bksz, (Δt, zeta_t0, zeta_t1, zeta_t2, rzeta_t1))
+        computeZetaPred(grsz, bksz, (Δt, zeta_t0, zeta_t1, zeta_t2, rzeta_t1))
 
 
 
@@ -183,19 +171,9 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # rvbar_t1[:] = 0.0
     # computeMomentumRHS((GRID.on_u.shape[0],), (GRID.on_u.shape[1],), (h, gzeta, gzeta*gzeta, GRID.on_u, GRID.om_v, rhs_ubar, rhs_vbar, g))
 
-    computeMomentumRHSPred(grsz, bksz, (h, GRID.on_u, GRID.om_v, rubar_t1, rvbar_t1, zeta_t1, zeta_t2, g))
-    # print('time step: ', compTimes.iic)
-    # Interpolate depth at points U, V
-    # D_t1 = zeta_t1 + h
-    # D_t2 = zeta_t2 + h
-    # D_t1U = D_t1RtoU_CUDA(D_t1, GRID.on_u, size=GRID.on_u.size)
-    # D_t1V = D_t1RtoV_CUDA(D_t1, GRID.om_v, size=GRID.om_v.size)
-    # D_t2U = D_t2RtoU_CUDA(D_t2, GRID.on_u, size=GRID.on_u.size)
-    # D_t2V = D_t2RtoV_CUDA(D_t2, GRID.om_v, size=GRID.om_v.size)
-    # D_t1U = RtoU(D_t1)
-    # D_t1V = RtoV(D_t1)
-    # D_t2U = RtoU(D_t2)
-    # D_t2V = RtoV(D_t2)
+    computeMomentumRHSPred(grsz, bksz, (h, rubar_t1, rvbar_t1, zeta_t1, zeta_t2, g))
+    print('time step: ', compTimes.iic)
+
 
 
     # During the first time-step, the predictor step is Forward-Euler
@@ -206,7 +184,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # Pred(grsz, bksz, (Δt, ubar_t1, ubar_t2, rubar_t1, D_t1U, D_t2U))
     # Pred(grsz, bksz, (Δt, vbar_t1, vbar_t2, rvbar_t1, D_t1V, D_t2V))
 
-    Pred2(grsz, bksz, (Δt, ubar_t1, ubar_t2, vbar_t1, vbar_t2, rubar_t1, rvbar_t1, h, zeta_t1, zeta_t2))
+    computeMomentumPred(grsz, bksz, (Δt, ubar_t1, ubar_t2, vbar_t1, vbar_t2, rubar_t1, rvbar_t1, h, zeta_t1, zeta_t2))
     # vbar_t2.reshape(402,402)[1,:] = 0.0
     # ubar_t2[:] = (ubar_t1*D_t1U + Δt*rhs_ubar)/D_t2U
     # vbar_t2[:] = (vbar_t1*D_t1V + Δt*rhs_vbar)/D_t2V
@@ -242,7 +220,7 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
     # During the first time-step,the corrector step is Backward-Euler. Otherwise, the corrector step is Adams-Moulton.
 
-    computeZetaRHS3(grsz, bksz, (zeta_t2, h, ubar_t2, vbar_t2, GRID.on_u, GRID.om_v, GRID.pn, GRID.pm, rzeta_t1))
+    computeZetaRHS(grsz, bksz, (zeta_t2, h, ubar_t2, vbar_t2, rzeta_t1))
 
     # Adams-Moulton order 3
     # zeta_t2[:] = zeta_t1 + Δt*(AM3_2*rhs_zeta_t2 + AM3_1*rzeta_t1 + AM3_0*rzeta_t0)
@@ -268,7 +246,7 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # rhs_vbar = cp.zeros(gzeta.shape)
     # rhs_ubar[:] = 0.0
     # rhs_vbar[:] = 0.0
-    computeMomentumRHSCorr(grsz, bksz, (h, GRID.on_u, GRID.om_v, rubar_t2, rvbar_t2, zeta_t0, zeta_t1, zeta_t2, g))
+    computeMomentumRHSCorr(grsz, bksz, (h, rubar_t2, rvbar_t2, zeta_t0, zeta_t1, zeta_t2, g))
 
 
     # And interpolate them at points U, V
