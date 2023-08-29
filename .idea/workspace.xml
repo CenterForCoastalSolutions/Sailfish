@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="Some code cleaning done. Continuing.">
+    <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="Cleaning finished on the python side.">
+      <change afterPath="$PROJECT_DIR$/nonlinear/main3d.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nonlinear/omega.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nonlinear/rhs.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nonlinear/step3d_t.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nonlinear/step3d_uv.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_cppkernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_cppkernels.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/step2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/step3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/bc_3d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/wvelocity.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/wvelocity.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/zetabc.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/zetabc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,13 +128,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1675796239226</updated>
-    </task>
-    <task id="LOCAL-00159" summary="...">
-      <created>1688677509901</created>
-      <option name="number" value="00159" />
-      <option name="presentableId" value="LOCAL-00159" />
-      <option name="project" value="LOCAL" />
-      <updated>1688677509901</updated>
     </task>
     <task id="LOCAL-00160" summary="...">
       <created>1688677618482</created>
@@ -466,7 +465,14 @@
       <option name="project" value="LOCAL" />
       <updated>1689846274705</updated>
     </task>
-    <option name="localTasksCounter" value="208" />
+    <task id="LOCAL-00208" summary="Cleaning finished on the python side.">
+      <created>1689848216509</created>
+      <option name="number" value="00208" />
+      <option name="presentableId" value="LOCAL-00208" />
+      <option name="project" value="LOCAL" />
+      <updated>1689848216509</updated>
+    </task>
+    <option name="localTasksCounter" value="209" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -492,7 +498,8 @@
     <MESSAGE value="..." />
     <MESSAGE value="Most optimized version achived. Now I have to clean up the code." />
     <MESSAGE value="Some code cleaning done. Continuing." />
-    <option name="LAST_COMMIT_MESSAGE" value="Some code cleaning done. Continuing." />
+    <MESSAGE value="Cleaning finished on the python side." />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleaning finished on the python side." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

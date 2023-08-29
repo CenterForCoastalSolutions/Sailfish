@@ -21,17 +21,6 @@ def zetabc(zeta, compTimes, BOUNDARY):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 #     # Implicit upstream radiation condition.
 #     # "In realistic domains, open boundary conditions can be extremely difficult to get right. There are
 #     # situations in which incoming flow and outgoing flow happen along the same boundary or even at
