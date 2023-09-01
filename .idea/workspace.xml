@@ -4,9 +4,6 @@
     <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="Cleaning finished on the python side.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/rhs.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/rhs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/step2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/step2d_kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d_kernels.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/step3d_uv.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step3d_uv.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -124,13 +121,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1675796239226</updated>
-    </task>
-    <task id="LOCAL-00161" summary="...">
-      <created>1688678010524</created>
-      <option name="number" value="00161" />
-      <option name="presentableId" value="LOCAL-00161" />
-      <option name="project" value="LOCAL" />
-      <updated>1688678010524</updated>
     </task>
     <task id="LOCAL-00162" summary="...">
       <created>1688678300805</created>
@@ -468,7 +458,14 @@
       <option name="project" value="LOCAL" />
       <updated>1693318048839</updated>
     </task>
-    <option name="localTasksCounter" value="210" />
+    <task id="LOCAL-00210" summary="Cleaning finished on the python side.">
+      <created>1693595672312</created>
+      <option name="number" value="00210" />
+      <option name="presentableId" value="LOCAL-00210" />
+      <option name="project" value="LOCAL" />
+      <updated>1693595672313</updated>
+    </task>
+    <option name="localTasksCounter" value="211" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

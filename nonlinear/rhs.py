@@ -59,8 +59,8 @@ def rhs3d():
 
         DO j=JstrV-1,Jend
           DO i=IstrU-1,Iend
-            cff1=0.5_r8*(v(i,j  ,k,nrhs) + v(i,j+1,k,nrhs))
-            cff2=0.5_r8*(u(i  ,j,k,nrhs) + u(i+1,j,k,nrhs))
+            cff1=0.5*(v(i,j  ,k,nrhs) + v(i,j+1,k,nrhs))
+            cff2=0.5*(u(i  ,j,k,nrhs) + u(i+1,j,k,nrhs))
             cff3=cff1*dndx(i,j)
             cff4=cff2*dmde(i,j)
 
@@ -72,15 +72,15 @@ def rhs3d():
 
         DO j=Jstr,Jend
           DO i=IstrU,Iend
-            cff1=0.5_r8*(UFx(i,j)+UFx(i-1,j))
-            ru(i,j,k,nrhs)=ru(i,j,k,nrhs)+cff1
+            cff1=0.5*(UFx(i,j)+UFx(i-1,j))
+            ru(i,j,k,nrhs) = ru(i,j,k,nrhs) + cff1
           END DO
         END DO
 
         DO j=JstrV,Jend
           DO i=Istr,Iend
-            cff1=0.5_r8*(VFe(i,j)+VFe(i,j-1))
-            rv(i,j,k,nrhs)=rv(i,j,k,nrhs)-cff1
+            cff1=0.5*(VFe(i,j)+VFe(i,j-1))
+            rv(i,j,k,nrhs) = rv(i,j,k,nrhs) - cff1
           END DO
         END DO
 # endif
@@ -104,6 +104,8 @@ def rhs3d():
             END DO
           END DO
         END IF
+
+
 
 # ifdef UV_ADV
 
@@ -145,13 +147,11 @@ def rhs3d():
 #  else
         DO j=Jstr,Jend
           DO i=IstrUm1,Iendp1
-            uxx(i,j)=u(i-1,j,k,nrhs)-2.0_r8*u(i,j,k,nrhs)+              &
-
-
-     &               u(i+1,j,k,nrhs)
-            Huxx(i,j)=Huon(i-1,j,k)-2.0_r8*Huon(i,j,k)+Huon(i+1,j,k)
+            uxx(i,j)  = u(i-1,j,k,nrhs) - 2.0*u(i,j,k,nrhs) + u(i+1,j,k,nrhs)
+            Huxx(i,j) = Huon(i-1,j,k) - 2.0_r8*Huon(i,j,k) + Huon(i+1,j,k)
           END DO
         END DO
+
         IF (.not.(CompositeGrid(iwest,ng).or.EWperiodic(ng))) THEN
           IF (DOMAIN(ng)%Western_Edge(tile)) THEN
             DO j=Jstr,Jend
@@ -160,6 +160,7 @@ def rhs3d():
             END DO
           END IF
         END IF
+
         IF (.not.(CompositeGrid(ieast,ng).or.EWperiodic(ng))) THEN
           IF (DOMAIN(ng)%Eastern_Edge(tile)) THEN
             DO j=Jstr,Jend
@@ -398,9 +399,11 @@ def rhs3d():
         END DO
 #   endif
 #  endif
-!
-!  Add in horizontal advection.
-!
+
+
+
+        # Add in horizontal advection.
+
         DO j=Jstr,Jend
           DO i=IstrU,Iend
             cff1=UFx(i,j)-UFx(i-1,j)
@@ -440,16 +443,15 @@ def rhs3d():
         cff2=1.0_r8/16.0_r8
         DO k=1,N(ng)
           DO i=IstrU,Iend
-            DC(i,k)=cff1*(Hz(i  ,j,k)+                                  &
-     &                    Hz(i-1,j,k))-                                 &
-     &              cff2*(Hz(i+1,j,k)+                                  &
-     &                    Hz(i-2,j,k))
+            DC(i,k) = cff1*(Hz(i  ,j,k) +  Hz(i-1,j,k)) - cff2*(Hz(i+1,j,k) + Hz(i-2,j,k))
           END DO
         END DO
+
         DO i=IstrU,Iend
           FC(i,0)=0.0_r8
           CF(i,0)=0.0_r8
         END DO
+
         DO k=1,N(ng)-1
           DO i=IstrU,Iend
             cff=1.0_r8/(2.0_r8*DC(i,k+1)+DC(i,k)*(2.0_r8-FC(i,k-1)))
@@ -520,9 +522,7 @@ def rhs3d():
         END DO
         DO i=IstrU,Iend
           FC(i,N(ng))=0.0_r8
-          FC(i,N(ng)-1)=(cff1*(u(i,j,N(ng)-1,nrhs)+                     &
-
-     &                         u(i,j,N(ng)  ,nrhs))-                    &
+          FC(i,N(ng)-1)=(cff1*(u(i,j,N(ng)-1,nrhs) + u(i,j,N(ng)  ,nrhs)) -                    &
      &                   cff2*(u(i,j,N(ng)-2,nrhs)+                     &
 
      &                         u(i,j,N(ng)  ,nrhs)))*                   &
