@@ -19,103 +19,7 @@ def rhs3d():
 
 
 
-    # ***** ifdef BODYFORCE
 
-    # Apply surface stress as a bodyforce: determine the thickness (m) of the surface layer; then add in surface stress as a bodyfoce.
-
-    # ***** FOR JstrV - 1, Jend,  IstrU - 1, Iend
-    wrk = Hz[levsfrc:N].sum(dim = 0)
-
-
-
-      DO j=Jstr,Jend
-        DO i=IstrU,Iend
-          cff=0.25_r8*(pm(i-1,j)+pm(i,j))*                              &
-     &                (pn(i-1,j)+pn(i,j))
-          cff1=1.0_r8/(cff*(wrk(i-1,j)+wrk(i,j)))
-          Uwrk(i,j)=sustr(i,j)*cff1
-        END DO
-      END DO
-
-      DO j=JstrV,Jend
-        DO i=Istr,Iend
-          cff=0.25*(pm(i,j-1)+pm(i,j))*                                 &
-     &             (pn(i,j-1)+pn(i,j))
-          cff1=1.0_r8/(cff*(wrk(i,j-1)+wrk(i,j)))
-          Vwrk(i,j)=svstr(i,j)*cff1
-        END DO
-      END DO
-
-
-      DO k=levsfrc(ng),N(ng)
-        DO j=Jstr,Jend
-          DO i=IstrU,Iend
-            cff=Uwrk(i,j)*(Hz(i  ,j,k)+                                 &
-     &                     Hz(i-1,j,k))
-            ru(i,j,k,nrhs)=ru(i,j,k,nrhs)+cff
-
-          END DO
-        END DO
-        DO j=JstrV,Jend
-          DO i=Istr,Iend
-            cff=Vwrk(i,j)*(Hz(i,j  ,k)+                                 &
-     &                     Hz(i,j-1,k))
-            rv(i,j,k,nrhs)=rv(i,j,k,nrhs)+cff
-
-          END DO
-        END DO
-      END DO
-
-    # Apply bottom stress as a bodyforce: determine the thickness (m) of the bottom layer; then add in bottom stress as a bodyfoce.
-!
-      DO j=JstrV-1,Jend
-        DO i=IstrU-1,Iend
-          wrk(i,j)=0.0_r8
-        END DO
-      END DO
-      DO k=1,levbfrc(ng)
-        DO j=JstrV-1,Jend
-          DO i=IstrU-1,Iend
-            wrk(i,j)=wrk(i,j)+Hz(i,j,k)
-          END DO
-        END DO
-      END DO
-      DO j=Jstr,Jend
-        DO i=IstrU,Iend
-          cff=0.25_r8*(pm (i-1,j)+pm (i,j))*                            &
-     &                (pn (i-1,j)+pn (i,j))
-          cff1=1.0_r8/(cff*(wrk(i-1,j)+wrk(i,j)))
-          Uwrk(i,j)=bustr(i,j)*cff1
-        END DO
-      END DO
-      DO j=JstrV,Jend
-        DO i=Istr,Iend
-          cff=0.25_r8*(pm (i,j-1)+pm (i,j))*                            &
-     &                (pn (i,j-1)+pn (i,j))
-          cff1=1.0_r8/(cff*(wrk(i,j-1)+wrk(i,j)))
-          Vwrk(i,j)=bvstr(i,j)*cff1
-        END DO
-      END DO
-      DO k=1,levbfrc(ng)
-        DO j=Jstr,Jend
-          DO i=IstrU,Iend
-            cff=Uwrk(i,j)*(Hz(i  ,j,k)+                                 &
-     &                     Hz(i-1,j,k))
-            ru(i,j,k,nrhs)=ru(i,j,k,nrhs)-cff
-
-          END DO
-        END DO
-        DO j=JstrV,Jend
-          DO i=Istr,Iend
-            cff=Vwrk(i,j)*(Hz(i,j  ,k)+                                 &
-     &                     Hz(i,j-1,k))
-            rv(i,j,k,nrhs)=rv(i,j,k,nrhs)-cff
-
-
-          END DO
-        END DO
-      END DO
-# endif
 
 
 
@@ -125,157 +29,119 @@ def rhs3d():
 
 
     # Add in Coriolis terms.
-        DO j=JstrV-1,Jend
-          DO i=IstrU-1,Iend
-            cff=0.5_r8*Hz(i,j,k)*fomn(i,j)
-            UFx(i,j)=cff*(v(i,j  ,k,nrhs)+                              &
-     &                    v(i,j+1,k,nrhs))
-            VFe(i,j)=cff*(u(i  ,j,k,nrhs)+                              &
-     &                    u(i+1,j,k,nrhs))
-          END DO
-        END DO
-        DO j=Jstr,Jend
-          DO i=IstrU,Iend
-            cff1=0.5_r8*(UFx(i,j)+UFx(i-1,j))
-            ru(i,j,k,nrhs)=ru(i,j,k,nrhs)+cff1
+        for j=JstrV-1,Jend:
+          for i=IstrU-1,Iend:
+            cff=Hz(i,j,k)*fomn(i,j)
+            UFξ(i,j)=cff*0.5*(v(i,j,k,nrhs) + v(i,j+1,k,nrhs))
+            VFη(i,j)=cff*0.5*(u(i,j,k,nrhs) + u(i+1,j,k,nrhs))
 
-          END DO
-        END DO
-        DO j=JstrV,Jend
-          DO i=Istr,Iend
-            cff1=0.5_r8*(VFe(i,j)+VFe(i,j-1))
-            rv(i,j,k,nrhs)=rv(i,j,k,nrhs)-cff1
 
-          END DO
-        END DO
-!
+        for j=Jstr,Jend:
+          for i=IstrU,Iend:
+            cff1=0.5*(UFx(i,j) + UFx(i-1,j))
+            ru(i,j,k,nrhs) = ru(i,j,k,nrhs) + cff1
+
+
+        for j=JstrV,Jend:
+          for i=Istr,Iend:
+            cff1=0.5*(VFe(i,j) + VFe(i,j-1))
+            rv(i,j,k,nrhs) = rv(i,j,k,nrhs) - cff1
+
 
 # endif
 
 
 
 # if defined CURVGRID && defined UV_ADV
-!
-!-----------------------------------------------------------------------
-!  Add in curvilinear transformation terms.
-!-----------------------------------------------------------------------
-!
+
+# Add in curvilinear transformation terms.
+# -----------------------------------------------------------------------
+
         DO j=JstrV-1,Jend
           DO i=IstrU-1,Iend
-            cff1=0.5_r8*(v(i,j  ,k,nrhs)+                               &
-
-     &                   v(i,j+1,k,nrhs))
-            cff2=0.5_r8*(u(i  ,j,k,nrhs)+                               &
-
-     &                   u(i+1,j,k,nrhs))
+            cff1=0.5_r8*(v(i,j  ,k,nrhs) + v(i,j+1,k,nrhs))
+            cff2=0.5_r8*(u(i  ,j,k,nrhs) + u(i+1,j,k,nrhs))
             cff3=cff1*dndx(i,j)
             cff4=cff2*dmde(i,j)
 
             cff=Hz(i,j,k)*(cff3-cff4)
             UFx(i,j)=cff*cff1
             VFe(i,j)=cff*cff2
-
           END DO
         END DO
+
         DO j=Jstr,Jend
           DO i=IstrU,Iend
             cff1=0.5_r8*(UFx(i,j)+UFx(i-1,j))
             ru(i,j,k,nrhs)=ru(i,j,k,nrhs)+cff1
-
           END DO
         END DO
+
         DO j=JstrV,Jend
           DO i=Istr,Iend
             cff1=0.5_r8*(VFe(i,j)+VFe(i,j-1))
             rv(i,j,k,nrhs)=rv(i,j,k,nrhs)-cff1
-
           END DO
         END DO
 # endif
 
 
 
-!  Add in nudging of 3D momentum climatology.
-!-----------------------------------------------------------------------
-!
+# Add in nudging of 3D momentum climatology.
+# -----------------------------------------------------------------------
         IF (LnudgeM3CLM(ng)) THEN
           DO j=Jstr,Jend
             DO i=IstrU,Iend
-              cff=0.25_r8*(CLIMA(ng)%M3nudgcof(i-1,j,k)+                &
-     &                     CLIMA(ng)%M3nudgcof(i  ,j,k))*               &
-     &            om_u(i,j)*on_u(i,j)
-              ru(i,j,k,nrhs)=ru(i,j,k,nrhs)+                            &
-     &                       cff*(Hz(i-1,j,k)+Hz(i,j,k))*               &
-     &                       (CLIMA(ng)%uclm(i,j,k)-                    &
-     &                        u(i,j,k,nrhs))
+              cff=0.25_r8*(CLIMA(ng)%M3nudgcof(i-1,j,k)  CLIMA(ng)%M3nudgcof(i  ,j,k))*om_u(i,j)*on_u(i,j)
+              ru(i,j,k,nrhs)=ru(i,j,k,nrhs) + cff*(Hz(i-1,j,k)+Hz(i,j,k))*(CLIMA(ng)%uclm(i,j,k) - u(i,j,k,nrhs))
             END DO
           END DO
+
           DO j=JstrV,Jend
             DO i=Istr,Iend
-              cff=0.25_r8*(CLIMA(ng)%M3nudgcof(i,j-1,k)+                &
-     &                     CLIMA(ng)%M3nudgcof(i,j  ,k))*               &
-     &            om_v(i,j)*on_v(i,j)
-              rv(i,j,k,nrhs)=rv(i,j,k,nrhs)+                            &
-     &                       cff*(Hz(i,j-1,k)+Hz(i,j,k))*               &
-     &                       (CLIMA(ng)%vclm(i,j,k)-                    &
-     &                        v(i,j,k,nrhs))
+              cff=0.25_r8*(CLIMA(ng)%M3nudgcof(i,j-1,k) + CLIMA(ng)%M3nudgcof(i,j  ,k))*om_v(i,j)*on_v(i,j)
+              rv(i,j,k,nrhs)=rv(i,j,k,nrhs) + cff*(Hz(i,j-1,k)+Hz(i,j,k))*(CLIMA(ng)%vclm(i,j,k) - v(i,j,k,nrhs))
             END DO
           END DO
         END IF
 
 # ifdef UV_ADV
-!
-!-----------------------------------------------------------------------
-!  Add in horizontal advection of momentum.
-!-----------------------------------------------------------------------
-!
-!  Compute diagonal [UFx,VFe] and off-diagonal [UFe,VFx] components
-!  of tensor of momentum flux due to horizontal advection.
-!
+
+
+# Add in horizontal advection of momentum.
+# -----------------------------------------------------------------------
+
+# Compute diagonal [UFx,VFe] and off-diagonal [UFe,VFx] components
+# of tensor of momentum flux due to horizontal advection.
+
 #  ifdef UV_C2ADVECTION
 !
 !  Second-order, centered differences advection.
 !
         DO j=Jstr,Jend
           DO i=IstrU-1,Iend
-            UFx(i,j)=0.25_r8*(u(i  ,j,k,nrhs)+                          &
-
-
-     &                        u(i+1,j,k,nrhs))*                         &
-     &                       (Huon(i  ,j,k)+                            &
-     &                        Huon(i+1,j,k))
+            UFx(i,j) = 0.25*(u(i  ,j,k,nrhs) + u(i+1,j,k,nrhs))*(Huon(i  ,j,k) + Huon(i+1,j,k))
           END DO
         END DO
+
         DO j=Jstr,Jend+1
           DO i=IstrU,Iend
-            UFe(i,j)=0.25_r8*(u(i,j-1,k,nrhs)+                          &
-
-
-     &                        u(i,j  ,k,nrhs))*                         &
-     &                       (Hvom(i-1,j,k)+                            &
-     &                        Hvom(i  ,j,k))
+            UFe(i,j) = 0.25*(u(i,j-1,k,nrhs) + u(i,j  ,k,nrhs))*(Hvom(i-1,j,k) + Hvom(i  ,j,k))
           END DO
         END DO
+
         DO j=JstrV,Jend
           DO i=Istr,Iend+1
-            VFx(i,j)=0.25_r8*(v(i-1,j,k,nrhs)+                          &
-
-
-     &                        v(i  ,j,k,nrhs))*                         &
-     &                       (Huon(i,j-1,k)+                            &
-     &                        Huon(i,j  ,k))
+            VFx(i,j) = 0.25*(v(i-1,j,k,nrhs) + v(i  ,j,k,nrhs))*(Huon(i,j-1,k) + Huon(i,j  ,k))
           END DO
         END DO
+
         DO j=JstrV-1,Jend
           DO i=Istr,Iend
-            VFe(i,j)=0.25_r8*(v(i,j  ,k,nrhs)+                          &
-
-
-     &                        v(i,j+1,k,nrhs))*                         &
-     &                       (Hvom(i,j  ,k)+                            &
-     &                        Hvom(i,j+1,k))
+            VFe(i,j) = 0.25*(v(i,j  ,k,nrhs) + v(i,j+1,k,nrhs))*(Hvom(i,j  ,k) + Hvom(i,j+1,k))
           END DO
         END DO
+
 #  else
         DO j=Jstr,Jend
           DO i=IstrUm1,Iendp1
@@ -302,6 +168,8 @@ def rhs3d():
             END DO
           END IF
         END IF
+
+
 #   ifdef UV_C4ADVECTION
 !
 !  Fourth-order, centered differences u-momentum horizontal advection.
@@ -924,8 +792,9 @@ def rhs3d():
 
             END DO
           END DO
-
 # ifndef BODYFORCE
+
+
           DO i=Istr,Iend
             cff=om_v(i,j)*on_v(i,j)
             cff1= svstr(i,j)*cff

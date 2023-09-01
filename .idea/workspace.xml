@@ -2,15 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="Cleaning finished on the python side.">
-      <change afterPath="$PROJECT_DIR$/nonlinear/main3d.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nonlinear/omega.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nonlinear/rhs.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nonlinear/step3d_t.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nonlinear/step3d_uv.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/step3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/bc_3d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/wvelocity.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/wvelocity.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/zetabc.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/zetabc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/rhs.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/rhs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/step2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/step2d_kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d_kernels.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/step3d_uv.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step3d_uv.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,13 +124,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1675796239226</updated>
-    </task>
-    <task id="LOCAL-00160" summary="...">
-      <created>1688677618482</created>
-      <option name="number" value="00160" />
-      <option name="presentableId" value="LOCAL-00160" />
-      <option name="project" value="LOCAL" />
-      <updated>1688677618482</updated>
     </task>
     <task id="LOCAL-00161" summary="...">
       <created>1688678010524</created>
@@ -472,7 +461,14 @@
       <option name="project" value="LOCAL" />
       <updated>1689848216509</updated>
     </task>
-    <option name="localTasksCounter" value="209" />
+    <task id="LOCAL-00209" summary="Cleaning finished on the python side.">
+      <created>1693318048838</created>
+      <option name="number" value="00209" />
+      <option name="presentableId" value="LOCAL-00209" />
+      <option name="project" value="LOCAL" />
+      <updated>1693318048839</updated>
+    </task>
+    <option name="localTasksCounter" value="210" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -548,6 +544,11 @@
           <url>file://$PROJECT_DIR$/modules/mod_boundary.py</url>
           <line>240</line>
           <option name="timeStamp" value="163" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/modules/mod_boundary.py</url>
+          <line>259</line>
+          <option name="timeStamp" value="165" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

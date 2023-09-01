@@ -126,8 +126,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     rzeta_t1, rzeta_t0 = (OCEAN.rzeta_t1, OCEAN.rzeta_t0)
     rubar_t1, rubar_t0 = (OCEAN.rubar_t1, OCEAN.rubar_t0)
     rvbar_t1, rvbar_t0 = (OCEAN.rvbar_t1, OCEAN.rvbar_t0)
-    h = GR
-    ID.h.ravel()
+    h = GRID.h.ravel()
 
     Δt = compTimes.dtfast
 

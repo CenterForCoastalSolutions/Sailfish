@@ -23,9 +23,9 @@ void computeMomentumRHSPred(const double *_h, const double *_on_u, const double 
     constexpr double weight = 2.0/5.0;
     auto gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1;
 
-//    auto gzeta2 = gzeta*gzeta;
-    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta,on_u));
-    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta,om_v));
+    auto gzeta2 = gzeta*gzeta;
+    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta2,on_u));
+    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta2,om_v));
 }
 
 
@@ -57,9 +57,9 @@ void computeMomentumRHSCorr(const double *_h, const double *_on_u, const double 
     constexpr double weight = 4.0/25.0;
     auto gzeta = (1 - weight)*zeta_t1 + weight*0.5*(zeta_t2 + zeta_t0);
 
-//    auto gzeta2 = gzeta*gzeta;
-    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta,on_u));
-    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta,om_v));
+    auto gzeta2 = gzeta*gzeta;
+    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta2,on_u));
+    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta2,om_v));
 }
 
 
@@ -75,7 +75,6 @@ void computeZetaRHS(const double *_zeta, const double *_h, double *_ubar, const 
 
     if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D)
     {
-//        res = 0.0;
         return;
     }
 
@@ -119,21 +118,6 @@ void aaa(const double Dt, const double *_zeta_t0, const double *_zeta_t1, const 
 
 }
 
-
-extern "C"  __global__
-void bbb(const double *_zeta_t1, const double *_zeta_t2)
-{
-    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-
-    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
-
-    STENCIL(zeta_t1);
-    STENCIL(zeta_t2);
-
-
-//    constexpr double weight = 2.0/5.0;
-//    gzeta  = (1 - weight)*zeta_t2(0,0) + weight*zeta_t1(0,0);
-}
 
 
 extern "C"  __global__
@@ -190,6 +174,7 @@ extern "C"  __global__
 void AdamsMoultonCorr3rd(const double Dt, const double *_v_t2, const double *_rhs_t0, const double *_rhs_t1, const double *_rhs_t2)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+
     // Adams-Moulton 3rd order coefficients
     constexpr double AM3_2 =  5.0 / 12.0;
     constexpr double AM3_1 =  8.0 / 12.0;

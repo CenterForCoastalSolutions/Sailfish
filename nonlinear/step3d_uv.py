@@ -1,4 +1,4 @@
-                                               !
+
 # This subroutine time-steps the nonlinear  horizontal  momentum
 # equations. The vertical viscosity terms are time-stepped using
 # an implicit algorithm.
