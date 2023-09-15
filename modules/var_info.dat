@@ -5,6 +5,7 @@ dtfast
 
 mod_grid:
     Grid:
+        Hz:         Thicknesses (m) of vertical RHO-points.
         dmde:       ETA-derivative of inverse metric factor pm, d(1/pm)/d(ETA).
         dndx:       XI-derivative  of inverse metric factor pn, d(1/pn)/d(XI).
         f:          Coriolis parameter (1/s).
@@ -49,3 +50,5 @@ mod_ocean:
         ubar:               m/s, Vertically integrated U-momentum component
         vbar:               m/s, Vertically integrated V-momentum component
         zeta:               m, Free surface
+
+

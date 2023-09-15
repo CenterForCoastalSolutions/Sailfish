@@ -105,6 +105,7 @@ class Grid:
         self.SinAngler = cp.zeros(shape2D, dtype = cp.float64)
 
 
+        self.Hz     = cp.zeros(shape2D, dtype = cp.float64)
         self.f      = cp.zeros(shape2D, dtype = cp.float64)
         self.fomn   = cp.zeros(shape2D, dtype = cp.float64)
         self.grdscl = cp.zeros(shape2D, dtype = cp.float64)

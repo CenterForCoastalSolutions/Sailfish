@@ -26,22 +26,29 @@
 #  define I_RANGE Istr,Iend
 #  define J_RANGE Jstr,Jend
 # endif
-      DO k=1,N(ng)
-        DO j=J_RANGE
-          DO i=I_RANGE
-            oHz(i,j,k)=1.0_r8/Hz(i,j,k)
-          END DO
-        END DO
-      END DO
+
+    oHz = 1.0/Hz
+      # DO k=1,N(ng)
+      #   DO j=J_RANGE
+      #     DO i=I_RANGE
+      #       oHz(i,j,k)=1.0_r8/Hz(i,j,k)
+      #     END DO
+      #   END DO
+      # END DO
+
 # undef I_RANGE
 # undef J_RANGE
+
+
 # if defined TS_MPDATA || defined TS_HSIMT
-!
-!  The MPDATA algorithm requires a three-point footprint, so exchange
-!  boundary data on t(:,:,:,nnew,:) so other processes computed earlier
-!  (horizontal diffusion, biology, or sediment) are accounted.
-!
-      IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
+
+
+# The MPDATA algorithm requires a three-point footprint, so exchange
+# boundary data on t(:,:,:,nnew,:) so other processes computed earlier
+# (horizontal diffusion, biology, or sediment) are accounted.
+#      IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
+
+
 # ifdef OFFLINE_BIOLOGY
         DO ibt=1,NBT
           itrc=idbio(ibt)
@@ -56,14 +63,10 @@
         END DO
       END IF
 
-#  ifdef DISTRIBUTE
-      CALL mp_exchange4d (ng, tile, iNLM, 1,                            &
-     &                    LBi, UBi, LBj, UBj, 1, N(ng), 1, NT(ng),      &
-     &                    NghostPoints,                                 &
-     &                    EWperiodic(ng), NSperiodic(ng),               &
-     &                    t(:,:,:,nnew,:))
-#  endif
+
 # endif
+
+
 # ifdef OFFLINE_BIOLOGY
       T_LOOP : DO ibt=1,NBT
         itrc=idbio(ibt)
@@ -815,16 +818,14 @@
 !  Time-step vertical advection term (m Tunits).
 #  endif
 # endif
-# ifdef DIAGNOSTICS_TS
-!  Convert units of tracer diagnostic terms to Tunits.
-# endif
-!
+
+
           DO i=I_RANGE
             CF(i,0)=dt(ng)*pm(i,j)*pn(i,j)
           END DO
-!
-!  Apply mass point sources (volume vertical influx), if any.
-!
+
+    # Apply mass point sources (volume vertical influx), if any.
+
           IF (LwSrc(ng).and.ANY(LtracerSrc(:,ng))) THEN
             DO is=1,Nsrc(ng)
               Isrc=SOURCES(ng)%Isrc(is)
