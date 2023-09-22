@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="Cleaning finished on the python side.">
+    <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="Starting 3D">
+      <change afterPath="$PROJECT_DIR$/nonlinear/gls_corrector_step.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nonlinear/gls_predictor_step.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_grid.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_grid.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/var_info.dat" beforeDir="false" afterPath="$PROJECT_DIR$/modules/var_info.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/gls_prestep.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/omega.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/omega.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/rhs.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/rhs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/step3d_t.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step3d_t.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/step3d_uv.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step3d_uv.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -41,18 +42,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/projects/src/oceangpu/modules&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Subversion.SSH&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "D:/projects/src/oceangpu/nonlinear",
+    "settings.editor.selected.configurable": "preferences.keymap"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\projects\src\oceangpu\modules" />
       <recent name="D:\projects\src\oceangpu\nonlinear" />
+      <recent name="D:\projects\src\oceangpu\modules" />
       <recent name="D:\projects\src\oceangpu\functionals" />
       <recent name="D:\projects\src\oceangpu\tests" />
     </key>
@@ -125,13 +126,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1675796239226</updated>
-    </task>
-    <task id="LOCAL-00163" summary="ö">
-      <created>1688678333812</created>
-      <option name="number" value="00163" />
-      <option name="presentableId" value="LOCAL-00163" />
-      <option name="project" value="LOCAL" />
-      <updated>1688678333812</updated>
     </task>
     <task id="LOCAL-00164" summary="...">
       <created>1688678396581</created>
@@ -469,7 +463,14 @@
       <option name="project" value="LOCAL" />
       <updated>1693597194891</updated>
     </task>
-    <option name="localTasksCounter" value="212" />
+    <task id="LOCAL-00212" summary="Starting 3D">
+      <created>1694809578230</created>
+      <option name="number" value="00212" />
+      <option name="presentableId" value="LOCAL-00212" />
+      <option name="project" value="LOCAL" />
+      <updated>1694809578230</updated>
+    </task>
+    <option name="localTasksCounter" value="213" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -496,7 +497,8 @@
     <MESSAGE value="Most optimized version achived. Now I have to clean up the code." />
     <MESSAGE value="Some code cleaning done. Continuing." />
     <MESSAGE value="Cleaning finished on the python side." />
-    <option name="LAST_COMMIT_MESSAGE" value="Cleaning finished on the python side." />
+    <MESSAGE value="Starting 3D" />
+    <option name="LAST_COMMIT_MESSAGE" value="Starting 3D" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
