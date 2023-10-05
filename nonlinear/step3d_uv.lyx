@@ -1,0 +1,175 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Step3D_uv
+\end_layout
+
+\begin_layout Standard
+This module solves the momentum equation using an semi-implicit method (implicit
+ only for the vertical viscosity).
+ The governing equation can be written as:
+\begin_inset Formula 
+\[
+\frac{\partial\boldsymbol{u}}{\partial t}+\frac{\partial}{\partial z}K_{v}\frac{\partial\boldsymbol{u}}{\partial z}=\boldsymbol{ru}
+\]
+
+\end_inset
+
+Where 
+\begin_inset Formula $\boldsymbol{ru}$
+\end_inset
+
+ is the right hand side containing the horizontal viscosity, coriolis and
+ advection terms.
+ This equation can be discretized for each component as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{u_{k}^{n+1}-u_{k}^{n}}{\Delta t}+\frac{1}{\Delta z_{k}}\left(K_{v}^{^{k-\nicefrac{1}{2}}}\frac{u_{k}^{n+1}-u_{k-1}^{n+1}}{\Delta z_{k-\nicefrac{1}{2}}}-K_{v}^{^{k+\nicefrac{1}{2}}}\frac{u_{k+1}^{n+1}-u_{k}^{n+1}}{\Delta z_{k+\nicefrac{1}{2}}}\right)=ru
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Delta z_{k}\frac{u_{k}^{n+1}-u_{k}^{n}}{\Delta t}+\left(K_{v}^{^{k-\nicefrac{1}{2}}}\frac{u_{k}^{n+1}-u_{k-1}^{n+1}}{\Delta z_{k-\nicefrac{1}{2}}}-K_{v}^{^{k+\nicefrac{1}{2}}}\frac{u_{k+1}^{n+1}-u_{k}^{n+1}}{\Delta z_{k+\nicefrac{1}{2}}}\right)=\Delta z_{k}ru
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Delta z_{k}u_{k}^{n+1}+\Delta t\left(K_{v}^{^{k-\nicefrac{1}{2}}}\frac{u_{k}^{n+1}-u_{k-1}^{n+1}}{\Delta z_{k-\nicefrac{1}{2}}}-K_{v}^{^{k+\nicefrac{1}{2}}}\frac{u_{k+1}^{n+1}-u_{k}^{n+1}}{\Delta z_{k+\nicefrac{1}{2}}}\right)=\Delta z_{k}\left(\Delta t\,ru+u_{k}^{n}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\Delta z_{k}u_{k}^{n+1}+\Delta t\left(K_{v}^{^{k-\nicefrac{1}{2}}}\frac{u_{k}^{n+1}}{\Delta z_{k-\nicefrac{1}{2}}}-K_{v}^{^{k-\nicefrac{1}{2}}}\frac{u_{k-1}^{n+1}}{\Delta z_{k-\nicefrac{1}{2}}}-K_{v}^{^{k+\nicefrac{1}{2}}}\frac{u_{k+1}^{n+1}}{\Delta z_{k+\nicefrac{1}{2}}}+K_{v}^{^{k+\nicefrac{1}{2}}}\frac{u_{k}^{n+1}}{\Delta z_{k+\nicefrac{1}{2}}}\right)=\Delta z_{k}\left(\Delta t\,ru+u_{k}^{n}\right)
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\underbrace{\left(\Delta z_{k}+\underbrace{\frac{\Delta tK_{v}^{^{k-\nicefrac{1}{2}}}}{\Delta z_{k-\nicefrac{1}{2}}}}_{-FC[k-1]}+\underbrace{\frac{\Delta tK_{v}^{^{k+\nicefrac{1}{2}}}}{\Delta z_{k+\nicefrac{1}{2}}}}_{-FC[k]}\right)}_{BC[k]}u_{k}^{n+1}\underbrace{-\Delta t\frac{K_{v}^{^{k-\nicefrac{1}{2}}}}{\Delta z_{k-\nicefrac{1}{2}}}}_{FC[k-1]}u_{k-1}^{n+1}\underbrace{-\Delta t\frac{K_{v}^{^{k+\nicefrac{1}{2}}}}{\Delta z_{k+\nicefrac{1}{2}}}}_{FC[k]}u_{k+1}^{n+1} & =\underbrace{\Delta z_{k}\left(\Delta t\,ru+u^{n}\right)}_{DC[k]}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+M=\left(\begin{array}{ccccccc}
+BC[1] & FC[1]\\
+FC[1] & BC[2] & FC[2]\\
+ & FC[2] & BC[3] & FC[3]\\
+ &  & \ddots & \ddots & \ddots\\
+ &  &  & \ddots & \ddots & \ddots\\
+ &  &  &  & FC[N-2] & BC[N-1] & FC[N-1]\\
+ &  &  &  &  & FC[N-1] & BC[N]
+\end{array}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Each 
+\end_layout
+
+\end_body
+\end_document

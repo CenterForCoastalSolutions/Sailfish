@@ -1,36 +1,88 @@
 
 
-def createVertViscousOpMatrix():
+    // The Eq. are:
+    // $$\frac{\partial\boldsymbol{u}}{\partial t}+\frac{\partial}{\partial z}K_{v}\frac{\partial\boldsymbol{u}}{\partial z}=\boldsymbol{ru}$$
+    // Which can be discretized as (for each component)
+    // $$\frac{u_{k}^{n+1}-u_{k}^{n}}{\Delta t}+\frac{1}{\Delta z_{k}}\left(K_{v}^{^{k-\nicefrac{1}{2}}}\frac{u_{k}^{n+1}-u_{k-1}^{n+1}}{\Delta z_{k-\nicefrac{1}{2}}}-K_{v}^{^{k+\nicefrac{1}{2}}}\frac{u_{k+1}^{n+1}-u_{k}^{n+1}}{\Delta z_{k+\nicefrac{1}{2}}}\right)=ru$$
+    // After some algebra:
+    // $$\underbrace{\left(\Delta z_{k}+\underbrace{\frac{\Delta tK_{v}^{^{k-\nicefrac{1}{2}}}}{\Delta z_{k-\nicefrac{1}{2}}}}_{-FC[k-1]}+\underbrace{\frac{\Delta tK_{v}^{^{k+\nicefrac{1}{2}}}}{\Delta z_{k+\nicefrac{1}{2}}}}_{-FC[k]}\right)}_{BC[k]}u_{k}^{n+1}\underbrace{-\Delta t\frac{K_{v}^{^{k-\nicefrac{1}{2}}}}{\Delta z_{k-\nicefrac{1}{2}}}}_{FC[k-1]}u_{k-1}^{n+1}\underbrace{-\Delta t\frac{K_{v}^{^{k+\nicefrac{1}{2}}}}{\Delta z_{k+\nicefrac{1}{2}}}}_{FC[k]}u_{k+1}^{n+1}	=\underbrace{\Delta z_{k}\left(\Delta t\,ru+u^{n}\right)}_{DC[k]}$$
+    // The matrix equation is $M\,U=DC$, where:
+    // $$M=\left(\begin{array}{ccccccc}BC[1] & FC[1]\\FC[1] & BC[2] & FC[2]\\ & FC[2] & BC[3] & FC[3]\\ &  & \ddots & \ddots & \ddots\\ &  &  & \ddots & \ddots & \ddots\\ &  &  &  & FC[N-2] & BC[N-1] & FC[N-1]\\ &  &  &  &  & FC[N-1] & BC[N]\end{array}\right)$$
+    // In reality, the terms with η or ξ derivatives are divided bi m and n respectively, while the terms with no derivatives are divided by m*n.
 
-    # The Eq. is: Un+1 = Un - Δt*∂z(Akv*∂zU) = [1 - ∂z(Akv*∂z)]U = Ru
-    # Integrating vertically between nodes k and k+1 we have (using Gauss central quadrature for the velocity):
-    #
-    # Hz*Un+1 = Hz*Un + Δt*Akv*(∂zU) = Hz*Un + Akv*(Un,k+1 - Un,k)/(Zk+1 - Zk)
+
+//    u  = u(nnew,:,:,:)
+//    ru = ru(nrhs,:,:,:)
+
+void XXXXXXX(const double Δt, const double lambda)
+{
+    const double coef = ;
+
+    double *FC = bufFC[i*N];
+
+    // If the index is not a U-node leaves.
+    if (!isUnode(i)) return;
+
+//      STENCIL3D(h);
+
+    // Builds matrix M and vector DC.
+    //-------------------------------
+    const auto AKvU = RtoU(Akv);
+    const auto HzU  = RtoU(Hz);
+
+    const auto pmnU = RtoU(pm)*RtoU(pn)
+
+    const auto cΔt_mn = coef*Δt*RtoU(pm)*RtoU(pn);
+
+    FC[0] = 0.0;
+    FC[N] = 0.0;
+    for (int k=1; k<N; k++)
+    {
+        // Δz is the vertical distance between two U nodes.
+        const double Δz = RtoU(z_r(k+1,0,0) - z_r(k,0,0));
+
+        // RHS
+        DC[k] = u(nnew,k,0,0) + cΔt_mn*ru(k,0,0);
+
+        // Off-diagonal elements
+        FC[k] = -lambda*Δt*AKvU(k,0,0)/Δz;
+
+        //Diagonal elements.
+        BC[k] = HzU(0,0,k) - FC[k] - FC[k-1];
+    }
+    BC[N] = HzU(0,0,N) - FC[N] - FC[N-1];
 
 
-    u  = u(nnew,:,:,:)
-    ru = ru(nrhs,:,:,:)
-    if isUnode(i):
-        AK  = RtoU(Akv)
-        Hzk = RtoU(Hz)
+    // Up to here, DC contains the RHS, BC is the main diagonal and FC[1:-1], FC[:,-2] the other two diagonals.
 
-        DC = cff*RtoU(pm)*RtoU(pn)
-        for k in range(1,N):
-            u += DC*ru(k,0,0)
 
-            Δz = RtoU(z_r(k+1) - z_r(k))
+    // Solve tridiagonal system.
+    // -------------------------
 
-            FC(k) = (-lambda*Δt)*AK(i,k)/Δz
+    // See https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm.
 
-        FC(0) = 0.0
-        FC(N) = 0.0
+    // Forward substitution.
+    CF[1] = FC[1]/BC[1];
+    DC[1] = DC[1]/BC[1];
 
-        for k in range(1,N):
-            # RHS
-            DC[k] = u(i,j,k,nnew)
+    for (int k=2; k<=N; k++)
+    {
+        double denom = 1.0/(BC[k] - FC[k-1]*CF[k-1]);
 
-            # Diagonal includes Hz and two of the components of (Un,k+1 - Un,k)/(Zk+1 - Zk) coming from the elements up and down
-            BC[k] = Hzk(i,j,k) - FC(k) - FC(k-1)
+        CF(i,k) = denom*FC[k];
+        DC(i,k) = denom*(DC[k] - FC[k-1]*DC[k-1];
+    }
+
+
+    // Back substitution.
+    DC[N] -= FC[N-1]*DC[N-1]/(BC[N] - FC[N-1]*CF[N-1]);
+    u(0,0,N,nnew) = DC[N];
+
+    for (int k=N-1; k>1; k--)
+    {
+        u(0,0,k,nnew) = DC[k] - CF[k]*u(0,0,k+1,nnew);
+    }
+
 
 
 

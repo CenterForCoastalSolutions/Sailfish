@@ -13,8 +13,13 @@ import cupy as cp
 # Nonlinear model state.
 class T_OCEAN:
     def __init__(self, input, GRID):
+        N = GRID.N
         M = GRID.M
         L = GRID.L
+
+
+        # 2D momentum
+        # -----------
 
         # RHS of the differential equations (like dzeta/dt = rzeta).
         self.rubar = cp.zeros((3, M + 1, L + 1), dtype = cp.float64)
@@ -53,6 +58,18 @@ class T_OCEAN:
         self.rvbar_t1 = self.rvbar[1, :, :].ravel()
         self.rvbar_t0 = self.rvbar[0, :, :].ravel()
 
+
+
+        # 3D momentum
+        # -----------
+        self.ru = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
+        self.rv = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
+        self.rz = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
+
+        # Nonlinear model state.
+        self.u  = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
+        self.v  = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
+        self.z  = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
 
 
     def cycleTimes(self):

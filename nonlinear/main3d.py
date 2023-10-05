@@ -12,7 +12,7 @@ def main3d (RunInterval):
     # Time-step the 3D kernel for the specified time interval (seconds),
     # RunInterval.
 
-    Time_Step = true
+    Time_Step = True
 
 
     # Initialize all time levels and compute other initial fields.
@@ -26,13 +26,13 @@ def main3d (RunInterval):
         # Initialize other state variables.
         ini_fields()
 
-    KERNEL_LOOP : DO WHILE (Time_Step)
+    while Time_Step:
 
 
-    # Notice that RunInterval is
-    # set in the calling driver. Its value may span the full period of the
-    # simulation, a multi-model coupling interval (RunInterval > ifac*dt),
-    # or just a single step (RunInterval=0).
+        # Notice that RunInterval is
+        # set in the calling driver. Its value may span the full period of the
+        # simulation, a multi-model coupling interval (RunInterval > ifac*dt),
+        # or just a single step (RunInterval=0).
 
         ntimesteps (iNLM, RunInterval, nl, Nsteps, Rsteps)
 
@@ -78,11 +78,6 @@ def main3d (RunInterval):
             # ---------------------------------------------------------------------
 
 
-    # ifdef BULK_FLUXES
-            bulk_flux()
-
-    # endif
-
             set_vbc()
 
 
@@ -91,16 +86,8 @@ def main3d (RunInterval):
 # diagnostically from horizontal mass divergence.
 # -----------------------------------------------------------------------
 
-# if defined ANA_VMIX
-                CALL ana_vmix (ng, tile, iNLM)
-# elif defined LMD_MIXING
-                CALL lmd_vmix (ng, tile)
-# elif defined BVF_MIXING
-                CALL bvf_mix (ng, tile)
-# endif
-# if defined DIFF_3DCOEF || defined VISC_3DCOEF
-                CALL hmixing (ng, tile)
-# endif
+            # XXX todo: put other mixings.
+            ana_vmix()
 
 
             omega(iNLM)
@@ -120,10 +107,8 @@ def main3d (RunInterval):
             rhs3d()
 
 
-# ifdef MY25_MIXING
-                CALL my25_prestep (ng, tile)
-# elif defined GLS_MIXING
-                CALL gls_prestep (ng, tile)
+# ifdef GLS_MIXING
+            gls_prestep()
 # endif
 
 
@@ -200,24 +185,18 @@ def main3d (RunInterval):
 
 
 
-            # Recompute depths and thicknesses using the new time filtered
-            # free-surface.
-            # ---------------------------------------------------------------------
-
+            # Recompute depths and thicknesses using the new time filtered free-surface.
             set_depth()
 
 
-            # Time-step 3D momentum equations and couple with vertically
-            # integrated equations.
-
+            # Time-step 3D momentum equations and couple with vertically integrated equations.
             step3d_uv()
 
 
             #   Time-step vertical mixing turbulent equations and passive tracer
             #   source and sink terms, if applicable.
-            #   ---------------------------------------------------------------------
-
             omega(iNLM)
+            gls_corstep()
 
 
             # -----------------------------------------------------------------------

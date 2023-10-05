@@ -1,8 +1,149 @@
-                                                       !
+import mod_ocean
+!
 # This subroutine evaluates right-hand-side terms for 3D momentum and tracers equations.
 import mod_grid
 
-# ηξ
+# ηξ Δ
+
+def UTOPIA_Advection(u, Huon):
+    # $ FU^{\xi}=\left(u-\gamma\frac{\partial^{2}y}{\partial\xi^{2}}\right)\left[\frac{H_{z}u}{n}-\gamma\frac{\partial^{2}y}{\partial\xi^{2}}\left(\frac{H_{z}u}{n}\right)\right] $
+
+    u_t2 = OCEAN.u_t2
+    v_t2 = OCEAN.v_t2
+    uξξ =  Dξξcentered(u_t2,  BC)
+    Huξξ = Dξξcentered(Hu_t2, BC)
+
+
+    UFξ = (UtoR(u) + Gadv*upwindUtoR(uξξ, u))*(UtoR(Huon) + Gadv*UtoR (Huξξ), BC)
+    UFη = (VtoR(u) + Gadv*upwindUtoR(uηη, u))*(UtoR(Hvom) + Gadv*UtoRl(Hvξξ), BC)
+
+
+
+        # uξξ  = Dξξ(   u[nrhs,:,:,:], BC)
+        # Huξξ = Dξξ(Huon[nrhs,:,:,:], BC)
+        # # DO j=Jstr,Jend
+        # #   DO i=IstrUm1,Iendp1
+        # #     uξξ(i,j)  = u(i-1,j,k,nrhs) - 2.0*u(i,j,k,nrhs) + u(i+1,j,k,nrhs)
+        # #     Huξξ(i,j) = Huon(i-1,j,k)   - 2.0*Huon(i,j,k)   + Huon(i+1,j,k)
+        # #   END DO
+        # # END DO
+        # #
+        # #
+        # # # BC's for 2nd derivatives
+        # # IF (DOMAIN(ng)%Western_Edge(tile)) THEN
+        # #     DO j=Jstr,Jend
+        # #       uξξ (Istr,j) = uξξ (Istr+1,j)
+        # #       Huξξ(Istr,j) = Huξξ(Istr+1,j)
+        # #     END DO
+        # # END IF
+        # #
+        # #
+        # # IF (DOMAIN(ng)%Eastern_Edge(tile)) THEN
+        # #     DO j=Jstr,Jend
+        # #       uξξ (Iend+1,j) = uξξ (Iend,j)
+        # #       Huξξ(Iend+1,j) = Huξξ(Iend,j)
+        # #     END DO
+        # # END IF
+        #
+        # uηη  = Dηη(   u[nrhs,:,:,:], BC)
+        # Hvξξ = Dξξ(Hvom[nrhs,:,:,:])
+        # # DO j=Jstrm1,Jendp1
+        # #   DO i=IstrU,Iend
+        # #     uηη(i,j) = u(i,j-1,k,nrhs) - 2.0*u(i,j,k,nrhs) + u(i,j+1,k,nrhs)
+        # #   END DO
+        # # END DO
+        # #
+        # # IF (DOMAIN(ng)%Southern_Edge(tile)) THEN
+        # #     DO i=IstrU,Iend
+        # #       uηη(i,Jstr-1)=uηη(i,Jstr)
+        # #     END DO
+        # # END IF
+        # #
+        # # IF (DOMAIN(ng)%Northern_Edge(tile)) THEN
+        # #     DO i=IstrU,Iend
+        # #       uηη(i,Jend+1) = uηη(i,Jend)
+        # #     END DO
+        # # END IF
+        # #
+        # #
+        # # DO j=Jstr,Jend+1
+        # #   DO i=IstrU-1,Iend
+        # #    Hvξξ(i,j) = Hvom(i-1,j,k) - 2.0*Hvom(i,j,k) + Hvom(i+1,j,k)
+        # #   END DO
+        # # END DO
+        # #
+        #
+        # pass
+        # Third-order, upstream bias u-momentum advection with velocity dependent hyperdiffusion.
+
+
+
+    # DO j=Jstr,Jend
+    # DO i=IstrU-1,Iend
+
+
+
+        #     cff1 = u(i,j,k,nrhs) + u(i+1,j,k,nrhs)
+        #     IF (cff1.gt.0.0) THEN
+        #       cff = uξξ(i,j)
+        #     ELSE
+        #       cff = uξξ(i+1,j)
+        #     END IF
+        #
+        #     UFξ(i,j)  =0.25*(cff1 + Gadv*cff)*(Huon(i,j,k) + Huon(i+1,j,k) + Gadv*0.5*(Huξξ(i  ,j) + Huξξ(i+1,j)))
+        #   END DO
+        # END DO
+        #
+        #
+        # DO j=Jstr,Jend+1
+        #   DO i=IstrU,Iend
+        #     cff1=u(i,j  ,k,nrhs) + u(i,j-1,k,nrhs)
+        #     cff2 = Hvom(i,j,k) + Hvom(i-1,j,k)
+        #     IF (cff2 > 0.0) THEN
+        #       cff = uηη(i,j-1)
+        #     ELSE
+        #       cff = uηη(i,j)
+        #     END IF
+        #     UFη(i,j) = 0.25*(cff1 + Gadv*cff)*(cff2 + Gadv*0.5*(Hvξξ(i,j) + Hvξξ(i-1,j)))
+        #   END DO
+        # END DO
+
+
+
+
+        # pass
+        # # V componentHvηη
+        #
+        # vξξ  = Dξξ(   u[nrhs,:,:,:], BC)
+        # Huηη = Dηη(Huon[nrhs,:,:,:])
+        # # DO j=JstrV,Jend
+        # #   DO i=Istrm1,Iendp1
+        # #     vξξ(i,j) = v(i-1,j,k,nrhs) - 2.0*v(i,j,k,nrhs) + v(i+1,j,k,nrhs)
+        # #   END DO
+        # # END DO
+        # #
+        # #
+        # # IF (DOMAIN(ng)%Western_Edge(tile)) THEN
+        # #     DO j=JstrV,Jend
+        # #       vξξ(Istr-1,j)=vξξ(Istr,j)
+        # #     END DO
+        # # END IF
+        # #
+        # #
+        # # IF (DOMAIN(ng)%Eastern_Edge(tile)) THEN
+        # #     DO j=JstrV,Jend
+        # #       vξξ(Iend+1,j)=vξξ(Iend,j)
+        # #     END DO
+        # # END IF
+        # #
+        # # DO j=JstrV-1,Jend
+        # #   DO i=Istr,Iend+1
+        # #    Huηη(i,j) = Huon(i,j-1,k) - 2.0*Huon(i,j,k) + Huon(i,j+1,k)
+        # #   END DO
+        # # END DO
+        #
+        #
+
 
 def rhs3d():
 
@@ -22,38 +163,38 @@ def rhs3d():
 
 
 
-    # Add in Coriolis terms.
+        # Add in Coriolis terms.
 
-    addCoriolis()
-    # ifdef UV_COR
-        # for j=JstrV-1,Jend:
-        #   for i=IstrU-1,Iend:
-        #     cff=Hz(i,j,k)*fomn(i,j)
-        #     UFξ(i,j)=cff*0.5*(v(i,j,k,nrhs) + v(i,j+1,k,nrhs))
-        #     VFη(i,j)=cff*0.5*(u(i,j,k,nrhs) + u(i+1,j,k,nrhs))
+        addCoriolis()
+        # ifdef UV_COR
+            # for j=JstrV-1,Jend:
+            #   for i=IstrU-1,Iend:
+            #     cff=Hz(i,j,k)*fomn(i,j)
+            #     UFξ(i,j)=cff*0.5*(v(i,j,k,nrhs) + v(i,j+1,k,nrhs))
+            #     VFη(i,j)=cff*0.5*(u(i,j,k,nrhs) + u(i+1,j,k,nrhs))
 
-        # for j=Jstr,Jend:
-        #   for i=IstrU,Iend:
-        #     cff1=0.5*(UFx(i,j) + UFx(i-1,j))
-        #     ru(i,j,k,nrhs) = ru(i,j,k,nrhs) + cff1
-        #
-        #
-        # for j=JstrV,Jend:
-        #   for i=Istr,Iend:
-        #     cff1=0.5*(VFe(i,j) + VFe(i,j-1))
-        #     rv(i,j,k,nrhs) = rv(i,j,k,nrhs) - cff1
+            # for j=Jstr,Jend:
+            #   for i=IstrU,Iend:
+            #     cff1=0.5*(UFx(i,j) + UFx(i-1,j))
+            #     ru(i,j,k,nrhs) = ru(i,j,k,nrhs) + cff1
+            #
+            #
+            # for j=JstrV,Jend:
+            #   for i=Istr,Iend:
+            #     cff1=0.5*(VFe(i,j) + VFe(i,j-1))
+            #     rv(i,j,k,nrhs) = rv(i,j,k,nrhs) - cff1
 
-    # endif
+        # endif
 
 
 
-    pass
-    # if defined CURVGRID && defined UV_ADV
-    # These are the terms (u*d_xi(1/n) - v*d_eta(1/m))*Hz*u  and  (v*d_xi(1/n) - u*d_eta(1/m))*Hz*v
-    # Where u is computed using an upwind interpolation.
-    pass
-    # Add in curvilinear transformation terms. (for the advection terms only)
-    # -----------------------------------------------------------------------
+        pass
+        # if defined CURVGRID && defined UV_ADV
+        # These are the terms (u*d_xi(1/n) - v*d_eta(1/m))*Hz*u  and  (v*d_xi(1/n) - u*d_eta(1/m))*Hz*v
+        # Where u is computed using an upwind interpolation.
+        pass
+        # Add in curvilinear transformation terms. (for the advection terms only)
+        # -----------------------------------------------------------------------
 
 
 
@@ -85,31 +226,31 @@ def rhs3d():
         # END DO
 # endif
 
-    pass
-    # Add in nudging towards 3D momentum climatology.
-    pass
-    # # -----------------------------------------------------------------------
-    #     IF (LnudgeM3CLM(ng)) THEN
-    #       DO j=Jstr,Jend
-    #         DO i=IstrU,Iend
-    #           cff=0.25*(CLIMA(ng)%M3nudgcof(i-1,j,k)  CLIMA(ng)%M3nudgcof(i  ,j,k))*om_u(i,j)*on_u(i,j)
-    #           ru(i,j,k,nrhs)=ru(i,j,k,nrhs) + cff*(Hz(i-1,j,k)+Hz(i,j,k))*(CLIMA(ng)%uclm(i,j,k) - u(i,j,k,nrhs))
-    #         END DO
-    #       END DO
-    #
-    #       DO j=JstrV,Jend
-    #         DO i=Istr,Iend
-    #           cff=0.25*(CLIMA(ng)%M3nudgcof(i,j-1,k) + CLIMA(ng)%M3nudgcof(i,j  ,k))*om_v(i,j)*on_v(i,j)
-    #           rv(i,j,k,nrhs)=rv(i,j,k,nrhs) + cff*(Hz(i,j-1,k)+Hz(i,j,k))*(CLIMA(ng)%vclm(i,j,k) - v(i,j,k,nrhs))
-    #         END DO
-    #       END DO
-    #     END IF
+        pass
+        # Add in nudging towards 3D momentum climatology.
+        pass
+        # # -----------------------------------------------------------------------
+        #     IF (LnudgeM3CLM(ng)) THEN
+        #       DO j=Jstr,Jend
+        #         DO i=IstrU,Iend
+        #           cff=0.25*(CLIMA(ng)%M3nudgcof(i-1,j,k)  CLIMA(ng)%M3nudgcof(i  ,j,k))*om_u(i,j)*on_u(i,j)
+        #           ru(i,j,k,nrhs)=ru(i,j,k,nrhs) + cff*(Hz(i-1,j,k)+Hz(i,j,k))*(CLIMA(ng)%uclm(i,j,k) - u(i,j,k,nrhs))
+        #         END DO
+        #       END DO
+        #
+        #       DO j=JstrV,Jend
+        #         DO i=Istr,Iend
+        #           cff=0.25*(CLIMA(ng)%M3nudgcof(i,j-1,k) + CLIMA(ng)%M3nudgcof(i,j  ,k))*om_v(i,j)*on_v(i,j)
+        #           rv(i,j,k,nrhs)=rv(i,j,k,nrhs) + cff*(Hz(i,j-1,k)+Hz(i,j,k))*(CLIMA(ng)%vclm(i,j,k) - v(i,j,k,nrhs))
+        #         END DO
+        #       END DO
+        #     END IF
 
 
         pass
 
 
-        # Add in horizontal advection of momentum.
+        # Compute horizontal advection of momentum.
         # -----------------------------------------------------------------------
         pass
         #
@@ -294,8 +435,9 @@ def rhs3d():
 
 
         pass
-        # Add in horizontal advection.
+        # Add horizontal advection of momentum to the RHS vector.
         ru[nrhs,:,:,:] -= Dξ(UFξ) + Dη(UFη)
+        rv[nrhs,:,:,:] -= Dξ(VFξ) + Dη(VFη)
 
         # DO j=Jstr,Jend
         #   DO i=IstrU,Iend
@@ -316,9 +458,8 @@ def rhs3d():
 # endif
 
 
-    END DO K_LOOP
 
-    J_LOOP : DO j=Jstr,Jend
+    DO j=Jstr,Jend
 # ifdef UV_ADV
 
 
@@ -411,7 +552,6 @@ def rhs3d():
             rvfrc(i,j) += om_v(i,j)*on_v(i,j)*(svstr(i,j) - bvstr(i,j))
 
         END IF
-      END DO J_LOOP
 
 
 #endif

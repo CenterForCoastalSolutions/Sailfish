@@ -28,7 +28,7 @@ def gls_corstep:
     # Compute several constants.
     # ----------------------------------------------------------------------
 
-      Zos_min=MAX(Zos(ng),0.0001_r8)
+      Zos_min = MAX(Zos(ng),0.0001_r8)
       DO j=Jstr,Jend
         DO i=Istr,Iend
           Zob_min(i,j)=MAX(ZoBot(i,j),0.0001_r8)
@@ -78,48 +78,11 @@ def gls_corstep:
       tke_exp2=0.5_r8+gls_m(ng)/gls_n(ng)
       tke_exp3=0.5_r8+gls_m(ng)
       tke_exp4=gls_m(ng)+0.5_r8*gls_n(ng)
-!
-!-----------------------------------------------------------------------
-!  Compute vertical velocity shear at W-points.
-!-----------------------------------------------------------------------
-!
-# ifdef RI_SPLINES
-      DO j=Jstrm1,Jendp1
-        DO i=Istrm1,Iendp1
-          CF(i,0)=0.0_r8
-          dU(i,0)=0.0_r8
-          dV(i,0)=0.0_r8
-        END DO
-        DO k=1,N(ng)-1
-          DO i=Istrm1,Iendp1
-            cff=1.0_r8/(2.0_r8*Hz(i,j,k+1)+                             &
-     &                  Hz(i,j,k)*(2.0_r8-CF(i,k-1)))
-            CF(i,k)=cff*Hz(i,j,k+1)
-            dU(i,k)=cff*(3.0_r8*(u(i  ,j,k+1,nstp)-u(i,  j,k,nstp)+     &
-     &                           u(i+1,j,k+1,nstp)-u(i+1,j,k,nstp))-    &
-     &                   Hz(i,j,k)*dU(i,k-1))
-            dV(i,k)=cff*(3.0_r8*(v(i,j  ,k+1,nstp)-v(i,j  ,k,nstp)+     &
-     &                           v(i,j+1,k+1,nstp)-v(i,j+1,k,nstp))-    &
-     &                   Hz(i,j,k)*dV(i,k-1))
-          END DO
-        END DO
-        DO i=Istrm1,Iendp1
-          dU(i,N(ng))=0.0_r8
-          dV(i,N(ng))=0.0_r8
-        END DO
-        DO k=N(ng)-1,1,-1
-          DO i=Istrm1,Iendp1
-            dU(i,k)=dU(i,k)-CF(i,k)*dU(i,k+1)
-            dV(i,k)=dV(i,k)-CF(i,k)*dV(i,k+1)
-          END DO
-        END DO
-        DO k=1,N(ng)-1
-          DO i=Istrm1,Iendp1
-            shear2(i,j,k)=dU(i,k)*dU(i,k)+dV(i,k)*dV(i,k)
-          END DO
-        END DO
-      END DO
-# else
+
+# Compute vertical velocity shear at W-points.
+# -----------------------------------------------------------------------
+
+
       DO k=1,N(ng)-1
         DO j=Jstrm1,Jendp1
           DO i=Istrm1,Iendp1
@@ -131,24 +94,26 @@ def gls_corstep:
           END DO
         END DO
       END DO
-# endif
-!
-! Load Brunt-Vaisala frequency.
-!
-      DO k=1,N(ng)-1
-        DO j=Jstr-1,Jend+1
-          DO i=Istr-1,Iend+1
-            buoy2(i,j,k)=bvf(i,j,k)
-          END DO
-        END DO
-      END DO
+
+
+    # Load Brunt-Vaisala frequency.
+
+    buoy2 = bvf.copy()
+      # DO k=1,N(ng)-1
+      #   DO j=Jstr-1,Jend+1
+      #     DO i=Istr-1,Iend+1
+      #       buoy2(i,j,k)=bvf(i,j,k)
+      #     END DO
+      #   END DO
+      # END DO
+
+pass
 # ifdef N2S2_HORAVG
-!
-!-----------------------------------------------------------------------
-!  Smooth horizontally buoyancy and shear.  Use buoy2(:,:,0) and
-!  shear2(:,:,0) as scratch utility array.
-!-----------------------------------------------------------------------
-!
+
+# Smooth horizontally buoyancy and shear.  Use buoy2(:,:,0) and
+# shear2(:,:,0) as scratch utility array.
+# -----------------------------------------------------------------------
+
       DO k=1,N(ng)-1
         IF (DOMAIN(ng)%Western_Edge(tile)) THEN
           DO j=MAX(1,Jstr-1),MIN(Jend+1,Mm(ng))
@@ -214,25 +179,7 @@ def gls_corstep:
 !  (from old time step and at W-points).
 !
       DO k=1,N(ng)-1
-# ifdef K_C2ADVECTION
-!
-!  Second-order, centered differences advection.
-!
-        DO j=Jstr,Jend
-          DO i=Istr,Iend+1
-            cff=0.25_r8*(Huon(i,j,k)+Huon(i,j,k+1))
-            FXK(i,j)=cff*(tke(i,j,k,3)+tke(i-1,j,k,3))
-            FXP(i,j)=cff*(gls(i,j,k,3)+gls(i-1,j,k,3))
-          END DO
-        END DO
-        DO j=Jstr,Jend+1
-          DO i=Istr,Iend
-            cff=0.25_r8*(Hvom(i,j,k)+Hvom(i,j,k+1))
-            FEK(i,j)=cff*(tke(i,j,k,3)+tke(i,j-1,k,3))
-            FEP(i,j)=cff*(gls(i,j,k,3)+gls(i,j-1,k,3))
-          END DO
-        END DO
-# else
+
         DO j=Jstr,Jend
           DO i=Istrm1,Iendp2
             gradK(i,j)=(tke(i,j,k,3)-tke(i-1,j,k,3))
@@ -261,21 +208,10 @@ def gls_corstep:
             END DO
           END IF
         END IF
-#  ifdef K_C4ADVECTION
-!
-!  Fourth-order, centered differences advection.
-!
-        cff1=1.0_r8/6.0_r8
-        DO j=Jstr,Jend
-          DO i=Istr,Iend+1
-            cff=0.5_r8*(Huon(i,j,k)+Huon(i,j,k+1))
-            FXK(i,j)=cff*0.5_r8*(tke(i-1,j,k,3)+tke(i,j,k,3)-           &
-     &                           cff1*(gradK(i+1,j)-gradK(i-1,j)))
-            FXP(i,j)=cff*0.5_r8*(gls(i-1,j,k,3)+gls(i,j,k,3)-           &
-     &                           cff1*(gradP(i+1,j)-gradP(i-1,j)))
-          END DO
-        END DO
-#  else
+
+
+
+
 !
 !  Third-order, upstream bias advection with velocity dependent
 !  hyperdiffusion.
@@ -302,7 +238,8 @@ def gls_corstep:
      &                           Gadv*cff2)
           END DO
         END DO
-#  endif
+
+
         DO j=Jstrm1,Jendp2
           DO i=Istr,Iend
             gradK(i,j)=(tke(i,j,k,3)-tke(i,j-1,k,3))
@@ -331,18 +268,8 @@ def gls_corstep:
             END DO
           END IF
         END IF
-#  ifdef K_C4ADVECTION
-        cff1=1.0_r8/6.0_r8
-        DO j=Jstr,Jend+1
-          DO i=Istr,Iend
-            cff=0.5_r8*(Hvom(i,j,k)+Hvom(i,j,k+1))
-            FEK(i,j)=cff*0.5_r8*(tke(i,j-1,k,3)+tke(i,j,k,3)-           &
-     &                           cff1*(gradK(i,j+1)-gradK(i,j-1)))
-            FEP(i,j)=cff*0.5_r8*(gls(i,j-1,k,3)+gls(i,j,k,3)-           &
-     &                           cff1*(gradP(i,j+1)-gradP(i,j-1)))
-          END DO
-        END DO
-#  else
+
+
         DO j=Jstr-1,Jend+1
           DO i=Istr,Iend
             curvK(i,j)=gradK(i,j+1)-gradK(i,j)
@@ -365,11 +292,12 @@ def gls_corstep:
      &                           Gadv*cff2)
           END DO
         END DO
-#  endif
-# endif
-!
-!  Time-step horizontal advection.
-!
+
+
+
+
+    # Time-step horizontal advection.
+
         DO j=Jstr,Jend
           DO i=Istr,Iend
             cff=dt(ng)*pm(i,j)*pn(i,j)
