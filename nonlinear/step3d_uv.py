@@ -47,7 +47,7 @@ def step3d_UV():
     # ξ-direction.
     AK  = RtoU(Akv)
     Hzk = RtoU(Hz)
-    DO j = Jstr, Jend
+    # DO j = Jstr, Jend
         # DO i=IstrU,Iend
         #
         #   AK(i,0) = 0.5*(Akv(i-1,j,0)+ Akv(i  ,j,0))
@@ -103,9 +103,6 @@ def step3d_UV():
     #     END DO
 
     MvU = createVertViscousOpMatrix()
-
-
-    # Solve the tridiagonal system.
     u = solveTri(MvV, AK, z_r, u)
     # Solve the tridiagonal system.
 
@@ -151,7 +148,6 @@ def step3d_UV():
 
 
     # CORRECTS the baroclinic velocity average
-    pass
     # Replace INTERIOR POINTS incorrect vertical mean with more accurate barotropic component, ubar=DU_avg1/(D*on_u).
     # Recall that, D=CF(:,0).
     # INTERIOR POINTS here means not the point at the bottom. In other words, ensures that the average baroclinic velocity = barotropic velocity.
@@ -185,10 +181,8 @@ def step3d_UV():
     #     END DO
 
 
-    pass
-
-
     MvV = createVertViscousOpMatrix()
+    v = solveTri(MvV, AK, z_r, v)
     #     IF (j.ge.JstrV) THEN
     #       DO i=Istr,Iend
     #         AK(i,0) = 0.5*(Akv(i,j-1,0) + Akv(i,j  ,0))
@@ -240,7 +234,7 @@ def step3d_UV():
     #       END DO
 
     # Solve the tridiagonal system.
-    v = solveTri(MvV, AK, z_r, v)
+
 
     #       DO k=1,N(ng)
     #         DO i=Istr,Iend

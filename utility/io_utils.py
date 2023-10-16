@@ -127,7 +127,7 @@ class Input:
                 msgError('Netcdf meta information file %s not found' % val, 4)
 
 
-    def getVal(self, varName, minVal = None, maxVal = None, dtype = None, count = None):
+    def getVal(self, varName, minVal = None, maxVal = None, dtype = None, count = None, validValues = None):
         # This function parses the value
 
         val = self.inputDict[varName]
@@ -153,6 +153,7 @@ class Input:
             for i in range(count):
                 val = values[i]
 
+
                 if (dtype == float) and ('d' in val.lower()):
                     # Fortran uses "d" like in 1.57d-2 for double floats.
                     # Substitutes the 'd' by 'e'
@@ -175,6 +176,9 @@ class Input:
 
                 if maxVal is not None and maxVal <= val:
                     msgError('Value %s is larger or equal than the maximum. See input_params_info.dat (var = %s)' % (val, varName))
+
+                if validValues is not None and val not in validValues:
+                        msgError('Value %s not in the list of valid values %s' % (val, repr(validValues)))
 
                 res += [val]
 

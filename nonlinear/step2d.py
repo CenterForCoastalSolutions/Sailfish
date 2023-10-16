@@ -69,7 +69,7 @@ import time
 
 # def computeMomentumRHS2(h, gzeta):
 #     rhs_ubar = 0.5*g*(RtoU(h)*DξRtoU(gzeta) + DξRtoU(gzeta*gzeta))
-#     rhs_vbar = 0.5*g*(RtoV(h)*DηRtoV(gzeta) + DηRtoV(gzeta*gzeta))
+#     rhs_vbar = 0.5*g*(RtoV(h)*DξRtoU(gzeta) + DξRtoU(gzeta*gzeta))
 
 
     # if UV_ADV:

@@ -9,7 +9,7 @@ def set_vbc():
 
 # Set linear bottom stress.
 
-    bustr[:,:] = 0.5*DxRtoU(rdrag)*ubar[krhs,:,:]
+    bustr[:,:] = 0.5*DηRtoU(rdrag)*ubar[krhs,:,:]
     bvstr[:,:] = 0.5*DxRtoV(rdrag)*vbar[krhs,:,:]
 
 

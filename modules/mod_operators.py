@@ -1,4 +1,6 @@
 import os.path
+import codecs
+import unicodedata
 
 import mod_grid
 import cupy as cp
@@ -36,7 +38,7 @@ def initModule(GRID):
     bksz = (blockSize,)
     grsz = (sz//blockSize + 1,)
 
-    initializeCPPKernels((1,), (1,), (1, shp[0], shp[1], G.on_u, G.om_v, G.pn, G.pm))
+    initializeCPPKernels((1,), (1,), (GRID.N, shp[0], shp[1], G.on_u, G.om_v, G.pn, G.pm))
 
 
 preamble2D = r'''
@@ -107,102 +109,12 @@ preamble3D = r'''
 
 
 
-loaded_from_source = r'''#define STENCIL(var) Stencil<double>  var((double *)(&(_##var[i])))
-ptrdiff_t strideJ, strideI;
-
-template<typename T>
-class Stencil
-{
-    T * const p;   
-public:
-    Stencil(T * _p): p(_p)
-    {
-    }
-    T &operator()(int const j, int const i) const
-    {
-        return *(p + j*strideJ + i);
-    }
-    T operator=(T val) const
-    {
-        return (*p = val);
-    }
-};
-
-extern "C" {
-
-double RtoU(const double *_R, const unsigned int i)
-{
-    
-    // Initializes the stencil variables that allow to access to relative elements.
-    STENCIL(R);
-    
-    if ((i % strideJ)==0) return 0.0;       
-                   
-    return (R(0, 0) + R(-1, 0)) * 0.5;
-
-}
-
-double RtoV(const double *_R, const unsigned int i)
-{
-       
-    STENCIL(R);
-    
-    if ((i/strideJ)==0) return 0.0;
-            
-    return (R(0, 0) + R(0, -1)) * 0.5;
-}
-
-double DERtoU(const double *_R, const double *_on_u, const unsigned int i)
-{
-    STENCIL(R);
-    STENCIL(on_u);
-    
-    if ((i % strideJ)==0) return 0.0; 
-
-    return on_u(0,0)*(R(0, 0) - R(0, -1));
-}
-
-double DNRtoV(const double *_R, const double *_om_v, const unsigned int i)
-{
-    STENCIL(R);
-    STENCIL(om_v);
-    
-    if ((i / strideJ)==0) return 0.0; 
-
-    return om_v(0,0)*(R(0, 0) - R(-1, 0));    
-}
-
-__global__ void computeMomentumRHS(const double *_h, const double *_gzeta, double *_gzeta2, const double *_on_u, const double *_om_v,
-                                   const double *_rhs_ubar, const double *_rhs_vbar)
-{
-    unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-    strideJ = 502;
-    
-    if ((i % strideJ)==0 || (i/strideJ)==0) return;
-    
-    //STENCIL(h);
-    //STENCIL(gzeta);
-    STENCIL(rhs_ubar);
-    STENCIL(rhs_vbar);
-    
-    
-    double g = 9.8; 
-    // printf("%li %li %li %li %p***\n", i, blockDim.x, blockIdx.x, threadIdx.x, _h);
-    // rhs_ubar = RtoU(_h,i); 
-    rhs_ubar = 0.5*g*(RtoU(_h,i)*DERtoU(_gzeta,_on_u,i) + DERtoU(_gzeta2,_on_u,i));
-    rhs_vbar = 0.5*g*(RtoV(_h,i)*DNRtoV(_gzeta,_om_v,i) + DNRtoV(_gzeta2,_om_v,i));
-}   
-
-}
-'''
-
-# module = cp.RawModule(code=loaded_from_source, options=('-default-device',))
-filename = os.path.join(exePath, r'modules/mod_operators.c')
-with open(filename, 'r') as file:
-    code = file.read()
-module = cp.RawModule(code=code, options=('-default-device',))
-computeMomentumRHS = module.get_function('computeMomentumRHS')
-initOperators = module.get_function('initOperators')
+# filename = os.path.join(exePath, r'modules/mod_operators.c')
+# with open(filename, 'r') as file:
+#     code = file.read()
+# module = cp.RawModule(code=code, options=('-default-device',))
+# computeMomentumRHS = module.get_function('computeMomentumRHS')
+# initOperators = module.get_function('initOperators')
 
 
 
@@ -220,6 +132,20 @@ computeZetaPred        = moduleCPPKernels.get_function('computeZetaPred')
 AdamsMoultonCorr3rd    = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
 AdamsMoultonCorr3rd2   = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
 computeMomentumPred    = moduleCPPKernels.get_function('computeMomentumPred')
+computeMomentumRHSCorr = moduleCPPKernels.get_function('computeMomentumRHSCorr')
+
+filename = os.path.join(exePath, r'nonlinear/rhs_kernels.cpp')
+with codecs.open(filename, encoding='utf-8') as file:
+    code = file.read()
+code = code.replace('η', 'E')
+code = code.replace('ξ', 'X')
+code = code.replace('Δ', 'D')
+code = code.replace('σ', 'sig')
+code = unicodedata.normalize('NFKD', code).encode('ascii', 'ignore').decode('ascii')
+moduleRHSKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--std=c++17'))
+initializeRHSKernels = moduleRHSKernels.get_function('initialize')
+
+
 
 
 
@@ -343,7 +269,7 @@ DξRtoU_CUDA = cp.ElementwiseKernel(
             U = on_u(0,0)*(R(0, 0) - R(0, -1));
 
            ''',
-    name = 'DXRtoU_CUDA',
+    name = 'DNRtoU_CUDA',
     options = ('-default-device',))
 
 
@@ -354,7 +280,7 @@ def DξRtoU(R):
 
 
 
-DηRtoV_CUDA = cp.ElementwiseKernel(
+DξRtoU_CUDA = cp.ElementwiseKernel(
     '''raw float64 _R, raw float64 _om_v, raw float64 varForStrides''',
     'raw float64 _V',
     preamble = preamble2D,
@@ -376,5 +302,5 @@ DηRtoV_CUDA = cp.ElementwiseKernel(
     options = ('-default-device',))
 
 
-def DηRtoV(R):
-    return DηRtoV_CUDA(R, om_v, om_v, size=sz)
+def DξRtoU(R):
+    return DξRtoU_CUDA(R, om_v, om_v, size=sz)

@@ -1,3 +1,17 @@
+from misc import *
+# from get_data import get_data
+# from set_data import set_data
+from step2d import step2dPredictor, step2dCorrector
+
+import matplotlib.pyplot as plt
+
+
+def main2d(compTimes, GRID, OCEAN, BOUNDARY):
+""" This subroutine is the main driver for nonlinear ROMS/TOMS when configurated as a full 3D baroclinic ocean
+model only. It advances forward  the vertically integrated primitive equations by thespecified  time interval
+(seconds), RunInterval.
+"""
+
 
 def main3d (RunInterval):
 # This subroutine is the main driver for nonlinear ROMS/TOMS when     !
@@ -43,9 +57,9 @@ def main3d (RunInterval):
         # Set time indices and time clock.
 
             # Gets next time step and cycles variables.
-        HERE OR BELOW????
+        # TODO: HERE OR BELOW????
             compTimes.nextTimeStep()
-            OCEAN.cycleTimes()
+            OCEAN.cycleTimes3D()
 
 #         iic += 1
 #         nstp(ng)=1+MOD(iic(ng)-ntstart(ng),2)
@@ -108,7 +122,7 @@ def main3d (RunInterval):
 
 
 # ifdef GLS_MIXING
-            gls_prestep()
+#             gls_prestep()
 # endif
 
 
@@ -121,7 +135,7 @@ def main3d (RunInterval):
                 # Set time indices for predictor step. The PREDICTOR_2D_STEP switch
                 # it is assumed to be false before the first time-step.
                 compTimes.nextTimeStep()
-                OCEAN.cycleTimes()
+                OCEAN.cycleTimes2D()
 
                 Δt = compTimes.dtfast
 
@@ -179,8 +193,6 @@ def main3d (RunInterval):
      #                CALL step2d ()
      #            END IF
 
-
-
             END DO LOOP_2D
 
 
@@ -196,7 +208,7 @@ def main3d (RunInterval):
             #   Time-step vertical mixing turbulent equations and passive tracer
             #   source and sink terms, if applicable.
             omega(iNLM)
-            gls_corstep()
+            # gls_corstep()
 
 
             # -----------------------------------------------------------------------
@@ -205,7 +217,6 @@ def main3d (RunInterval):
             iic(ng)=iic(ng)+1
             time(ng)=time(ng)+dt(ng)
             step_counter(ng)=step_counter(ng)-1
-            CALL time_string (time(ng), time_code(ng))
 
 
 

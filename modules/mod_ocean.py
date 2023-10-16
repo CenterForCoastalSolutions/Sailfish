@@ -33,7 +33,7 @@ class T_OCEAN:
 
 
         # These aliases are used in the predictor/corrector steps. t2, t1 and t0 always mean t+2Δt, t+Δt and t,
-        # but their location in the arrays changes (as given by cycleTimes) to avoid copying lots of data.
+        # but their location in the arrays changes (as given by cycleTimes2D) to avoid copying lots of data.
         self.zeta_t2 = self.zeta[2, :, :].ravel()
         self.zeta_t1 = self.zeta[1, :, :].ravel()
         self.zeta_t0 = self.zeta[0, :, :].ravel()
@@ -72,7 +72,26 @@ class T_OCEAN:
         self.z  = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
 
 
-    def cycleTimes(self):
+        # These aliases are used in the predictor/corrector steps. t2, t1 and t0 always mean t+2LΔt, t+LΔt and t,
+        # but their location in the arrays changes (as given by cycleTimes) to avoid copying lots of data.
+        self.u_t2 = self.u[2, :, :].ravel()
+        self.u_t1 = self.u[1, :, :].ravel()
+        self.u_t0 = self.u[0, :, :].ravel()
+
+        self.v_t2 = self.v[2, :, :].ravel()
+        self.v_t1 = self.v[1, :, :].ravel()
+        self.v_t0 = self.v[0, :, :].ravel()
+
+        self.ru_t2 = self.ru[2, :, :].ravel()
+        self.ru_t1 = self.ru[1, :, :].ravel()
+        self.ru_t0 = self.ru[0, :, :].ravel()
+
+        self.rv_t2 = self.rv[2, :, :].ravel()
+        self.rv_t1 = self.rv[1, :, :].ravel()
+        self.rv_t0 = self.rv[0, :, :].ravel()
+
+
+    def cycleTimes2D(self):
         # Cycle the variables that contain the previous times. In reality this is a shift, where variables are moved
         # one barotropic time-step in such a way that t2 always point to time = t + 2Δt and so on.
         # The reason for cycling is to reuse the same memory. the t2 variables contain "garbage" at this point. They
@@ -107,6 +126,33 @@ class T_OCEAN:
         self.rvbar_t0 = self.rvbar_t1
         self.rvbar_t1 = self.rvbar_t2
         self.rvbar_t2 = temp
+
+
+    def cycleTimes3D(self):
+        # Cycle the variables that contain the previous times. In reality this is a shift, where variables are moved
+        # one barotropic time-step in such a way that t2 always point to time = t + 2LΔt and so on.
+        # The reason for cycling is to reuse the same memory. the t2 variables contain "garbage" at this point. They
+        # must be filled with newly computed values.
+
+        temp = self.u_t0
+        self.u_t0 = self.u_t1
+        self.u_t1 = self.u_t2
+        self.u_t2 = temp
+
+        temp = self.v_t0
+        self.v_t0 = self.v_t1
+        self.v_t1 = self.v_t2
+        self.v_t2 = temp
+
+        temp = self.ru_t0
+        self.ru_t0 = self.ru_t1
+        self.ru_t1 = self.ru_t2
+        self.ru_t2 = temp
+
+        temp = self.rv_t0
+        self.rv_t0 = self.rv_t1
+        self.rv_t1 = self.rv_t2
+        self.rv_t2 = temp
 
 
     def getVars(self):

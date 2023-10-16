@@ -17,7 +17,10 @@ import mod_comptimes
 import mod_physical_params
 import mod_operators
 
+from rhs import rhs3d
 from main2d import main2d
+
+import rhs
 
 from barotropicVelocityBC import barotropicVelocityBC
 from zetabc import zetabc
@@ -33,7 +36,6 @@ varInfoList = io_utils.VarInfoList(path = r'../modules')
 input = io_utils.Input(r'../utility/test.in', varInfoList)
 
 GRID           = mod_grid           .Grid(input)
-
 BOUNDARY       = mod_boundary       .Boundary(input, GRID)
 io             = mod_io             .T_IO(input)
 physicalParams = mod_physical_params.PhysicalParams(input, GRID)
@@ -63,7 +65,10 @@ GRID.updateMetrics()
 mod_operators.initModule(GRID)
 # mod_operators.initOperators((1,), (1,), (10, *(GRID.h.shape)))
 
-main2d(compTimes,  GRID, OCEAN, BOUNDARY)
+
+rhs3d()
+
+main2d(compTimes, GRID, OCEAN, BOUNDARY)
 
 # cProfile.run('main2d(compTimes,  GRID, OCEAN, BOUNDARY)')
 pass

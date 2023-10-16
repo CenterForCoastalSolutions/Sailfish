@@ -56,7 +56,7 @@ __global__ double DERtoU(const double *_R, const double *_on_u, const unsigned i
     return on_u(0,0)*(R(0, 0) - R(0, -1));
 }
 
-__global__ double DNRtoV(const double *_R, const double *_om_, const unsigned int i)v
+__global__ double DξRtoV(const double *_R, const double *_om_, const unsigned int i)v
 {
     STENCIL(R);
     STENCIL(om_v);

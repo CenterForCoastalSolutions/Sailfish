@@ -59,7 +59,7 @@ def fuseRtoV(u1, u2):
     return 0.25*(u1 + u2)
 
 @cp.fuse()
-def fuseDxRtoU(u1, u2):
+def fuseDηRtoU(u1, u2):
     return (u1 - u2)
 
 @cp.fuse()
@@ -71,7 +71,7 @@ def fuseDyRtoV(u1, u2):
 def fuseAndCupy():
     res = 0.0
     for iter in range(10):
-        wrk[:, :-1, :] = u[Ninp, :, 1:-1, 1:] * fuseDxRtoU(z_r[:, 1:-1, 1:], z_r[:, 1:-1, :-1]) * (pm[None,1:-1, 0:-1] + pm[None,1:-1, 1:])
+        wrk[:, :-1, :] = u[Ninp, :, 1:-1, 1:] * fuseDηRtoU(z_r[:, 1:-1, 1:], z_r[:, 1:-1, :-1]) * (pm[None,1:-1, 0:-1] + pm[None,1:-1, 1:])
         vert[:,:,1:] = fuseRtoU(wrk[:,:, 1:], wrk[:,:,:-1])
 
         wrk[:, :, :-1] = v[Ninp, :, 1:, 1:-1] * fuseDyRtoV(z_r[:, 1:, 1:-1], z_r[:, :-1, 1:-1]) * (pn[None, 0:-1, 1:-1] + pn[None, 1:, 1:-1])

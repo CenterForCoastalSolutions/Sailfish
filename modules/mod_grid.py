@@ -161,6 +161,22 @@ class Grid:
         self.vmask_full = cp.zeros(shape2D, dtype = bool)
 
 
+        # Vertical part.
+        self.N = input.getVal('N', minVal = 0, dtype = int)       # Number of vertical levels.
+
+
+        # sigma coordinates.
+        self.Vtransform  = input.getVal('Vtransform',  validValues = (1, 2), dtype = int)
+        self.Vstretching = input.getVal('Vstretching', validValues = (1, 2, 3, 4, 5), dtype=int)
+
+
+        self.theta_s = input.getVal('THETA_S', dtype=float)       # S-coordinate surface control parameter. The range of optimal values depends on the vertical stretching function, C(s).
+        self.theta_b = input.getVal('THETA_B', dtype=float)       # S-coordinate bottom  control parameter. The range of optimal values depends on the vertical stretching function, C(s).
+        Tcline  = input.getVal('TCLINE',  dtype=float)            # Critical depth (hc) in meters (positive) controlling the stretching. It can be interpreted as the width of surface or
+                                                                  # bottom boundary layer in which higher vertical resolution (levels) is required during stretching.
+        self.hc = Tcline
+
+
     def updateMetrics(self):
         """This routine computes various horizontal metric terms."""
 
@@ -191,7 +207,7 @@ class Grid:
 
 
 
-        # Compute m/n, 1/m, and 1/n at horizontal U-points.
+        # Compute m/n, 1/m, and 1/n at horizontal V-points.
         # -----------------------------------------------------------------------
 
         self.pmon_v = (self.pm[:,:-1] + self.pm[:,1:]) / (self.pn[:,:-1] + self.pn[:,1:])
@@ -549,23 +565,6 @@ class Grid:
 # Cs_w          Set of S-curves used to stretch the vertical grid that follows the bathymetry at vertical W-points.
 # sc_r          S-coordinate independent variable, [-1 < sc < 0] at vertical RHO-points.
 # sc_w          S-coordinate independent variable, [-1 < sc < 0] at  vertical W-points.
-
-class VertGrid:
-    def __init__(self, input):
-
-        N = input.getVal('N' , minVal = 0)               # Number of vertical levels.
-
-
-        # sigma coordinates.
-        Vtransform  = input.getVal('Vtransform',  validValues = (1, 2), dtype = int)
-        Vstretching = input.getVal('Vstretching', validValues = (1, 2, 3, 4, 5), dtype=int)
-
-
-        theta_s = input.getVal('THETA_S', dtype=float)       # S-coordinate surface control parameter. The range of optimal values depends on the vertical stretching function, C(s).
-        theta_b = input.getVal('THETA_B', dtype=float)       # S-coordinate bottom  control parameter. The range of optimal values depends on the vertical stretching function, C(s).
-        Tcline  = input.getVal('TCLINE',  dtype=float)       # Critical depth (hc) in meters (positive) controlling the stretching. It can be interpreted as the width of surface or
-                                                            #   bottom boundary layer in which higher vertical resolution (levels) is required during stretching.
-        hc = Tcline
 
 
 

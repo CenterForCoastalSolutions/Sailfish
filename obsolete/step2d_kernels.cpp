@@ -24,8 +24,8 @@ void computeMomentumRHSPred(const double *_h, const double *_on_u, const double 
     auto gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1;
 
     auto gzeta2 = gzeta*gzeta;
-    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta2,on_u));
-    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta2,om_v));
+    rhs_ubar = 0.5*g*(RtoU(h)*DηRtoU(gzeta,on_u) + DηRtoU(gzeta2,on_u));
+    rhs_vbar = 0.5*g*(RtoV(h)*DξRtoV(gzeta,om_v) + DξRtoV(gzeta2,om_v));
 }
 
 
@@ -58,8 +58,8 @@ void computeMomentumRHSCorr(const double *_h, const double *_on_u, const double 
     auto gzeta = (1 - weight)*zeta_t1 + weight*0.5*(zeta_t2 + zeta_t0);
 
     auto gzeta2 = gzeta*gzeta;
-    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta2,on_u));
-    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta2,om_v));
+    rhs_ubar = 0.5*g*(RtoU(h)*DηRtoU(gzeta,on_u) + DηRtoU(gzeta2,on_u));
+    rhs_vbar = 0.5*g*(RtoV(h)*DξRtoV(gzeta,om_v) + DξRtoV(gzeta2,om_v));
 }
 
 

@@ -24,7 +24,7 @@ def wvelocity (Ninp):
 
 
     # Compute contribution due to quasi-horizontal motions along S-coordinate surfaces:  U·GRADs(z).
-    vert = UtoR(u[Ninp,:,:,:]*dξRtoU(z_r)) + VtoR(v[Ninp,:,:,:]*dηRtoV(z_r))
+    vert = UtoR(u[Ninp,:,:,:]*dξRtoU(z_r)) + VtoR(v[Ninp,:,:,:]*DξRtoU(z_r))
 
 
     # Compute contribution due to time tendency of the free-surface, d(zeta)/d(t), which is the vertical velocity at the free-surface
@@ -50,7 +50,7 @@ def wvelocity (Ninp):
     #pragma unroll 1
     for (int k=1; k<N; n++):
         dξz_rU = dξRtoU(z_r)
-        dηz_rV = dηRtoV(z_r)
+        dηz_rV = DξRtoU(z_r)
         vertW(0,0,k) = RtoW(UtoR(u(0,0,k)*dξz_rU(0,0,k)) + VtoR(v(0,0,k)*dηz_rV(0,0,k)))
 
     # Compute contribution due to time tendency of the free-surface, d(zeta)/d(t), which is the vertical velocity at the free-surface

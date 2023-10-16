@@ -70,7 +70,7 @@ void XXXXXXX(const double Δt, const double lambda)
         double denom = 1.0/(BC[k] - FC[k-1]*CF[k-1]);
 
         CF(i,k) = denom*FC[k];
-        DC(i,k) = denom*(DC[k] - FC[k-1]*DC[k-1];
+        DC(i,k) = denom*(DC[k] - FC[k-1]*DC[k-1]);
     }
 
 

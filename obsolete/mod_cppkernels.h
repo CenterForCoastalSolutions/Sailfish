@@ -1,5 +1,5 @@
 enum Op  {opValue, opStencil, opSum, opSub, opMul, opDiv, opRtoU, opRtoV,
-          opDERtoU, opDNRtoV, opdivUVtoR};
+          opDηRtoU, opDξRtoV, opdivUVtoR};
 
 
 extern "C" __global__ void initialize(unsigned int sizeK, unsigned int sizeJ, unsigned int sizeI,
@@ -28,7 +28,7 @@ public:
         return *(p + j*szJ + i);
     }
 
-    // By design, we choose not to return a value from the assignment opertor.
+    // By design, we choose not to return a value from the assignment operator.
     void operator=(L val) const
     {
         *p = val;
@@ -114,7 +114,7 @@ public:
 
 
 template<typename L>
-class Expr<L, void, opDERtoU>
+class Expr<L, void, opDηRtoU>
 {
     L &expr;
 
@@ -141,7 +141,7 @@ public:
 
 
 template<typename L>
-class Expr<L, void, opDNRtoV>
+class Expr<L, void, opDξRtoV>
 {
     L &expr;
 
@@ -335,15 +335,15 @@ auto RtoV(const T &R)
 }
 
 template<typename T>
-auto DERtoU(const T &R, const Expr<double, void, opStencil> &on_u)
+auto DηRtoU(const T &R, const Expr<double, void, opStencil> &on_u)
 {
-    return Expr<T, void, opDERtoU>(R, on_u);
+    return Expr<T, void, opDηRtoU>(R, on_u);
 }
 
 template<typename T>
-auto DNRtoV(const T &R, const Expr<double, void, opStencil> &om_v)
+auto DξRtoV(const T &R, const Expr<double, void, opStencil> &om_v)
 {
-    return Expr<T, void, opDNRtoV>(R, om_v);
+    return Expr<T, void, opDξRtoV>(R, om_v);
 }
 
 

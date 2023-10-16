@@ -1,15 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="ANALYZE_INJECTED_CODE" value="false" />
+    <option name="SCOPE_TYPE" value="3" />
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="Starting 3D">
-      <change afterPath="$PROJECT_DIR$/nonlinear/step3D_uv.kernels.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nonlinear/step3d_uv.lyx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nonlinear/rhs_kernels.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nonlinear/step3d_kernels.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_cppkernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_cppkernels.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_cppkernels.h" beforeDir="false" afterPath="$PROJECT_DIR$/obsolete/mod_cppkernels.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_grid.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_grid.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/mod_ocean.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_ocean.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/gls_corrector_step.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/gls_corrector_step.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_operators.c" beforeDir="false" afterPath="$PROJECT_DIR$/obsolete/mod_operators.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_operators.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_operators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/main2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main2d.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/main3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main3d.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/rhs.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/rhs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/set_vbc.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/set_vbc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/step2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/step2d_kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/obsolete/step2d_kernels.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/step3D_uv.kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step3D_uv.kernels.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/step3d_uv.lyx" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step3d_uv.lyx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/step3d_uv.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step3d_uv.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/wvelocity.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/wvelocity.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/step2Dnew.py" beforeDir="false" afterPath="$PROJECT_DIR$/obsolete/step2Dnew.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/translator/wvelminiapp.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/translator/wvelminiapp.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp/testProgram.py" beforeDir="false" afterPath="$PROJECT_DIR$/tmp/testProgram.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utility/io_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utility/io_utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,6 +61,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 6
+}]]></component>
   <component name="ProjectId" id="2LQH9xZTbrJr1qNclotul09gBTg" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -47,8 +74,15 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "D:/projects/src/oceangpu/nonlinear",
-    "settings.editor.selected.configurable": "preferences.keymap"
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Users/jo.gonzalez/OneDrive - University of Florida/Documents",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "Settings.Puppet",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -65,8 +99,33 @@
       <recent name="D:\projects\src\oceangpu" />
       <recent name="D:\projects\src\oceangpu\utility" />
     </key>
+    <key name="ImportExportFile.TargetDir.RECENT_KEYS">
+      <recent name="D:\projects\src\oceangpu\nonlinear" />
+    </key>
   </component>
   <component name="RunManager" selected="Python.testProgram">
+    <configuration name="main2d" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="oceangpu" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/nonlinear" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/nonlinear/main2d.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="testProgram" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="oceangpu" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -79,6 +138,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tmp/testProgram.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -100,6 +160,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/testSpline.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -112,6 +173,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.testProgram" />
+        <item itemvalue="Python.main2d" />
         <item itemvalue="Python.testSpline" />
       </list>
     </recent_temporary>
@@ -127,13 +189,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1675796239226</updated>
-    </task>
-    <task id="LOCAL-00165" summary="...">
-      <created>1688678466164</created>
-      <option name="number" value="00165" />
-      <option name="presentableId" value="LOCAL-00165" />
-      <option name="project" value="LOCAL" />
-      <updated>1688678466164</updated>
+      <workItem from="1697479459355" duration="3311000" />
     </task>
     <task id="LOCAL-00166" summary="...">
       <created>1688678591767</created>
@@ -471,8 +527,18 @@
       <option name="project" value="LOCAL" />
       <updated>1695414719778</updated>
     </task>
-    <option name="localTasksCounter" value="214" />
+    <task id="LOCAL-00214" summary="Starting 3D">
+      <created>1696539411615</created>
+      <option name="number" value="00214" />
+      <option name="presentableId" value="LOCAL-00214" />
+      <option name="project" value="LOCAL" />
+      <updated>1696539411616</updated>
+    </task>
+    <option name="localTasksCounter" value="215" />
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -531,7 +597,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/modules/mod_grid.py</url>
-          <line>303</line>
+          <line>319</line>
           <option name="timeStamp" value="115" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -540,19 +606,24 @@
           <option name="timeStamp" value="147" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/nonlinear/rhs.py</url>
+          <line>211</line>
+          <option name="timeStamp" value="166" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/nonlinear/step3d_uv.py</url>
+          <line>12</line>
+          <option name="timeStamp" value="167" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/modules/mod_operators.py</url>
-          <line>214</line>
-          <option name="timeStamp" value="151" />
+          <line>136</line>
+          <option name="timeStamp" value="172" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/modules/mod_boundary.py</url>
-          <line>240</line>
-          <option name="timeStamp" value="163" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/modules/mod_boundary.py</url>
-          <line>259</line>
-          <option name="timeStamp" value="165" />
+          <url>file://$PROJECT_DIR$/modules/mod_operators.py</url>
+          <line>144</line>
+          <option name="timeStamp" value="173" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -563,5 +634,8 @@
         </breakpoint>
       </default-breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/oceangpu$testProgram.coverage" NAME="testProgram Coverage Results" MODIFIED="1697489854689" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp" />
   </component>
 </project>

@@ -1,12 +1,18 @@
 //#include "stdio.h"
 
-#define STENCIL(var) class Expr<double, void, opStencil>  var((double *)(_##var + i))
+#define STENCIL(var)   class Expr<double, void, opStencil2D>  var((double *)(_##var + i))
+#define STENCIL3D(var) class Expr<double, void, opStencil3D>  var((double *)(_##var + i))
+
+
+#define OPERATOR_ACCESS ResType operator()(int const k, int const j, int const i) const { return Eval(k,j,i);} \
+                        ResType operator()(int const j, int const i) const { return Eval(j,i); }
 
 int sz2D, sz3D, szI, szJ, szK;
 double *_on_u, *_om_v, *_pm, *_pn;
 
-enum Op  {opValue, opStencil, opSum, opSub, opMul, opDiv, opRtoU, opRtoV,
-          opDERtoU, opDNRtoV, opdivUVtoR};
+enum Op  {opValue, opStencil2D, opStencil3D, opSum, opSub, opMul, opDiv, opRtoU, opRtoV,
+          opDERtoU, opDXRtoV, opdivUVtoR,
+          opDXXcentered, opUtoUW_4th};
 
 
 extern "C" __global__ void initialize(unsigned int sizeK, unsigned int sizeJ, unsigned int sizeI,
@@ -36,7 +42,7 @@ class Expr
 
 
 template<typename L>
-class Expr<L, void, opStencil>
+class Expr<L, void, opStencil2D>
 {
     L * const p;
 
@@ -49,16 +55,16 @@ public:
     }
     L &operator()(int const j, int const i) const
     {
-        return *(p + j*szJ + i);
+        return *(p + j*szI + i);
     }
 
-    // By design, we choose not to return a value from the assignment opertor.
+    // By design, we choose not to return a value from the assignment operator.
     void operator=(L val) const
     {
         *p = val;
     }
 
-    // By design, we choose not to return a value from the assignment opertor.
+    // By design, we choose not to return a value from the assignment operator.
     template<typename T1>
     void operator=(const T1 &expr) const
     {
@@ -68,25 +74,53 @@ public:
 
     L Eval(int const j, int const i) const
     {
-        return *(p + j*szJ + i);
+        return *(p + j*szI + i);
     }
 
 
-
-
-//    operator Expr<T, opStencil>() const { return Expr<T, opStencil>(*this); }
 };
 
 
 
+template<typename L>
+class Expr<L, void, opStencil3D>
+{
+    L * const p;
 
-//template<typename T, typename L, typename R, int op>
-//void operator=(Expr(T, void, opStencil) &l, Expr<L,R,op> const &expr) const
-//{
-//    printf("%p -- %f\n",  p, expr.Eval(0,0));
-//    return (*l.p = expr.Eval(0,0));
-//}
 
+public:
+    typedef L ResType;
+
+    Expr(L * _p): p(_p)
+    {
+    }
+
+    L &operator()(int const k, int const j, int const i) const
+    {
+        return Eval(k,j,i);
+    }
+
+    // By design, we choose not to return a value from the assignment operator.
+    void operator=(L val) const
+    {
+        *p = val;
+    }
+
+    // By design, we choose not to return a value from the assignment operator.
+    template<typename T1>
+    void operator=(const T1 &expr) const
+    {
+        *p = expr.Eval(0,0,0);
+    }
+
+    L Eval(int const k, int const j, int const i) const
+    {
+        return *(p + k*sz2D + j*szI + i);
+    }
+
+
+
+};
 
 
 
@@ -102,14 +136,16 @@ public:
     {
     }
 
-    ResType operator()(int const j, int const i) const
-    {
-        return this->Eval(i,j);
-    }
+    OPERATOR_ACCESS
 
     ResType Eval(int const j, int const i) const
     {
-        return (expr.Eval(j, i) + expr.Eval(j-1, i)) * 0.5;
+        return (expr.Eval(j,i) + expr.Eval(j-1,i)) * 0.5;
+    }
+
+    ResType Eval(int const k, int const j, int const i) const
+    {
+        return (expr.Eval(k,j,i) + expr.Eval(k,j,i-1)) * 0.5;
     }
 };
 
@@ -124,17 +160,39 @@ public:
     Expr(L _expr): expr(_expr)
     {
     }
-    ResType operator()(int const j, int const i) const
-    {
-        return this->Eval(i,j);
-    }
+
+    OPERATOR_ACCESS
 
     ResType Eval(int const j, int const i) const
     {
-        return (expr.Eval(j, i) + expr.Eval(j, i-1)) * 0.5;
+        return (expr.Eval(j, i) + expr.Eval(j-1, i)) * 0.5;
+    }
+
+    ResType Eval(int const k, int const j, int const i) const
+    {
+        return (expr.Eval(j, i) + expr.Eval(k,j-1, i)) * 0.5;
     }
 
 };
+
+
+template<typename L, typename R>
+class Expr<L, R, opUtoUW_4th>
+{
+    L &Var;
+
+protected:
+    typedef decltype(Var.Eval(0,0)*Var.Eval(0,0)) ResType;
+
+public:
+    Expr(L _Var): Var(_Var)
+    {
+    }
+
+
+    auto Eval(int const j, int const i) const { return (9.0/16.0)*(var(k,j,i) + var(k+1,j,i)) - (1.0/16.0)*(var(k-1,j,i) + var(k+2,j,i)); };
+};
+
 
 
 template<typename L>
@@ -144,16 +202,12 @@ class Expr<L, void, opDERtoU>
 
 protected:
     typedef decltype(expr.Eval(0,0)*expr.Eval(0,0)) ResType;
-    typedef Expr<ResType, void, opStencil> OType;
+    typedef Expr<ResType, void, opStencil2D> OType;
     OType &on_u;
 
 public:
     Expr(L _expr, OType _on_u): expr(_expr), on_u(_on_u)
     {
-    }
-    ResType operator()(int const j, int const i) const
-    {
-        return this->Eval(j,i);
     }
 
     ResType Eval(int const j, int const i) const
@@ -165,22 +219,18 @@ public:
 
 
 template<typename L>
-class Expr<L, void, opDNRtoV>
+class Expr<L, void, opDXRtoV>
 {
     L &expr;
 
 protected:
     typedef decltype(expr.Eval(0,0)*expr.Eval(0,0)) ResType;
-    typedef Expr<ResType, void, opStencil> OType;
+    typedef Expr<ResType, void, opStencil2D> OType;
     OType &om_v;
 
 public:
     Expr(L _expr, OType _om_v): expr(_expr), om_v(_om_v)
     {
-    }
-    ResType operator()(int const j, int const i) const
-    {
-        return this->Eval(j,i);
     }
 
     ResType Eval(int const j, int const i) const
@@ -199,7 +249,7 @@ class Expr<L, R, opdivUVtoR>
 
 protected:
     typedef decltype(U.Eval(0,0)*V.Eval(0,0)) ResType;
-    typedef Expr<ResType, void, opStencil> OType;
+    typedef Expr<ResType, void, opStencil2D> OType;
     OType &on_u;
     OType &om_v;
     OType &pn;
@@ -209,10 +259,6 @@ public:
     Expr(L _U, R _V, OType _on_u, OType _om_v, OType _pn, OType _pm): U(_U), V(_V), on_u(_on_u), om_v(_om_v), pn(_pn), pm(_pm)
     {
     }
-    ResType operator()(int const j, int const i) const
-    {
-        return this->Eval(j,i);
-    }
 
     ResType Eval(int const j, int const i) const
     {
@@ -220,6 +266,28 @@ public:
     }
 
 };
+
+
+template<typename L>
+class Expr<L, void, opDXXcentered>
+{
+    L &Var;
+
+protected:
+    typedef decltype(Var.Eval(0,0)*Var.Eval(0,0)) ResType;
+
+public:
+    Expr(L _Var): Var(_Var)
+    {
+    }
+
+    ResType Eval(int const j, int const i) const
+    {
+        return Var.Eval(k,j,i-1) - 2.0*Var.Eval(k,j,i) + Var.Eval(k,j,i+1);
+    }
+
+};
+
 
 
 template<typename L>
@@ -302,6 +370,9 @@ public:
 
 
 
+
+
+
 template<typename L, typename R>
 auto operator+(const L &l, const R &r) { return Expr<L, R, opSum>(l, r); }
 
@@ -358,24 +429,44 @@ auto RtoV(const T &R)
     return Expr<T, void, opRtoV>(R);
 }
 
+
 template<typename T>
-auto DERtoU(const T &R, const Expr<double, void, opStencil> &on_u)
+auto UtoUW_4th(const T &V) {
+    return Expr<T, void, opUtoUW_4th>(U);
+}
+
+
+template<typename T>
+auto DERtoU(const T &R, const Expr<double, void, opStencil2D> &on_u)
 {
     return Expr<T, void, opDERtoU>(R, on_u);
 }
 
 template<typename T>
-auto DNRtoV(const T &R, const Expr<double, void, opStencil> &om_v)
+auto DXRtoV(const T &R, const Expr<double, void, opStencil2D> &om_v)
 {
-    return Expr<T, void, opDNRtoV>(R, om_v);
+    return Expr<T, void, opDXRtoV>(R, om_v);
 }
 
 
 template<typename T1, typename T2>
-auto divUVtoR(const T1 &U, const T2 &V, const Expr<double, void, opStencil> &on_u, const Expr<double, void, opStencil> &om_v, const Expr<double, void, opStencil> &pn, const Expr<double, void, opStencil> &pm)
+auto divUVtoR(const T1 &U, const T2 &V, const Expr<double, void, opStencil2D> &on_u, const Expr<double, void, opStencil2D> &om_v, const Expr<double, void, opStencil2D> &pn, const Expr<double, void, opStencil2D> &pm)
 {
     return Expr<T1, T2, opdivUVtoR>(U, V, on_u, om_v, pn, pm);
 }
+
+
+template<typename T>
+auto DXXUtoU(const T &U) { return Expr<T, void, opDXXcentered>(U); }
+
+template<typename T>
+auto DXXVtoV(const T &V) { return Expr<T, void, opDXXcentered>(U); }
+
+
+
+
+
+
 
 
 
@@ -386,7 +477,6 @@ void computeMomentumRHSPred(const double *_h,
                             const double *_zeta_t1, const double *_zeta_t2, const double g, const double weight)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-
 
 //    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
     if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D)
@@ -408,7 +498,8 @@ void computeMomentumRHSPred(const double *_h,
     auto gzeta2 = gzeta*gzeta;   // TODO : sqr expression.
 
     rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta2,on_u));
-    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta2,om_v));
+    rhs_vbar = 0.5*g*(RtoV(h)*DXRtoV(gzeta,om_v) + DXRtoV(gzeta2,om_v));
+
 }
 
 
@@ -443,7 +534,7 @@ void computeMomentumRHSCorr(const double *_h,
 
     auto gzeta2 = gzeta*gzeta;
     rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta2,on_u));
-    rhs_vbar = 0.5*g*(RtoV(h)*DNRtoV(gzeta,om_v) + DNRtoV(gzeta2,om_v));
+    rhs_vbar = 0.5*g*(RtoV(h)*DXRtoV(gzeta,om_v) + DXRtoV(gzeta2,om_v));
 }
 
 

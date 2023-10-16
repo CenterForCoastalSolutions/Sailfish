@@ -1,5 +1,3 @@
-import mod_param
-import mod_scalars
 from misc import *
 # from get_data import get_data
 # from set_data import set_data
@@ -8,7 +6,7 @@ from step2d import step2dPredictor, step2dCorrector
 import matplotlib.pyplot as plt
 
 
-def main2d(compTimes,  GRID, OCEAN, BOUNDARY):
+def main2d(compTimes, GRID, OCEAN, BOUNDARY):
     """ This subroutine is the main driver for nonlinear ROMS/TOMS when configurated as shallow water (barotropic) ocean
     model only. It advances forward  the vertically integrated primitive equations for all nested grids,  if any,  by the
     specified  time interval (seconds), RunInterval.
@@ -42,7 +40,7 @@ def main2d(compTimes,  GRID, OCEAN, BOUNDARY):
 
         # Gets next time step and cycles variables.
         compTimes.nextTimeStep()
-        OCEAN.cycleTimes()
+        OCEAN.cycleTimes2D()   # Fast time cycle (barotropic)
 
 
         # Read in required data, if any, from input NetCDF files.

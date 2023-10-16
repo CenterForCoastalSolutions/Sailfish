@@ -151,6 +151,14 @@ Where
 \begin_layout Standard
 \begin_inset Formula 
 \[
+M\,U=DC
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
 M=\left(\begin{array}{ccccccc}
 BC[1] & FC[1]\\
 FC[1] & BC[2] & FC[2]\\
