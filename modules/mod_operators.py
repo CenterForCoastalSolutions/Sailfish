@@ -118,10 +118,12 @@ preamble3D = r'''
 
 
 
+filePath = os.path.dirname(os.path.abspath(__file__))
+
 filename = os.path.join(exePath, r'modules/mod_cppkernels.cpp')
 with open(filename, 'r') as file:
     code = file.read()
-moduleCPPKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--std=c++17'))
+moduleCPPKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--std=c++17', r'-I%s' % filePath))
 initializeCPPKernels = moduleCPPKernels.get_function('initialize')
 
 # computeMomentumRHS3 = moduleCPPKernels.get_function('computeMomentumRHS')
@@ -142,7 +144,7 @@ code = code.replace('ξ', 'X')
 code = code.replace('Δ', 'D')
 code = code.replace('σ', 'sig')
 code = unicodedata.normalize('NFKD', code).encode('ascii', 'ignore').decode('ascii')
-moduleRHSKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--std=c++17'))
+moduleRHSKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--std=c++17', r'-I%s' % filePath))
 initializeRHSKernels = moduleRHSKernels.get_function('initialize')
 
 

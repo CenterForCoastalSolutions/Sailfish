@@ -8,32 +8,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="Starting 3D">
-      <change afterPath="$PROJECT_DIR$/nonlinear/rhs_kernels.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nonlinear/step3d_kernels.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="Working on the 3D kernels">
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/markdown.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/oceangpu.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modules/mod_cppkernels.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/mod_cppkernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_cppkernels.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_cppkernels.h" beforeDir="false" afterPath="$PROJECT_DIR$/obsolete/mod_cppkernels.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_grid.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_grid.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_ocean.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_ocean.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_operators.c" beforeDir="false" afterPath="$PROJECT_DIR$/obsolete/mod_operators.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/mod_operators.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_operators.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/main2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main2d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/main3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main3d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/rhs.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/rhs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/set_vbc.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/set_vbc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/step2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/step2d_kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/obsolete/step2d_kernels.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/step3D_uv.kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step3D_uv.kernels.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/step3d_uv.lyx" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step3d_uv.lyx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/step3d_uv.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step3d_uv.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/wvelocity.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/wvelocity.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/step2Dnew.py" beforeDir="false" afterPath="$PROJECT_DIR$/obsolete/step2Dnew.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/translator/wvelminiapp.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/translator/wvelminiapp.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tmp/testProgram.py" beforeDir="false" afterPath="$PROJECT_DIR$/tmp/testProgram.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utility/io_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utility/io_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/rhs_kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/rhs_kernels.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,30 +45,31 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="2LQH9xZTbrJr1qNclotul09gBTg" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/jo.gonzalez/OneDrive - University of Florida/Documents",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "Settings.Puppet",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/jo.gonzalez/OneDrive - University of Florida/Documents&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;Settings.Puppet&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\projects\src\oceangpu\nonlinear" />
@@ -189,7 +174,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1675796239226</updated>
-      <workItem from="1697479459355" duration="3311000" />
+      <workItem from="1697479459355" duration="25563000" />
     </task>
     <task id="LOCAL-00166" summary="...">
       <created>1688678591767</created>
@@ -534,7 +519,7 @@
       <option name="project" value="LOCAL" />
       <updated>1696539411616</updated>
     </task>
-    <option name="localTasksCounter" value="215" />
+    <option name="localTasksCounter" value="216" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -565,7 +550,8 @@
     <MESSAGE value="Some code cleaning done. Continuing." />
     <MESSAGE value="Cleaning finished on the python side." />
     <MESSAGE value="Starting 3D" />
-    <option name="LAST_COMMIT_MESSAGE" value="Starting 3D" />
+    <MESSAGE value="Working on the 3D kernels" />
+    <option name="LAST_COMMIT_MESSAGE" value="Working on the 3D kernels" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -615,16 +601,6 @@
           <line>12</line>
           <option name="timeStamp" value="167" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/modules/mod_operators.py</url>
-          <line>136</line>
-          <option name="timeStamp" value="172" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/modules/mod_operators.py</url>
-          <line>144</line>
-          <option name="timeStamp" value="173" />
-        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -636,6 +612,6 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/oceangpu$testProgram.coverage" NAME="testProgram Coverage Results" MODIFIED="1697489854689" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp" />
+    <SUITE FILE_PATH="coverage/oceangpu$testProgram.coverage" NAME="testProgram Coverage Results" MODIFIED="1697661755378" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp" />
   </component>
 </project>
