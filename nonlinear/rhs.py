@@ -1,7 +1,10 @@
 import mod_ocean
+import mod_boundary
+from mod_operators import horizontalAdvection, verticalAdvection
 
 # This subroutine evaluates right-hand-side terms for 3D momentum and tracers equations.
 import mod_grid
+import mod_ocean
 
 
 # ηξ Δ
@@ -9,7 +12,10 @@ import mod_grid
 
 
 
-def rhs3d():
+def rhs3d(OCEAN, BOUNDARY):
+    from mod_operators import grsz, bksz
+
+    BC = BOUNDARY.zetaBC.bcIdxField
 
 
     CURVGRID = False
@@ -121,8 +127,11 @@ def rhs3d():
 
     # Compute horizontal advection of momentum.
     # -----------------------------------------------------------------------
-    horizontalAdvection()
-    HorizontalHomogeneousBC()
+    horizontalAdvection(grsz, bksz, (OCEAN.u_t2, OCEAN.v_t2, OCEAN.u_t2, OCEAN.u_t2, OCEAN.ru_t2, OCEAN.rv_t2, BC, Gadv, 16))
+    # TODO: remember to put the correct parameters Huvn... instead of ru_t2
+    # pass
+        # mod_ocean.T_OCEAN.,  const double *_v, const double *_Huon, const double *_Hvom,
+        #                  const double *_ru, const double *_rv, const int N)
 
     # uξξ  = Dξξ(   u[nrhs,:,:,:], BC)
     # Huξξ = Dξξ(Huon[nrhs,:,:,:], BC)
@@ -158,58 +167,9 @@ def rhs3d():
     # Add in vertical advection.
     # -----------------------------------------------------------------------
 
-    verticalAdvection()
-    # # Product of the fourth order centered interpolations (at R points) of u and W  (internal vertical nodes)
-    # Fσ = UtoUW_4th(u)*WtoUW_4th(W)
-    #
-    # ru[nrhs,:,:,:] -= Dσ(Fσ)
- #    DO k=2,N(ng)-2
- #      DO i=IstrU,Iend
- #        # Fσ(i,k)=((9.0/16.0)*(u(i,j,k,nrhs) + u(i,j,k+1,nrhs)) - (1.0/16.0)*(u(i,j,k-1,nrhs) + u(i,j,k+2,nrhs)))*                           &
- #        #         ((9.0/16.0)*(W(i,j,k)      + W(i-1,j,k))      - (1.0/16.0)*(W(i+1,j,k) + W(i-2,j,k)))
- #      END DO
- #    END DO
- #
- #    # Bottom and surface edge cases
- #    DO i=IstrU,Iend
- #      Fσ(i,N(ng))=0.0
- #      Fσ(i,N(ng)-1)=((9.0/16.0)*(u(i,j,N(ng)-1,nrhs) + u(i,j,N(ng)  ,nrhs)) - (1.0/16.0)*(u(i,j,N(ng)-2,nrhs) + u(i,j,N(ng)  ,nrhs)))*                   &
- # &                  ((9.0/16.0)*(W(i  ,j,N(ng)-1   ) + W(i-1,j,N(ng)-1)   ) - (1.0/16.0)*(W(i+1,j,N(ng)-1) + W(i-2,j,N(ng)-1)))
- #      Fσ(i,1)=((9.0/16.0)*(u(i,j,1,nrhs) + u(i,j,2,nrhs)) - (1.0/16.0)*(u(i,j,1,nrhs) +  u(i,j,3,nrhs)))*                               &
- # &            ((9.0/16.0)*(W(i  ,j,1) + W(i-1,j,1))       - (1.0/16.0)*(W(i+1,j,1)    + W(i-2,j,1)))
- #      Fσ(i,0)=0.0
- #    END DO
+    verticalAdvection(grsz, bksz, (0,0,0,0,BC,0))
+    # TODO: remember to put the correct parameters Huvn... instead of 0
 
-    # Product of the fourth order centered interpolations (at R points) of u and W  (internal vertical nodes)
-    Fσ = VtoUW_4th(v, zgrad)*WtoUW_4th(W)
-    rv[nrhs,:,:,:] -= Dσ(Fσ)
- #    IF (j.ge.JstrV) THEN
- #
- #      cff1=9.0/16.0
- #      cff2=1.0/16.0
- #      DO k=2,N(ng)-2
- #        DO i=Istr,Iend
- #          Fσ(i,k)=(cff1*(v(i,j,k  ,nrhs) + v(i,j,k+1,nrhs)) - cff2*(v(i,j,k-1,nrhs) + v(i,j,k+2,nrhs)))*                         &
- #                  (cff1*(W(i,j  ,k) + W(i,j-1,k)) - cff2*(W(i,j+1,k) + W(i,j-2,k)))
- #        END DO
- #      END DO
- #
- #      DO i=Istr,Iend
- #        Fσ(i,N(ng))=0.0
- #        Fσ(i,N(ng)-1)=(cff1*(v(i,j,N(ng)-1,nrhs) + v(i,j,N(ng)  ,nrhs)) - cff2*(v(i,j,N(ng)-2,nrhs) + v(i,j,N(ng)  ,nrhs)))*                 &
- #                      (cff1*(W(i,j  ,N(ng)-1) + W(i,j-1,N(ng)-1)) - cff2*(W(i,j+1,N(ng)-1) W(i,j-2,N(ng)-1)))
- #        Fσ(i,1)=(cff1*(v(i,j,1,nrhs) + v(i,j,2,nrhs)) - cff2*(v(i,j,1,nrhs) + v(i,j,3,nrhs)))*                             &
- # &              (cff1*(W(i,j  ,1) + W(i,j-1,1)) - cff2*(W(i,j+1,1) + W(i,j-2,1)))
- #        Fσ(i,0)=0.0
- #      END DO
- #
- #      DO k=1,N(ng)
- #        DO i=Istr,Iend
- #          rv(i,j,k,nrhs) = rv(i,j,k,nrhs) - (Fσ(i,k) - Fσ(i,k-1))
- #        END DO
- #      END DO
- #    END IF
-    pass
 
     # Compute forcing term for the 2D momentum equations.
     # -----------------------------------------------------------------------

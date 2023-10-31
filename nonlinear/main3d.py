@@ -6,18 +6,12 @@ from step2d import step2dPredictor, step2dCorrector
 import matplotlib.pyplot as plt
 
 
-def main2d(compTimes, GRID, OCEAN, BOUNDARY):
+def main3d(RunInterval, compTimes, GRID, OCEAN, BOUNDARY):
 """ This subroutine is the main driver for nonlinear ROMS/TOMS when configurated as a full 3D baroclinic ocean
 model only. It advances forward  the vertically integrated primitive equations by thespecified  time interval
 (seconds), RunInterval.
 """
 
-
-def main3d (RunInterval):
-# This subroutine is the main driver for nonlinear ROMS/TOMS when     !
-# configurated as a full 3D baroclinic ocean model.  It  advances     !
-# forward the primitive equations for all  nested  grids, if any,     !
-# for the specified time interval (seconds), RunInterval.             !
 
 
     # Time-step nonlinear 3D primitive equations by the specified time.
@@ -83,7 +77,7 @@ def main3d (RunInterval):
             # Compute horizontal mass fluxes (Hz*u/n and Hz*v/m), density related
             # quatities and report global diagnostics.
             # -----------------------------------------------------------------------
-            set_massflux()
+            set_maxflux(u, v, Huon, Hvom)
 
 
 
@@ -104,11 +98,13 @@ def main3d (RunInterval):
             ana_vmix()
 
 
-            omega(iNLM)
+            omega()
+            bc_w3d()
             wvelocity (nstp)
+            bc_w3d()  # TODO: twice, really?
 
 
-            # Set free-surface to it time-averaged value.  If applicable, accumulate time-averaged output data which
+            # Set free-surface to its time-averaged value.  If applicable, accumulate time-averaged output data which
             # needs a irreversible loop in shared-memory jobs.
             set_zeta()
 
@@ -119,11 +115,6 @@ def main3d (RunInterval):
 
             # Compute right-hand-side terms for 3D equations.
             rhs3d()
-
-
-# ifdef GLS_MIXING
-#             gls_prestep()
-# endif
 
 
             # Solve the vertically integrated primitive equations for the
@@ -208,7 +199,7 @@ def main3d (RunInterval):
             #   Time-step vertical mixing turbulent equations and passive tracer
             #   source and sink terms, if applicable.
             omega(iNLM)
-            # gls_corstep()
+            bc_w3d()
 
 
             # -----------------------------------------------------------------------

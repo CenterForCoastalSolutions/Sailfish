@@ -5,7 +5,7 @@
 #
 # diagnostically at horizontal RHO-points and vertical W-points.
 #
-# Added implicit vertical adveciton froman adaptive, Courant-number-dependent implicit scheme for vertical
+# Added implicit vertical advection froman adaptive, Courant-number-dependent implicit scheme for vertical
 # advection in oceanic modeling, Alexander F. Shchepetkin, pp 38-69.
 
 

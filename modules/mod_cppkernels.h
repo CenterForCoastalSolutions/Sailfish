@@ -1,21 +1,26 @@
 
 
-#define STENCIL(var)   class Expr<double, void, opStencil2D>  var((double *)(_##var + i))
-#define STENCIL3D(var) class Expr<double, void, opStencil3D>  var((double *)(_##var + i))
+#define STENCIL(var)      class Expr<double, void, opStencil2D>  var((double *)(_##var + i))
+#define STENCIL3D(var, K) class Expr<double, void, opStencil3D>  var((double *)(_##var + i), K)
 
 
 #define OPERATOR_ACCESS ResType operator()(int const k, int const j, int const i) const { return Eval(k,j,i);} \
                         ResType operator()(int const j, int const i) const { return Eval(j,i); }
 
-int sz2D, sz3D, szI, szJ, szK, K;
+int sz2D, sz3D, szI, szJ, szK;
 double *_on_u, *_om_v, *_pm, *_pn;
 
 enum Op  {opValue, opStencil2D, opStencil3D, opSum, opSub, opMul, opDiv, opRtoU, opRtoV,
-          opUtoR, opVtoR, opUtoP, opVtoP, opUpwindUtoR, opUpwindVtoR, opUpwindUtoP, opUpwindVtoP, opUtoUW_4th,
+          opUtoR, opVtoR, opUtoP, opVtoP, opUpwindUtoR, opUpwindVtoR, opUpwindUtoP, opUpwindVtoP,
+          opRtoU_4th, opRtoV_4th, opRtoW_4th,
           opDxRtoU, opDyRtoV, opdivUVtoR,
-          opDXXcentered, opDEEcentered, opDX, opDE};
+          opDXXcentered, opDEEcentered, opDX, opDE,
+          opDsigWtoR};
 
-enum nodeType {ntR, ntU, ntV, ntP};
+enum nodeType {ntR, ntU, ntV, ntP, ntUW, ntVW, ntAny};
+
+template<class T1, class T2>
+bool checkNodeTypes(T1 N1, T2 N2) { return (N1 == ntAny) || (N2 == ntAny) || (N1 == N2); };
 
 
 
@@ -36,14 +41,8 @@ extern "C" __global__ void initialize(unsigned int sizeK, unsigned int sizeJ, un
     _pn   = pn;
     _pm   = pm;
 
-    K = 0;
-
 }
 
-extern "C" __global__ void setK(unsigned int k)
-{
-    K = k;
-}
 
 
 template<class T>
@@ -120,12 +119,13 @@ template<typename L>
 class Expr<L, void, opStencil3D>
 {
     L * const p;
+    int &K;
 
 
 public:
     typedef L ResType;
 
-    Expr(L * _p): p(_p)
+    Expr(L * _p, int &_K): p(_p), K(_K)
     {
     }
 
@@ -166,6 +166,8 @@ public:
     }
 
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
+
+
 
 };
 
@@ -429,7 +431,7 @@ public:
 
 
 template<typename L, typename R>
-class Expr<L, R, opUtoUW_4th>
+class Expr<L, R, opRtoW_4th>
 {
     L &Var;
 
@@ -442,7 +444,47 @@ public:
     }
 
 
-    ResType Eval(int const k, int const j, int const i) const { return (9.0/16.0)*(var(k,j,i) + var(k+1,j,i)) - (1.0/16.0)*(var(k-1,j,i) + var(k+2,j,i)); };
+    ResType Eval(int const k, int const j, int const i) const { return (9.0/16.0)*(Var.Eval(k,j,i) + Var.Eval(k+1,j,i)) - (1.0/16.0)*(Var.Eval(k-1,j,i) + Var.Eval(k+2,j,i)); };
+
+    ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
+};
+
+
+template<typename L, typename R>
+class Expr<L, R, opRtoV_4th>
+{
+    L &Var;
+
+protected:
+    typedef decltype(zeroOf(Var)*zeroOf(Var)) ResType;
+
+public:
+    Expr(L _Var): Var(_Var)
+    {
+    }
+
+
+    ResType Eval(int const k, int const j, int const i) const { return (9.0/16.0)*(Var.Eval(k,j,i) + Var.Eval(k,j+1,i)) - (1.0/16.0)*(Var.Eval(k,j-1,i) + Var.Eval(k,j+2,i)); };
+
+    ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
+};
+
+
+template<typename L, typename R>
+class Expr<L, R, opRtoU_4th>
+{
+    L &Var;
+
+protected:
+    typedef decltype(zeroOf(Var)*zeroOf(Var)) ResType;
+
+public:
+    Expr(L _Var): Var(_Var)
+    {
+    }
+
+
+    ResType Eval(int const k, int const j, int const i) const { return (9.0/16.0)*(Var.Eval(k,j,i) + Var.Eval(k,j,i+1)) - (1.0/16.0)*(Var.Eval(k,j,i-1) + Var.Eval(k,j,i+2)); };
 
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
 };
@@ -518,7 +560,6 @@ class Expr<L, void, opDX>
 
 protected:
     typedef decltype(zeroOf(expr)*zeroOf(expr)) ResType;
-    typedef Expr<ResType, void, opStencil2D> OType;
 
 public:
     Expr(L _expr): expr(_expr)
@@ -546,7 +587,6 @@ class Expr<L, void, opDE>
 
 protected:
     typedef decltype(zeroOf(expr)*zeroOf(expr)) ResType;
-    typedef Expr<ResType, void, opStencil2D> OType;
 
 public:
     Expr(L _expr): expr(_expr)
@@ -561,6 +601,34 @@ public:
     ResType Eval(int const k, int const j, int const i) const
     {
         return expr.Eval(k,j,i) - expr.Eval(k,j-1,i);
+    }
+
+    ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
+};
+
+
+
+template<typename L>
+class Expr<L, void, opDsigWtoR>
+{
+    L &expr;
+
+protected:
+    typedef decltype(zeroOf(expr)*zeroOf(expr)) ResType;
+
+public:
+    Expr(L _expr): expr(_expr)
+    {
+    }
+
+    ResType Eval(int const j, int const i) const
+    {
+        return expr.Eval(j,i) - expr.Eval(j-1,i);
+    }
+
+    ResType Eval(int const k, int const j, int const i) const
+    {
+        return expr.Eval(k,j,i) - expr.Eval(k-1,j,i);
     }
 
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
@@ -834,8 +902,28 @@ auto RtoV(const T &R)
 
 
 template<typename T>
+auto RtoW_4th(const T &R) {
+    return Expr<T, void, opRtoW_4th>(R);
+}
+
+template<typename T>
 auto UtoUW_4th(const T &U) {
-    return Expr<T, void, opUtoUW_4th>(U);
+    return Expr<T, void, opRtoW_4th>(U);
+}
+
+template<typename T>
+auto VtoVW_4th(const T &V) {
+    return Expr<T, void, opRtoW_4th>(V);
+}
+
+template<typename T>
+auto WtoUW_4th(const T &W) {
+    return Expr<T, void, opRtoU_4th>(W);
+}
+
+template<typename T>
+auto WtoVW_4th(const T &W) {
+    return Expr<T, void, opRtoV_4th>(W);
 }
 
 
@@ -911,6 +999,12 @@ auto DERtoV(const T &R) { return Expr<T, void, opDE>(R); }
 
 
 
+template<typename T>
+auto DsigUWtoU(const T &UW) { return Expr<T, void, opDsigWtoR>(UW); }
+
+
+template<typename T>
+auto DsigVWtoV(const T &UW) { return Expr<T, void, opDsigWtoR>(UW); }
 
 
 

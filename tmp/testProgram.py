@@ -66,7 +66,7 @@ mod_operators.initModule(GRID)
 # mod_operators.initOperators((1,), (1,), (10, *(GRID.h.shape)))
 
 
-rhs3d()
+rhs3d(OCEAN, BOUNDARY)
 
 main2d(compTimes, GRID, OCEAN, BOUNDARY)
 

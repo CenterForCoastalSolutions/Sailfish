@@ -39,6 +39,7 @@ def initModule(GRID):
     grsz = (sz//blockSize + 1,)
 
     initializeCPPKernels((1,), (1,), (GRID.N, shp[0], shp[1], G.on_u, G.om_v, G.pn, G.pm))
+    initializeRHSKernels((1,), (1,), (GRID.N, shp[0], shp[1], G.on_u, G.om_v, G.pn, G.pm))
 
 
 preamble2D = r'''
@@ -146,9 +147,8 @@ code = code.replace('σ', 'sig')
 code = unicodedata.normalize('NFKD', code).encode('ascii', 'ignore').decode('ascii')
 moduleRHSKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--std=c++17', r'-I%s' % filePath))
 initializeRHSKernels = moduleRHSKernels.get_function('initialize')
-
-
-
+horizontalAdvection  = moduleRHSKernels.get_function('horizontalAdvection')
+verticalAdvection    = moduleRHSKernels.get_function('verticalAdvection')
 
 
 # initOperators = moduleCPPKernels.get_function('initOperators')

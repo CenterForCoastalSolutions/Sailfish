@@ -38,8 +38,6 @@ def wvelocity (Ninp):
 
     tmp = W - ηξdivR(DU_avg1)*lcDepth/wcDepth
 
-    if OMEGA_IMPLICIT:
-        tmp += Wi
 
     wvel = pm*pn*tmp + RtoW(vert)
 
@@ -47,11 +45,11 @@ def wvelocity (Ninp):
     krnl(u, v, z_r, pm, pn)
 
 
-    #pragma unroll 1
-    for (int k=1; k<N; n++):
+    for (K=1; K<N; K++):
         dξz_rU = dξRtoU(z_r)
-        dηz_rV = DξRtoU(z_r)
-        vertW(0,0,k) = RtoW(UtoR(u(0,0,k)*dξz_rU(0,0,k)) + VtoR(v(0,0,k)*dηz_rV(0,0,k)))
+        dηz_rV = dηRtoU(z_r)
+
+        vertW = RtoW(UtoR(u*dξz_rU) + VtoR(v*dηz_rV))
 
     # Compute contribution due to time tendency of the free-surface, d(zeta)/d(t), which is the vertical velocity at the free-surface
     # and it is expressed in terms of barotropic mass flux divergence.
@@ -61,7 +59,6 @@ def wvelocity (Ninp):
 
     tmpW = W - UVdivR(DU_avg1)*lcDepth/wcDepth
 
-    if (OMEGA_IMPLICIT) tmpW += Wi
 
     wvel = pm*pn*tmpW + vertW
 

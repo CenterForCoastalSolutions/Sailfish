@@ -85,11 +85,12 @@ iW, iS, iE, iN = (0, 1, 2, 3)
 
 
 class BCIdx:
-    def __init__(self, bcIdx, bcIdx1, bcIdx2, LBC):
-        self.bcIdx  = bcIdx
-        self.bcIdx1 = bcIdx1
-        self.bcIdx2 = bcIdx2
-        self.LBC    = LBC
+    def __init__(self, bcIdx, bcIdx1, bcIdx2, bcIdxField, LBC):
+        self.bcIdx      = bcIdx     # See description of idxFlat below.
+        self.bcIdx1     = bcIdx1    # idxFlat1
+        self.bcIdx2     = bcIdx2    # idxFlat2
+        self.bcIdxField = bcIdxField
+        self.LBC        = LBC
 
     def unpack(self):
         return self.bcIdx, self.bcIdx1, self.bcIdx2, self.LBC
@@ -99,12 +100,15 @@ class Boundary:
     def buildLBC(self, val, i0, j0):
         # LBC's are stored in this order: W  S  E  N
         #
-        # idxFlat : Index of the cell where the BC is being set (corners cells can have two BCs)
+        # idxFlat : Index of the *cell* where the BC is being set (corners cells can have two BC nodes)
         # idxFlat1: Index of the node where the BC value is modified (it may be a ghost cell)
         # idxFlat2: index of the node where the BC value is copied (it mau be a fully interior cell).
         #
-        # idxFlat is a cell index, meaning that U, V and R BC's in the same cell would have the same idxFlat index.
+        # idxFlat is a *cell* index, meaning that U, V and R BC's in the same cell would have the same idxFlat index.
         # It follows the same indexing as R nodes.
+        #
+        # Note the difference between a cell, indexed by their R node, and a node (with their own indexing). For example,
+        # the right U node in cell i has index i+1.
 
         L = self.GRID.L
         M = self.GRID.M
@@ -115,9 +119,6 @@ class Boundary:
         LBC = []
         shp = (M + 1, L + 1)
 
-        # TODO: I think that this code can be simplified since ravel_multi_index takes an array as an input, so the for loops
-        # may be unnecessary
-        # West/East
         bcW = decodeLBC(val[iW])
         bcE = decodeLBC(val[iE])
         bcN = decodeLBC(val[iN])
@@ -129,7 +130,7 @@ class Boundary:
         idxFlat  = cp.ravel_multi_index((jRange, cp.array([i0    ])), shp)
         idxFlat1 = cp.ravel_multi_index((jRange, cp.array([i0    ])), shp)
         idxFlat2 = cp.ravel_multi_index((jRange, cp.array([i0 + 1])), shp)
-        bcIdx  += idxFlat.tolist()
+        bcIdx  += idxFlat .tolist()
         bcIdx1 += idxFlat1.tolist()
         bcIdx2 += idxFlat2.tolist()
         LBC += [bcW]*(M-j0)
@@ -137,7 +138,7 @@ class Boundary:
         idxFlat  = cp.ravel_multi_index((jRange, cp.array([L - 1])), shp)
         idxFlat1 = cp.ravel_multi_index((jRange, cp.array([L    ])), shp)
         idxFlat2 = cp.ravel_multi_index((jRange, cp.array([L - 1])), shp)
-        bcIdx  += idxFlat.tolist()
+        bcIdx  += idxFlat .tolist()
         bcIdx1 += idxFlat1.tolist()
         bcIdx2 += idxFlat2.tolist()
         LBC += [bcE]*(M-j0)
@@ -145,7 +146,7 @@ class Boundary:
         idxFlat  = cp.ravel_multi_index((cp.array([i0    ]), iRange), shp)
         idxFlat1 = cp.ravel_multi_index((cp.array([i0    ]), iRange), shp)
         idxFlat2 = cp.ravel_multi_index((cp.array([i0 + 1]), iRange), shp)
-        bcIdx  += idxFlat.tolist()
+        bcIdx  += idxFlat .tolist()
         bcIdx1 += idxFlat1.tolist()
         bcIdx2 += idxFlat2.tolist()
         LBC += [bcN]*(L-i0)
@@ -153,7 +154,7 @@ class Boundary:
         idxFlat  = cp.ravel_multi_index((cp.array([M - 1]), iRange), shp)
         idxFlat1 = cp.ravel_multi_index((cp.array([M    ]), iRange), shp)
         idxFlat2 = cp.ravel_multi_index((cp.array([M - 1]), iRange), shp)
-        bcIdx  += idxFlat.tolist()
+        bcIdx  += idxFlat .tolist()
         bcIdx1 += idxFlat1.tolist()
         bcIdx2 += idxFlat2.tolist()
         LBC += [bcS]*(L-i0)
@@ -163,7 +164,7 @@ class Boundary:
 
 
 
-
+        # TODO: Remove???
         # # Corners.
         # idxFlat  = cp.ravel_multi_index((j0,     i0    ), shp)
         # idxFlat1 = cp.ravel_multi_index((j0,     i0    ), shp)
@@ -187,8 +188,11 @@ class Boundary:
         bcIdx2 = bcIdx2[sortIdx]
         LBC    = LBC   [sortIdx]
 
+        bcIdxField = -cp.ones(shp, cp.int32)
+        bcIdxField.ravel()[bcIdx1] = bcIdx2
 
-        return BCIdx(bcIdx, bcIdx1, bcIdx2, LBC)
+
+        return BCIdx(bcIdx, bcIdx1, bcIdx2, bcIdxField, LBC)
 
     def getLocalBCIdx(self, idxBC, flatIdx):
         # Given an array of flat indices and a flat index (that must be in the array), returns the location
