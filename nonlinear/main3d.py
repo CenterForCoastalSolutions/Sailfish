@@ -98,10 +98,12 @@ model only. It advances forward  the vertically integrated primitive equations b
             ana_vmix()
 
 
-            omega()
-            bc_w3d()
-            wvelocity (nstp)
-            bc_w3d()  # TODO: twice, really?
+            omega(BC)
+            # bc_w3d()
+
+            # This is needed only for output. I will not implement it just yet.
+            # wvelocity (nstp)
+            # bc_w3d()  # TODO: twice, really?
 
 
             # Set free-surface to its time-averaged value.  If applicable, accumulate time-averaged output data which
@@ -198,8 +200,8 @@ model only. It advances forward  the vertically integrated primitive equations b
 
             #   Time-step vertical mixing turbulent equations and passive tracer
             #   source and sink terms, if applicable.
-            omega(iNLM)
-            bc_w3d()
+            omega(iNLM, BC)
+            # bc_w3d()
 
 
             # -----------------------------------------------------------------------

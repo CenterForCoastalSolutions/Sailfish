@@ -2,7 +2,7 @@
 
 
 extern "C"  __global__
-void omega(const double *_W, const double *_u, const double *_v, const double *_Huon, const double *_Hvom, const double *_z_w)
+void omega(const double *_W, const double *_u, const double *_v, const double *_Huon, const double *_Hvom, const double *_z_w, const int *BC)
 // This routine computes S-coordinate vertical velocity (m^3/s),
 //
 //                 W = [Hz/(m*n)]*omega,
@@ -11,7 +11,22 @@ void omega(const double *_W, const double *_u, const double *_v, const double *_
 //
 // Added implicit vertical advection from an adaptive, Courant-number-dependent implicit scheme for vertical advection in oceanic modeling, Alexander F. Shchepetkin, pp 38-69.
 
+    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+
+//    if (((i % szI) == 0 || ((i % szI) >= (szI - 2) || (i/szI) == 0) || (i/szI) >= (szJ - 2)) || i >= sz2D) return;
+
+    if (i >= sz2D) return;
+
     STENCIL3D(W);
+
+    if (BC[i] >= 0)
+    // This is a homogenous gradient BC
+    {
+        W = _W[BC[i]]; // Makes W at the BC equal to W at cell BC[i], which is the closest one normal to the BC.
+        return;
+    }
+
+
     STENCIL3D(u);
     STENCIL3D(v);
     STENCIL3D(Huon);
@@ -30,6 +45,7 @@ void omega(const double *_W, const double *_u, const double *_v, const double *_
         W = W(-1,0,0) - (Dξ(Huon) + Dη(Hvom));
     }
 
+// TODO : Finish this.
 //        #  Apply mass point sources (volume vertical influx), if any.
 //        #
 //        #  Overwrite W(Isrc,Jsrc,k) with the same divergence of Huon,Hvom as
@@ -84,6 +100,9 @@ void omega(const double *_W, const double *_u, const double *_v, const double *_
     W = 0.0;
 
 }
+
+
+
 
 
 

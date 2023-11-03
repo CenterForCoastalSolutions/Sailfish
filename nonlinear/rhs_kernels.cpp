@@ -3,7 +3,66 @@
 #include "./mod_cppkernels.h"
 
 
+extern "C"  __global__
+void addCoriolis(const double *_fomn, const double *_u, const double *_v, const double *_ru, const double *_rv)
+{
+    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
+    if (!isRhoNode(i)) return;
+
+    int K = 0;
+    STENCIL(fomn)
+    STENCIL3D(u, K);
+    STENCIL3D(v, K);
+    STENCIL3D(ru, K);
+    STENCIL3D(rv, K);
+
+
+    for (K = 0; K<N; K++)
+    {
+        auto cff = (Hz*fomn).Eval(0,0,0);
+        auto UF = cff*(VtoR(v(0,0,0)));
+        auto VF = cff*(UtoR(u(0,0,0)));
+
+
+        ru += RtoU(UF(0,0,0));
+        rv -= RtoV(VF(0,0,0));
+    }
+
+}
+
+
+extern "C"  __global__
+void addCurvedGridTerms(void)
+{
+// TODO: implement
+//    DO j=JstrV-1,Jend
+//        DO i=IstrU-1,Iend
+//             cff1=0.5*(v(i,j  ,k,nrhs) + v(i,j+1,k,nrhs))
+//             cff2=0.5*(u(i  ,j,k,nrhs) + u(i+1,j,k,nrhs))
+//             cff3=cff1*dndx(i,j)
+//             cff4=cff2*dmde(i,j)
+//
+//             cff=Hz(i,j,k)*(cff3-cff4)
+//             UFx(i,j)=cff*cff1
+//             VFe(i,j)=cff*cff2
+//        END DO
+//    END DO
+//
+//    DO j=Jstr,Jend
+//        DO i=IstrU,Iend
+//            cff1=0.5*(UFx(i,j)+UFx(i-1,j))
+//            ru(i,j,k,nrhs) = ru(i,j,k,nrhs) + cff1
+//        END DO
+//    END DO
+//
+//    DO j=JstrV,Jend
+//        DO i=Istr,Iend
+//             cff1=0.5*(VFe(i,j)+VFe(i,j-1))
+//             rv(i,j,k,nrhs) = rv(i,j,k,nrhs) - cff1
+//        END DO
+//    END DO
+}
 
 extern "C"  __global__
 void horizontalAdvection(const double *_u,  const double *_v, const double *_Huon, const double *_Hvom,
