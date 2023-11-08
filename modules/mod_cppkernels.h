@@ -14,6 +14,7 @@ enum Op  {opValue, opStencil2D, opStencil3D, opSum, opSub, opMul, opDiv, opRtoU,
           opUtoR, opVtoR, opUtoP, opVtoP, opUpwindUtoR, opUpwindVtoR, opUpwindUtoP, opUpwindVtoP,
           opRtoU_4th, opRtoV_4th, opRtoW_4th,
           opDxRtoU, opDyRtoV, opdivUVtoR,
+          opDXUtoR, opDEVtoR,
           opDXXcentered, opDEEcentered, opDX, opDE,
           opDsigWtoR};
 
@@ -23,6 +24,53 @@ template<class T1, class T2>
 bool checkNodeTypes(T1 N1, T2 N2) { return (N1 == ntAny) || (N2 == ntAny) || (N1 == N2); };
 
 
+//-------------------------------------------
+
+
+struct VerticalVelEq
+{
+    const double *D, *SD, *RHS;
+
+    VerticalVelEq(const double * _D, const double * _SD, const double * _RHS): D(_D), SD(_SD), RHS(_RHS) {};
+};
+
+//-------------------------------------------
+
+bool isRNode(const int idx)
+// It is a little unfortunate that i sometimes mean the flat index and other times on the the 2D/3D indices i,j,k.
+// In these functions the flat index is called idx to avoid confusion.
+// An R node here means that it is an R node not in the boundaries, that is, only an internal node (horizontally).
+{
+    if (idx >= sz2D) return false;
+    const int i = idx % szI;
+    const int j = idx / szI;
+
+    return (i > 0) && (i < szI) && (j > 0) && (j < szJ);
+}
+
+bool isUNode(const int idx)
+// It is a little unfortunate that i sometimes mean the flat index and other times on the the 2D/3D indices i,j,k.
+// In these functions the flat index is called idx to avoid confusion.
+// A U node here means that it is a U node not in the boundaries, that is, only an internal node (horizontally).
+{
+    if (idx >= sz2D) return false;
+    const int i = idx % szI;
+    const int j = idx / szI;
+
+    return (i > 1) && (i < szI) && (j > 0) && (j < szJ);
+}
+
+bool isVNode(const int idx)
+// It is a little unfortunate that i sometimes mean the flat index and other times on the the 2D/3D indices i,j,k.
+// In these functions the flat index is called idx to avoid confusion.
+// A V node here means that it is a V node not in the boundaries, that is, only an internal node (horizontally).
+{
+    if (idx >= sz2D) return false;
+    const int i = idx % szI;
+    const int j = idx / szI;
+
+    return (i > 0) && (i < szI) && (j > 1) && (j < szJ);
+}
 
 extern "C" __global__ void initialize(unsigned int sizeK, unsigned int sizeJ, unsigned int sizeI,
                                       double *on_u, double *om_v, double *pn, double *pm)
@@ -46,11 +94,11 @@ extern "C" __global__ void initialize(unsigned int sizeK, unsigned int sizeJ, un
 
 
 template<class T>
-bool zeroOf(T const &t) { return t.zero(); };
+auto zeroOf(T const &t) { return t.zero(); };
 
 
 template<>
-bool zeroOf(double const &t) { return 0.0; };
+auto zeroOf(double const &t) { return 0.0; };
 
 
 
@@ -94,17 +142,23 @@ public:
     template<typename T1>
     void operator-=(const T1 &expr) const
     {
-        *p = *p - expr.Eval(0,0,0);
+        *p = *p - expr.Eval(0,0);
     }
 
     template<typename T1>
     void operator+=(const T1 &expr) const
     {
-        *p = *p + expr.Eval(0,0,0);
+        *p = *p + expr.Eval(0,0);
     }
 
 
     L Eval(int const j, int const i) const
+    {
+        return *(p + j*szI + i);
+    }
+
+    L Eval(int const k, int const j, int const i) const
+    // This function is for compatibility with 3D stencils (for example for operations between 2D and 3D). k is unused.
     {
         return *(p + j*szI + i);
     }
@@ -129,7 +183,13 @@ public:
     {
     }
 
-    L &operator()(int const k, int const j, int const i) const
+    auto operator[](int const k) const
+    {
+        Expr<double, void, opStencil2D>  res(p + K*sz2D);
+        return res;
+    }
+
+    L operator()(int const k, int const j, int const i) const
     {
         return Eval(k,j,i);
     }
@@ -148,10 +208,20 @@ public:
         *(p + K*sz2D) = expr.Eval(0,0,0);
     }
 
+    void operator-=(L val) const
+    {
+        *(p + K*sz2D) = *(p + K*sz2D) - val;
+    }
+
     template<typename T1>
     void operator-=(const T1 &expr) const
     {
         *(p + K*sz2D) = *(p + K*sz2D) - expr.Eval(0,0,0);
+    }
+
+    void operator+=(L val) const
+    {
+        *(p + K*sz2D) = *(p + K*sz2D) + val;
     }
 
     template<typename T1>
@@ -159,6 +229,7 @@ public:
     {
         *(p + K*sz2D) = *(p + K*sz2D) + expr.Eval(0,0,0);
     }
+
 
     L Eval(int const k, int const j, int const i) const
     {
@@ -522,7 +593,6 @@ public:
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
 };
 
-
 template<typename L>
 class Expr<L, void, opDyRtoV>
 {
@@ -550,6 +620,61 @@ public:
 
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
 };
+
+
+template<typename L>
+class Expr<L, void, opDXUtoR>
+{
+    L &expr;
+
+protected:
+    typedef decltype(zeroOf(expr)*zeroOf(expr)) ResType;
+
+public:
+    Expr(L _expr): expr(_expr)
+    {
+    }
+
+    ResType Eval(int const j, int const i) const
+    {
+        return expr.Eval(j,i+1) - expr.Eval(j,i);
+    }
+
+    ResType Eval(int const k, int const j, int const i) const
+    {
+        return expr.Eval(k,j,i+1) - expr.Eval(k,j,i);
+    }
+
+    ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
+};
+
+template<typename L>
+class Expr<L, void, opDEVtoR>
+{
+    L &expr;
+
+protected:
+    typedef decltype(zeroOf(expr)*zeroOf(expr)) ResType;
+
+
+public:
+    Expr(L _expr): expr(_expr)
+    {
+    }
+
+    ResType Eval(int const j, int const i) const
+    {
+        return expr.Eval(j+1,i) - expr.Eval(j,i);
+    }
+
+    ResType Eval(int const k, int const j, int const i) const
+    {
+        return expr.Eval(k,j+1,i) - expr.Eval(k,j,i);
+    }
+
+    ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
+};
+
 
 
 
@@ -619,11 +744,6 @@ protected:
 public:
     Expr(L _expr): expr(_expr)
     {
-    }
-
-    ResType Eval(int const j, int const i) const
-    {
-        return expr.Eval(j,i) - expr.Eval(j-1,i);
     }
 
     ResType Eval(int const k, int const j, int const i) const
@@ -739,7 +859,7 @@ public:
     }
 
 
-    L zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
+    L zero(void) const { return L(0.0); }  // This is mostly a trick to get a number with the appropriate type;
 };
 
 
@@ -949,6 +1069,19 @@ auto upwindVtoP(const L &V, const R &velV) {
 
 
 
+template<typename T>
+auto DXUtoR(const T &R)
+{
+    return Expr<T, void, opDXUtoR>(R);
+}
+
+template<typename T>
+auto DEVtoR(const T &R)
+{
+    return Expr<T, void, opDEVtoR>(R);
+}
+
+
 
 template<typename T>
 auto DxRtoU(const T &R, const Expr<double, void, opStencil2D> &on_u)
@@ -968,6 +1101,9 @@ auto divUVtoR(const T1 &U, const T2 &V, const Expr<double, void, opStencil2D> &o
 {
     return Expr<T1, T2, opdivUVtoR>(U, V, on_u, om_v, pn, pm);
 }
+
+
+
 
 
 template<typename T>
@@ -1007,6 +1143,8 @@ template<typename T>
 auto DsigVWtoV(const T &UW) { return Expr<T, void, opDsigWtoR>(UW); }
 
 
+template<typename T>
+auto DsigWtoR(const T &W) { return Expr<T, void, opDsigWtoR>(W); }
 
 
 

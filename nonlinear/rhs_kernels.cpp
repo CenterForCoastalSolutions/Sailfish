@@ -4,29 +4,31 @@
 
 
 extern "C"  __global__
-void addCoriolis(const double *_fomn, const double *_u, const double *_v, const double *_ru, const double *_rv)
+void addCoriolis(const double *_fomn, const double *_u, const double *_v, const double *_ru, const double *_rv, const double *_Hz)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+    const int N = szK;
 
-    if (!isRhoNode(i)) return;
+    if (!isRNode(i)) return;
 
     int K = 0;
-    STENCIL(fomn)
-    STENCIL3D(u, K);
-    STENCIL3D(v, K);
+    STENCIL(fomn);
+    STENCIL3D(u,  K);
+    STENCIL3D(v,  K);
     STENCIL3D(ru, K);
     STENCIL3D(rv, K);
+    STENCIL3D(Hz, K);
 
 
-    for (K = 0; K<N; K++)
+    for (K = 0; K  <N; K++)
     {
-        auto cff = (Hz*fomn).Eval(0,0,0);
-        auto UF = cff*(VtoR(v(0,0,0)));
-        auto VF = cff*(UtoR(u(0,0,0)));
+        auto cff = (Hz*fomn);
 
+        auto UF = cff*(VtoR(v));
+        auto VF = cff*(UtoR(u));
 
-        ru += RtoU(UF(0,0,0));
-        rv -= RtoV(VF(0,0,0));
+        ru += RtoU(UF);
+        rv -= RtoV(VF);
     }
 
 }
@@ -66,7 +68,7 @@ void addCurvedGridTerms(void)
 
 extern "C"  __global__
 void horizontalAdvection(const double *_u,  const double *_v, const double *_Huon, const double *_Hvom,
-                         const double *_ru, const double *_rv, const int *BC, cont double Gadv, const int N)
+                         const double *_ru, const double *_rv, const int *BC, const double Gadv, const int N)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -150,20 +152,18 @@ void verticalAdvection(double const *_u, double const *_v, double const *_W, dou
     STENCIL3D(rv, K);
 
 
-    for (int k=2; k<N-2; k++)
+    for (K=2; K<N-2; K++)
     {
         // Product of the fourth order centered interpolations (at R points) of u (or v) and W  (internal vertical nodes,
         // the ones near the surface or botton are dealt with as BC)
         auto FsigmaUW = UtoUW_4th(u)*WtoUW_4th(W);
         auto FsigmaVW = VtoVW_4th(v)*WtoVW_4th(W);
 
-        K = k;  // Sets current k index.
-
         ru -= DσUWtoU(FsigmaUW);
         rv -= DσVWtoV(FsigmaVW);
     }
 
-    // vertical boundary conditions (TODO: can it be done inside DσVWtoV?)
+    // vertical boundary conditions (TODO: can it be done inside DσVWtoV?, also revise, clearly there is an error with K and the indices used for k)
     K = 1;
     ru -= (9.0/16.0)*(ru(  0,0,0) + ru(  1,0,0)) - (1.0/16.0)*(ru(  0,0,0) + ru(  2,0,0));
     rv -= (9.0/16.0)*(rv(  0,0,0) + rv(  1,0,0)) - (1.0/16.0)*(rv(  0,0,0) + rv(  2,0,0));

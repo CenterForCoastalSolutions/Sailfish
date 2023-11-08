@@ -74,21 +74,21 @@ class T_OCEAN:
 
         # These aliases are used in the predictor/corrector steps. t2, t1 and t0 always mean t+2LΔt, t+LΔt and t,
         # but their location in the arrays changes (as given by cycleTimes) to avoid copying lots of data.
-        self.u_t2 = self.u[2, :, :].ravel()
-        self.u_t1 = self.u[1, :, :].ravel()
-        self.u_t0 = self.u[0, :, :].ravel()
+        self.u_t2 = self.u[2, :, :, :].ravel()
+        self.u_t1 = self.u[1, :, :, :].ravel()
+        self.u_t0 = self.u[0, :, :, :].ravel()
 
-        self.v_t2 = self.v[2, :, :].ravel()
-        self.v_t1 = self.v[1, :, :].ravel()
-        self.v_t0 = self.v[0, :, :].ravel()
+        self.v_t2 = self.v[2, :, :, :].ravel()
+        self.v_t1 = self.v[1, :, :, :].ravel()
+        self.v_t0 = self.v[0, :, :, :].ravel()
 
-        self.ru_t2 = self.ru[2, :, :].ravel()
-        self.ru_t1 = self.ru[1, :, :].ravel()
-        self.ru_t0 = self.ru[0, :, :].ravel()
+        self.ru_t2 = self.ru[2, :, :, :].ravel()
+        self.ru_t1 = self.ru[1, :, :, :].ravel()
+        self.ru_t0 = self.ru[0, :, :, :].ravel()
 
-        self.rv_t2 = self.rv[2, :, :].ravel()
-        self.rv_t1 = self.rv[1, :, :].ravel()
-        self.rv_t0 = self.rv[0, :, :].ravel()
+        self.rv_t2 = self.rv[2, :, :, :].ravel()
+        self.rv_t1 = self.rv[1, :, :, :].ravel()
+        self.rv_t0 = self.rv[0, :, :, :].ravel()
 
 
     def cycleTimes2D(self):
@@ -164,31 +164,6 @@ class T_OCEAN:
                 self.rvbar_t1, self.rvbar_t0)
 
 
-
-
-
-# Set array initialization range.
-
-    # IF (DOMAIN(ng)%Western_Edge(tile)) THEN
-    #     Imin=BOUNDS(ng)%LBi(tile)
-    # ELSE
-    #     Imin=Istr
-    # END IF
-    # IF (DOMAIN(ng)%Eastern_Edge(tile)) THEN
-    #     Imax=BOUNDS(ng)%UBi(tile)
-    # ELSE
-    #     Imax=Iend
-    # END IF
-    # IF (DOMAIN(ng)%Southern_Edge(tile)) THEN
-    #     Jmin=BOUNDS(ng)%LBj(tile)
-    # ELSE
-    #     Jmin=Jstr
-    # END IF
-    # IF (DOMAIN(ng)%Northern_Edge(tile)) THEN
-    #     Jmax=BOUNDS(ng)%UBj(tile)
-    # ELSE
-    #     Jmax=Jend
-    # END IF
 
 
 

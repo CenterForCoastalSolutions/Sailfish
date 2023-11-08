@@ -68,6 +68,7 @@ mod_operators.initModule(GRID)
 
 rhs3d(OCEAN, BOUNDARY)
 
+main3d(compTimes, GRID, OCEAN, BOUNDARY)
 main2d(compTimes, GRID, OCEAN, BOUNDARY)
 
 # cProfile.run('main2d(compTimes,  GRID, OCEAN, BOUNDARY)')

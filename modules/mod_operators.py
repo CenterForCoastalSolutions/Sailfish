@@ -150,6 +150,19 @@ initializeRHSKernels = moduleRHSKernels.get_function('initialize')
 horizontalAdvection  = moduleRHSKernels.get_function('horizontalAdvection')
 verticalAdvection    = moduleRHSKernels.get_function('verticalAdvection')
 
+filename = os.path.join(exePath, r'nonlinear/step3D_uv.kernels.cpp')
+with codecs.open(filename, encoding='utf-8') as file:
+    code = file.read()
+code = code.replace('η', 'E')
+code = code.replace('ξ', 'X')
+code = code.replace('Δ', 'D')
+code = code.replace('σ', 'sig')
+code = unicodedata.normalize('NFKD', code).encode('ascii', 'ignore').decode('ascii')
+moduleStep3DKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--std=c++17', r'-I%s' % filePath))
+initializeStep3DKernels  = moduleStep3DKernels.get_function('initialize')
+adjustBarotropicVelocity = moduleStep3DKernels.get_function('adjustBarotropicVelocity')
+correctBaroclinicVel     = moduleStep3DKernels.get_function('correctBaroclinicVel')
+
 
 # initOperators = moduleCPPKernels.get_function('initOperators')
 

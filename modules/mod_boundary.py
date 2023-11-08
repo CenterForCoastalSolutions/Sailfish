@@ -245,6 +245,8 @@ class Boundary:
         self.zetaBC = self.buildLBC(input.getVal('LBC(isFsur)').split(), 1, 1)
         self.ubarBC = self.buildLBC(input.getVal('LBC(isUbar)').split(), 2, 1)
         self.vbarBC = self.buildLBC(input.getVal('LBC(isVbar)').split(), 1, 2)
+        self.uvelBC = self.buildLBC(input.getVal('LBC(isUvel)').split(), 2, 1)
+        self.vvelBC = self.buildLBC(input.getVal('LBC(isVvel)').split(), 1, 2)
 
         # Performs some adjustments
         # When Flather or Shchepetkin conditions are used for the velocities, we will need to "acquire"
@@ -283,14 +285,6 @@ class Boundary:
         idx = ((self.ubarBC.LBC & bcGradient) != 0)
         self.ubarGradientBCIdx1 = self.ubarBC.bcIdx1[idx]
         self.ubarGradientBCIdx2 = self.ubarBC.bcIdx2[idx]
-
-        idx = ((self.ubarBC.LBC & bcGradient) != 0)
-        self.ubarGradientBCIdx1 = self.ubarBC.bcIdx1[idx]
-        self.ubarGradientBCIdx2 = self.ubarBC.bcIdx2[idx]
-
-        idx = ((self.vbarBC.LBC & bcGradient) != 0)
-        self.vbarGradientBCIdx1 = self.vbarBC.bcIdx1[idx]
-        self.vbarGradientBCIdx2 = self.vbarBC.bcIdx2[idx]
 
         idx = ((self.vbarBC.LBC & bcGradient) != 0)
         self.vbarGradientBCIdx1 = self.vbarBC.bcIdx1[idx]

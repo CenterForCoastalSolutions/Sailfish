@@ -48,4 +48,3 @@ def set_vbc():
     barotropicVelocityBC(bustr, bvstr)
 
 
-

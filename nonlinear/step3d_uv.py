@@ -1,4 +1,8 @@
-
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 def createVertViscousOpMatrix():
 
@@ -10,7 +14,7 @@ def createVertViscousOpMatrix():
 
     u  = u(nnew,:,:,:)
     ru = ru(nrhs,:,:,:)
-    if isUnode(i):
+    if isUNode(i):
         AK  = RtoU(Akv)
         Hzk = RtoU(Hz)
 
@@ -45,8 +49,8 @@ def step3d_UV():
     # ----------------------------
 
     # ξ-direction.
-    AK  = RtoU(Akv)
-    Hzk = RtoU(Hz)
+    # AK  = RtoU(Akv)
+    # Hzk = RtoU(Hz)
     # DO j = Jstr, Jend
         # DO i=IstrU,Iend
         #
