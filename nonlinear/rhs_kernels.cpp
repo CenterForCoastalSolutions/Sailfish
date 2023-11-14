@@ -22,6 +22,7 @@ void addCoriolis(const double *_fomn, const double *_u, const double *_v, const 
 
     for (K = 0; K  <N; K++)
     {
+        printf("> %i, %i \n", K, i);
         auto cff = (Hz*fomn);
 
         auto UF = cff*(VtoR(v));

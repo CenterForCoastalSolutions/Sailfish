@@ -67,5 +67,7 @@ def ana_grid(analiticalCase, GRID):
 
 
     # Compute bathymetry (meters, positive down) at RHO-points.
-    h = modAnalitical.computeBathymetry(depth, GRID)
+    modAnalitical.computeBathymetry(depth, GRID)
+
+
 

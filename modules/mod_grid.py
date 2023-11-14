@@ -172,9 +172,16 @@ class Grid:
 
         self.theta_s = input.getVal('THETA_S', dtype=float)       # S-coordinate surface control parameter. The range of optimal values depends on the vertical stretching function, C(s).
         self.theta_b = input.getVal('THETA_B', dtype=float)       # S-coordinate bottom  control parameter. The range of optimal values depends on the vertical stretching function, C(s).
-        Tcline  = input.getVal('TCLINE',  dtype=float)            # Critical depth (hc) in meters (positive) controlling the stretching. It can be interpreted as the width of surface or
+        self.Tcline  = input.getVal('TCLINE',  dtype=float)            # Critical depth (hc) in meters (positive) controlling the stretching. It can be interpreted as the width of surface or
                                                                   # bottom boundary layer in which higher vertical resolution (levels) is required during stretching.
-        self.hc = Tcline
+        self.hc = self.Tcline   # TODO: This value is re-computed in set_coords. Check if this value is ever used or we can remove it.
+
+        # Vertical grid structure.
+        self.Cs_r = cp.zeros(self.N, dtype = cp.float64)          # Set of S-curves used to stretch the vertical grid that follows the bathymetry at vertical RHO-points.
+        self.Cs_w = cp.zeros(self.N, dtype = cp.float64)          # Set of S-curves used to stretch the vertical grid that follows the bathymetry at vertical W-points.
+        self.sc_r = cp.zeros(self.N, dtype = cp.float64)          # S-coordinate independent variable, [-1 < sc < 0] at vertical RHO-points.
+        self.sc_w = cp.zeros(self.N, dtype = cp.float64)          # S-coordinate independent variable, [-1 < sc < 0] at  vertical W-points.
+
 
 
     def updateMetrics(self):
@@ -558,20 +565,7 @@ class Grid:
 
 
 
-# Vertical grid structure. This structure used to be called T_SCALARS and been in mod_scalars, but I don't think it
-# made sense there. In fact, I would argue is should be part of Grid.
-# -----------------------------------------------------------------------
-# Cs_r          Set of S-curves used to stretch the vertical grid that follows the bathymetry at vertical RHO-points.
-# Cs_w          Set of S-curves used to stretch the vertical grid that follows the bathymetry at vertical W-points.
-# sc_r          S-coordinate independent variable, [-1 < sc < 0] at vertical RHO-points.
-# sc_w          S-coordinate independent variable, [-1 < sc < 0] at  vertical W-points.
 
-
-
-#         # real(dp), pointer :: Cs_r(:)
-#         # real(dp), pointer :: Cs_w(:)
-#         # real(dp), pointer :: sc_r(:)
-#         # real(dp), pointer :: sc_w(:)
 
 
   

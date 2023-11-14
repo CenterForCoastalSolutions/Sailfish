@@ -25,10 +25,10 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
     # Initialize all time levels and compute other initial fields.
     # -----------------------------------------------------------------------
 
-    if isInitialTimeStep(self)
+    if compTimes.isInitialTimeStep:
         # Initialize free-surface and compute initial level thicknesses and depths.
         ini_zeta()
-        set_depth()
+        set_depth(GRID.Vtransform, GRID.Zt_avg1, GRID.z, GRID.z_r, GRID.z_w, GRID.h, GRID.hc, GRID.Hz, GRID.sc_r,  GRID.sc_w, GRID.Cs_r, GRID.Cs_w)
 
         # Initialize other state variables.
         ini_fields()
@@ -140,6 +140,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
                 # during the auxiliary (nfast+1) time-step.
                 step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY)
 
+     # TODO: THIS*****
      #            # Predictor step - Advance barotropic equations using 2D time-step
      #            # ==============   predictor scheme.  No actual time-stepping is
      #            # performed during the auxiliary (nfast+1) time-step. It is needed
@@ -155,14 +156,14 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
 
             # Recompute depths and thicknesses using the new time filtered free-surface.
-            set_depth()
+            set_depth(GRID.Vtransform, GRID.Zt_avg1, GRID.z, GRID.z_r, GRID.z_w, GRID.h, GRID.hc, GRID.Hz, GRID.sc_r,  GRID.sc_w, GRID.Cs_r, GRID.Cs_w)
 
 
             # Time-step 3D momentum equations and couple with vertically integrated equations.
-            step3d_uv(OCEAN.u_t2, OCEAN.v_t2, OCEAN.ru_t1, OCEAN.rv_t1, velEq)
+            step3d_uv(OCEAN.u_t2, OCEAN.v_t2, OCEAN.ru_t1, OCEAN.rv_t1, VerticalVelEq)
 
 
-            setLateralUVBCs(u[nnew,:,:,:], v[nnew,:,:,:])
+            setLateralUVBCs(OCEAN.u_t2, OCEAN.v_t2)
 
             #   Time-step vertical mixing turbulent equations and passive tracer
             #   source and sink terms, if applicable.

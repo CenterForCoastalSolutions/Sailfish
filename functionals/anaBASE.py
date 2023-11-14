@@ -51,6 +51,9 @@ def computeBathymetry(depth, GRID):
 
     GRID.h[:,:] = depth
 
+    GRID.hmax = GRID.h.max()
+    GRID.hmin = GRID.h.min()
+
 
 def computeStatistics():
     pass
@@ -62,6 +65,8 @@ def computeCoordinateTransform(GRID):
 
     GRID.dndξ[:, :] = 0.0
     GRID.dmdη[:, :] = 0.0
+
+
 
 
     return GRID

@@ -1,6 +1,6 @@
 import mod_ocean
 import mod_boundary
-from mod_operators import horizontalAdvection, verticalAdvection
+from mod_operators import horizontalAdvection, verticalAdvection, addCoriolis
 
 # This subroutine evaluates right-hand-side terms for 3D momentum and tracers equations.
 import mod_grid
@@ -12,10 +12,10 @@ import mod_ocean
 
 
 
-def rhs3d(OCEAN, BOUNDARY):
+def rhs3d(GRID, OCEAN, BOUNDARY):
     from mod_operators import grsz, bksz
 
-    BC = BOUNDARY.zetaBC.bcIdxField
+    BC = BOUNDARY.zetaBC.bcIdxFieldIdx2
 
 
     CURVGRID = False
@@ -37,7 +37,7 @@ def rhs3d(OCEAN, BOUNDARY):
 
     # Add in Coriolis terms.
     if UV_COR:
-        addCoriolis(fomn, u[nrhs,:,:,:], v[nrhs,:,:,:], ru[nrhs,:,:,:], rv[nrhs,:,:,:])
+        addCoriolis(grsz, bksz, (GRID.fomn, OCEAN.u_t2, OCEAN.v_t2, OCEAN.ru_t2, OCEAN.rv_t2))   # TODO: Check that all must be _t2.
 
 
 

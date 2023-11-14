@@ -24,6 +24,8 @@ from misc import *
 setBC = None
 copyBC = None
 
+# REMEMBER: This code has to be syncronized with the same definitions in C++ code.
+bcNone               = 0;
 bcAcquire            = 1 << 0       # Read lateral boundary data from files
 bcChapman_explicit   = 1 << 1
 bcChapman_implicit   = 1 << 2
@@ -85,12 +87,13 @@ iW, iS, iE, iN = (0, 1, 2, 3)
 
 
 class BCIdx:
-    def __init__(self, bcIdx, bcIdx1, bcIdx2, bcIdxField, LBC):
-        self.bcIdx      = bcIdx     # See description of idxFlat below.
-        self.bcIdx1     = bcIdx1    # idxFlat1
-        self.bcIdx2     = bcIdx2    # idxFlat2
-        self.bcIdxField = bcIdxField
-        self.LBC        = LBC
+    def __init__(self, bcIdx, bcIdx1, bcIdx2, bcIdxFieldIdx2, bcIdxFieldType, LBC):
+        self.bcIdx          = bcIdx              # See description of idxFlat below.
+        self.bcIdx1         = bcIdx1             # idxFlat1
+        self.bcIdx2         = bcIdx2             # idxFlat2
+        self.bcIdxFieldIdx2 = bcIdxFieldIdx2     # Same as bcIdx2, but as field (indexed by the node number).
+        self.bcIdxFieldType = bcIdxFieldType     # Same as LBC, but as field (indexed by the node number).
+        self.LBC            = LBC
 
     def unpack(self):
         return self.bcIdx, self.bcIdx1, self.bcIdx2, self.LBC
@@ -188,11 +191,13 @@ class Boundary:
         bcIdx2 = bcIdx2[sortIdx]
         LBC    = LBC   [sortIdx]
 
-        bcIdxField = -cp.ones(shp, cp.int32)
-        bcIdxField.ravel()[bcIdx1] = bcIdx2
+        bcIdxFieldIdx2 = -cp.ones(shp, cp.int32)
+        bcIdxFieldType = -cp.ones(shp, cp.int32)
+        bcIdxFieldIdx2.ravel()[bcIdx1] = bcIdx2
+        bcIdxFieldType.ravel()[bcIdx1] = LBC
 
 
-        return BCIdx(bcIdx, bcIdx1, bcIdx2, bcIdxField, LBC)
+        return BCIdx(bcIdx, bcIdx1, bcIdx2, bcIdxFieldIdx2, bcIdxFieldType, LBC)
 
     def getLocalBCIdx(self, idxBC, flatIdx):
         # Given an array of flat indices and a flat index (that must be in the array), returns the location

@@ -215,7 +215,7 @@ def calcCs5(theta_b, theta_s, sc):
     else:
         return
 
-def set_coords(Vtransform, Vstretching, GRID, SCALARS):
+def set_coords(GRID):
 # This routine sets and initializes relevant variables associated
 # with the vertical terrain-following coordinates transformation.
 #
@@ -352,102 +352,102 @@ def set_coords(Vtransform, Vstretching, GRID, SCALARS):
     #   (Vtransform=2): hc can be any value. It works for both hc < hmin
     #   and hc > hmin.
 
-    if Vtransform == 1:
-        hc = min(hmin, GRID.Tcline)
+    if GRID.Vtransform == 1:
+        hc = min(GRID.hmin, GRID.Tcline)
 
-    elif Vtransform == 2:
+    elif GRID.Vtransform == 2:
         hc = GRID.Tcline
 
     N = GRID.N
 
 
-    SCALARS.sc_w[0] = -1.0
-    SCALARS.Cs_w[0] = -1.0
+    GRID.sc_w[0] = -1.0
+    GRID.Cs_w[0] = -1.0
 
     ds = 1.0/N
 
-    if Vstretching == 1:
+    if GRID.Vstretching == 1:
 
         for k in range(1,N+1):
-            SCALARS.sc_w[k] = ds*(k - N)
-            SCALARS.sc_r[k] = ds*(k - N - 0.5)
+            GRID.sc_w[k] = ds*(k - N)
+            GRID.sc_r[k] = ds*(k - N - 0.5)
 
-            SCALARS.Cs_w[k] = calcCs1(theta_b, theta_s, SCALARS.sc_w[k])
-            SCALARS.Cs_r[k] = calcCs1(theta_b, theta_s, SCALARS.sc_r[k])
-
-
-    elif Vstretching == 2:
-
-        for k in range(1,N+1):
-
-            SCALARS.sc_w[k] = ds*(k - N)
-            SCALARS.sc_r[k] = ds*(k - N - 0.5)
-
-            SCALARS.Cs_w[k] = calcCs2(theta_b, theta_s, SCALARS.sc_w[k])
-            SCALARS.Cs_r[k] = calcCs2(theta_b, theta_s, SCALARS.sc_r[k])
+            GRID.Cs_w[k] = calcCs1(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
+            GRID.Cs_r[k] = calcCs1(GRID.theta_b, GRID.theta_s, GRID.sc_r[k])
 
 
-    elif Vstretching == 3:
+    elif GRID.Vstretching == 2:
 
         for k in range(1,N+1):
 
-            SCALARS.sc_w[k] = ds*(k - N)
-            SCALARS.sc_r[k] = ds*(k - N - 0.5)
+            GRID.sc_w[k] = ds*(k - N)
+            GRID.sc_r[k] = ds*(k - N - 0.5)
 
-            SCALARS.Cs_w[k] = calcCs3(theta_b, theta_s, SCALARS.sc_w[k])
-            SCALARS.Cs_r[k] = calcCs3(theta_b, theta_s, SCALARS.sc_r[k])
-
-
-    elif Vstretching == 4:
-
-        for k in range(1, N+1):
-            SCALARS.sc_w[k] = ds*(k - N)
-            SCALARS.sc_r[k] = ds*(k - N - 0.5)
-
-            SCALARS.Cs_w[k] = calcCs4(theta_b, theta_s, SCALARS.sc_w[k])
-            SCALARS.Cs_r[k] = calcCs4(theta_b, theta_s, SCALARS.sc_r[k])
+            GRID.Cs_w[k] = calcCs2(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
+            GRID.Cs_r[k] = calcCs2(GRID.theta_b, GRID.theta_s, GRID.sc_r[k])
 
 
-    elif Vstretching == 5:
+    elif GRID.Vstretching == 3:
+
+        for k in range(1,N+1):
+
+            GRID.sc_w[k] = ds*(k - N)
+            GRID.sc_r[k] = ds*(k - N - 0.5)
+
+            GRID.Cs_w[k] = calcCs3(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
+            GRID.Cs_r[k] = calcCs3(GRID.theta_b, GRID.theta_s, GRID.sc_r[k])
+
+
+    elif GRID.Vstretching == 4:
+
+        for k in range(0, N):
+            GRID.sc_w[k] = ds*(k - N + 1)
+            GRID.sc_r[k] = ds*(k - N + 0.5)
+
+            GRID.Cs_w[k] = calcCs4(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
+            GRID.Cs_r[k] = calcCs4(GRID.theta_b, GRID.theta_s, GRID.sc_r[k])
+
+
+    elif GRID.Vstretching == 5:
 
         for k in range(1, N+1):
             k2 = k + 0.5
-            SCALARS.sc_w[k] = -(k*k   - 2.0*k*N  + k  + N*N - N)/(N*N - N) - 0.01*(k *k  - k *N)/(1.0 - N)
-            SCALARS.sc_r[k] = -(k2*k2 - 2.0*k2*N + k2 + N*N - N)/(N*N - N) - 0.01*(k2*k2 - k2*N)/(1.0 - N)
+            GRID.sc_w[k] = -(k*k   - 2.0*k*N  + k  + N*N - N)/(N*N - N) - 0.01*(k *k  - k *N)/(1.0 - N)
+            GRID.sc_r[k] = -(k2*k2 - 2.0*k2*N + k2 + N*N - N)/(N*N - N) - 0.01*(k2*k2 - k2*N)/(1.0 - N)
 
-            SCALARS.Cs_w[k] = calcCs5(theta_b, theta_s, SCALARS.sc_w[k])
-            SCALARS.Cs_r[k] = calcCs5(theta_b, theta_s, SCALARS.sc_r[k])
+            GRID.Cs_w[k] = calcCs5(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
+            GRID.Cs_r[k] = calcCs5(GRID.theta_b, GRID.theta_s, GRID.sc_r[k])
 
 
 
     # Report information about vertical transformation.
     # -----------------------------------------------------------------------
-
-    if Master and LwrtInfo:
+    LwrtInfo = True
+    if LwrtInfo:
 
         msgInfo('Vertical S-coordinate System:\nlevel   S-coord     Cs-curve   Z  at hmin       at hc    half way     at hmax')
-        cff = 0.5*(hmax + hmin)
+        cff = 0.5*(GRID.hmax + GRID.hmin)
 
-        for k in range(N,-1,-1):
-            if Vtransform == 1:
-                zhc = hc*SCALARS.sc_w[k]
-                z1 = zhc + (hmin - hc)*SCALARS.Cs_w[k]
-                z2 = zhc + (cff  - hc)*SCALARS.Cs_w[k]
-                z3 = zhc + (hmax - hc)*SCALARS.Cs_w[k]
+        for k in range(N-1,-1,-1):
+            if GRID.Vtransform == 1:
+                zhc = GRID.hc*GRID.sc_w[k]
+                z1 = zhc + (GRID.hmin - GRID.hc)*GRID.Cs_w[k]
+                z2 = zhc + (cff       - GRID.hc)*GRID.Cs_w[k]
+                z3 = zhc + (GRID.hmax - GRID.hc)*GRID.Cs_w[k]
 
-            elif Vtransform == 2:
-                z1 = hmin*(hc*SCALARS.sc_w[k] + hmin*SCALARS.Cs_w[k])/(hc + hmin)
-                z2 = cff *(hc*SCALARS.sc_w[k] + cff *SCALARS.Cs_w[k])/(hc + cff )
-                z3 = hmax*(hc*SCALARS.sc_w[k] + hmax*SCALARS.Cs_w[k])/(hc + hmax)
+            elif GRID.Vtransform == 2:
+                z1 = GRID.hmin*(GRID.hc*GRID.sc_w[k] + GRID.hmin*GRID.Cs_w[k])/(GRID.hc + GRID.hmin)
+                z2 = cff      *(GRID.hc*GRID.sc_w[k] + cff      *GRID.Cs_w[k])/(GRID.hc + cff )
+                z3 = GRID.hmax*(GRID.hc*GRID.sc_w[k] + GRID.hmax*GRID.Cs_w[k])/(GRID.hc + GRID.hmax)
 
-                if hc > hmax:
+                if hc > GRID.hmax:
                     zhc = z3      ## same as hmax, other values do not make sense
                 else:
-                    zhc = 0.5*hc*(SCALARS.sc_w[k] + SCALARS.Cs_w[k])
+                    zhc = 0.5*hc*(GRID.sc_w[k] + GRID.Cs_w[k])
 
 
 
-            msgInfo('%.3i      %12.6f     %12.6f     %12.6f     %12.6f     %12.6f     %12.6f     %12.6f' %
-                    (k, SCALARS.sc_w[k], SCALARS.Cs_w[k], z1, zhc, z2, z3))
+            msgInfo('%.3i     %12.6f     %12.6f     %12.6f     %12.6f     %12.6f     %12.6f' %
+                    (k, GRID.sc_w[k], GRID.Cs_w[k], z1, zhc, z2, z3))
 
 

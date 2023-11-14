@@ -1,5 +1,4 @@
 import sys
-import cProfile
 
 # import mod_operators
 
@@ -16,14 +15,10 @@ import mod_ocean
 import mod_comptimes
 import mod_physical_params
 import mod_operators
+from set_coords import set_coords   # TODO I believe this can be inside mod_grid
 
 from rhs import rhs3d
 from main2d import main2d
-
-import rhs
-
-from barotropicVelocityBC import barotropicVelocityBC
-from zetabc import zetabc
 
 import ana_grid
 
@@ -42,6 +37,13 @@ physicalParams = mod_physical_params.PhysicalParams(input, GRID)
 compTimes      = mod_comptimes      .CompTimes(input)
 OCEAN          = mod_ocean          .T_OCEAN(input, GRID)
 
+
+# Generates the mesh.
+ana_grid.ana_grid('Basin', GRID)
+GRID.updateMetrics()
+
+set_coords(GRID)
+
     # TODO: Change 10 by the Z dimension
 
 
@@ -58,15 +60,12 @@ input.printReport()
 
 
 
-# Generates the mesh.
-ana_grid.ana_grid('Basin', GRID)
-GRID.updateMetrics()
 
 mod_operators.initModule(GRID)
 # mod_operators.initOperators((1,), (1,), (10, *(GRID.h.shape)))
 
 
-rhs3d(OCEAN, BOUNDARY)
+rhs3d(GRID, OCEAN, BOUNDARY)
 
 main3d(compTimes, GRID, OCEAN, BOUNDARY)
 main2d(compTimes, GRID, OCEAN, BOUNDARY)
