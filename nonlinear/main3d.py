@@ -1,8 +1,9 @@
 from misc import *
 # from get_data import get_data
 # from set_data import set_data
+from rhs import rhs3d
 from step2d import step2dPredictor, step2dCorrector
-from mod_operators import *
+from mod_operators import set_maxflux, omega, set_zeta, set_depth
 
 import matplotlib.pyplot as plt
 
@@ -15,7 +16,11 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
     model only.
     """
 
-    VerticalVelEq(velEq, BC, FC, RHS)
+    from mod_operators import grsz, bksz
+
+    # TODO: Check this BC
+    BC = BOUNDARY.zetaBC.bcIdxFieldIdx2
+
 
     # Time-step nonlinear 3D primitive equations by the specified time.
     # =======================================================================
@@ -25,13 +30,15 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
     # Initialize all time levels and compute other initial fields.
     # -----------------------------------------------------------------------
 
-    if compTimes.isInitialTimeStep:
+    # if compTimes.isInitialTimeStep:
         # Initialize free-surface and compute initial level thicknesses and depths.
-        ini_zeta()
-        set_depth(GRID.Vtransform, GRID.Zt_avg1, GRID.z, GRID.z_r, GRID.z_w, GRID.h, GRID.hc, GRID.Hz, GRID.sc_r,  GRID.sc_w, GRID.Cs_r, GRID.Cs_w)
 
-        # Initialize other state variables.
-        ini_fields()
+        # TODO: Write these.
+        # ini_zeta()
+        # set_depth(GRID.Vtransform, GRID.Zt_avg1, GRID.z, GRID.z_r, GRID.z_w, GRID.h, GRID.hc, GRID.Hz, GRID.sc_r,  GRID.sc_w, GRID.Cs_r, GRID.Cs_w)
+        #
+        # # Initialize other state variables.
+        # ini_fields()
 
 
     while not compTimes.isFinalTimeStep():
@@ -40,8 +47,8 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         # simulation, a multi-model coupling interval (RunInterval > ifac*dt), or just a single step (RunInterval = 0).
 
 
-        # Time-step governing equations for Nsteps.
-        for istep in range(compTimes.Nsteps):
+        # Time-step governing equations for Nsteps.  TODO: CHECK, I changed Nsteps by ndtfast
+        for istep in range(compTimes.ndtfast):
 
         # Set time indices and time clock.
 
@@ -72,7 +79,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
             # Compute horizontal mass fluxes (Hz*u/n and Hz*v/m), density related
             # quatities and report global diagnostics.
             # -----------------------------------------------------------------------
-            set_maxflux(u, v, Huon, Hvom)
+            set_maxflux(grsz, bksz, (OCEAN.u_t2, OCEAN.v_t2, OCEAN.Huon, OCEAN.Hvom, GRID.Hz))
 
 
 
@@ -80,8 +87,8 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
             # if any.
             # ---------------------------------------------------------------------
 
-
-            set_vbc()
+            # TODO: Recover!!
+            # set_vbc()
 
 
 # Compute time-dependent vertical/horizontal mixing coefficients for
@@ -90,10 +97,12 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 # -----------------------------------------------------------------------
 
             # XXX todo: put other mixings.
-            ana_vmix()
+            # TODO: Implement
+            # ana_vmix()
 
 
-            omega(BC)
+
+            omega(grsz, bksz, (OCEAN.W, OCEAN.u_t2, OCEAN.v_t2, OCEAN.Huon, OCEAN.Hvom, GRID.z_w, BC))
             # bc_w3d()
 
             # This is needed only for output. I will not implement it just yet.
@@ -103,7 +112,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
             # Set free-surface to its time-averaged value.  If applicable, accumulate time-averaged output data which
             # needs a irreversible loop in shared-memory jobs.
-            set_zeta(zeta[1,:,:], zeta[2,:,:], ZtAvg1)
+            set_zeta(grsz, bksz, (OCEAN.zeta_t1, OCEAN.zeta_t2, OCEAN.Zt_avg1))
 
             # If appropriate, write out fields into output NetCDF files.  Notice that IO data is written in delayed
             # and serial mode.  Exit if last time step.
@@ -111,7 +120,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
 
             # Compute right-hand-side terms for 3D equations.
-            rhs3d()
+            rhs3d(GRID, OCEAN, BOUNDARY)
 
 
             # Solve the vertically integrated primitive equations for the
@@ -156,7 +165,8 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
 
             # Recompute depths and thicknesses using the new time filtered free-surface.
-            set_depth(GRID.Vtransform, GRID.Zt_avg1, GRID.z, GRID.z_r, GRID.z_w, GRID.h, GRID.hc, GRID.Hz, GRID.sc_r,  GRID.sc_w, GRID.Cs_r, GRID.Cs_w)
+            set_depth(grsz, bksz, (GRID.Vtransform, OCEAN.Zt_avg1, GRID.z_w, GRID.z_r, GRID.h, GRID.hc, GRID.Hz,
+                                   GRID.sc_r,  GRID.sc_w, GRID.Cs_r, GRID.Cs_w))
 
 
             # Time-step 3D momentum equations and couple with vertically integrated equations.
@@ -167,7 +177,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
             #   Time-step vertical mixing turbulent equations and passive tracer
             #   source and sink terms, if applicable.
-            omega(BC)
+            omega(grsz, bksz, (OCEAN.W, OCEAN.u_t2, OCEAN.v_t2, OCEAN.Huon, OCEAN.Hvom, OCEAN.z_w, BC))
             # bc_w3d()
 
             cycleTimes3D()

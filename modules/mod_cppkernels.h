@@ -1,16 +1,16 @@
 
 
-#define STENCIL(var)      class Expr<double, void, opStencil2D>  var((double *)(_##var + i))
-#define STENCIL3D(var, K) class Expr<double, void, opStencil3D>  var((double *)(_##var + i), K)
+#define STENCIL(var)      class Expr<double, void, opStencil2D>  const var((double *)(_##var + i))
+#define STENCIL3D(var, K) class Expr<double, void, opStencil3D>  const var((double *)(_##var + i), K)
 
-#define STENCILR(var)      class Expr<double, void, opStencil2D, ntR>  var((double *)(_##var + i))
-#define STENCILR3D(var, K) class Expr<double, void, opStencil3D, ntR>  var((double *)(_##var + i), K)
+#define STENCILR(var)      class Expr<double, void, opStencil2D, ntR>  const var((double *)(_##var + i))
+#define STENCILR3D(var, K) class Expr<double, void, opStencil3D, ntR>  const var((double *)(_##var + i), K)
 
-#define STENCILU(var)      class Expr<double, void, opStencil2D, ntU>  var((double *)(_##var + i))
-#define STENCILU3D(var, K) class Expr<double, void, opStencil3D, ntU>  var((double *)(_##var + i), K)
+#define STENCILU(var)      class Expr<double, void, opStencil2D, ntU>  const var((double *)(_##var + i))
+#define STENCILU3D(var, K) class Expr<double, void, opStencil3D, ntU>  const var((double *)(_##var + i), K)
 
-#define STENCILV(var)      class Expr<double, void, opStencil2D, ntV>  var((double *)(_##var + i))
-#define STENCILV3D(var, K) class Expr<double, void, opStencil3D, ntV>  var((double *)(_##var + i), K)
+#define STENCILV(var)      class Expr<double, void, opStencil2D, ntV>  const var((double *)(_##var + i))
+#define STENCILV3D(var, K) class Expr<double, void, opStencil3D, ntV>  const var((double *)(_##var + i), K)
 
 
 #define OPERATOR_ACCESS ResType operator()(int const k, int const j, int const i) const { return Eval(k,j,i); } \
@@ -187,12 +187,30 @@ public:
         *p = val;
     }
 
+    void operator-=(L val) const
+    {
+        *p -= val;
+    }
+
+    void operator+=(L val) const
+    {
+        *p += val;
+    }
+
     // By design, we choose not to return a value from the assignment operator.
+//    template<typename T1>
+//    void operator=(const T1 &expr) const
+//    {
+//        *p = expr.Eval(0,0);
+//    }
+
+
     template<typename T1>
     void operator=(const T1 &expr) const
     {
         *p = expr.Eval(0,0);
     }
+
 
     template<typename T1>
     void operator-=(const T1 &expr) const
@@ -367,7 +385,7 @@ public:
 
 
 template<typename L>
-class Expr<L, void, opUtoP, ntU>
+class Expr<L, void, opUtoP, ntP>
 {
     L &expr;
     static_assert(L::nt == ntU || L::nt == ntAny);
@@ -494,6 +512,7 @@ public:
 };
 
 
+
 template<typename L, typename R>
 class Expr<L, R, opUpwindUtoR, ntR>
 {
@@ -516,6 +535,7 @@ public:
 
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
 };
+
 
 template<typename L, typename R>
 class Expr<L, R, opUpwindVtoR, ntR>
@@ -565,13 +585,14 @@ public:
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
 };
 
+
 template<typename L, typename R>
 class Expr<L, R, opUpwindVtoP, ntP>
 {
     L &expr;
     R &vel;
 
-    static_assert(L::nt == ntU || L::nt == ntAny);
+    static_assert(L::nt == ntV || L::nt == ntAny);
 
 public:
     static const NodeType nt = ntR;
@@ -591,15 +612,15 @@ public:
 
 
 
-
-template<typename L, typename R>
-class Expr<L, R, opRtoW_4th, ntW>
+template<typename L, typename R, NodeType nodeType>
+class Expr<L, R, opRtoW_4th, nodeType>
 {
     L &Var;
     static_assert(L::nt == ntW || L::nt == ntAny);
+    static_assert(nodeType == ntW || nodeType == ntUW || nodeType == ntVW || nodeType == ntAny);
 
 public:
-    static const NodeType nt = ntR;
+    static const NodeType nt = nodeType;
     typedef decltype(zeroOf(Var)*zeroOf(Var)) ResType;
 
     Expr(L _Var): Var(_Var)
@@ -614,14 +635,14 @@ public:
 };
 
 
-template<typename L, typename R>
-class Expr<L, R, opRtoV_4th, ntV>
+template<typename L, typename R, NodeType nodeType>
+class Expr<L, R, opRtoV_4th, nodeType>
 {
     L &Var;
     static_assert(L::nt == ntR || L::nt == ntAny);
 
 public:
-    static const NodeType nt = ntV;
+    static const NodeType nt = nodeType;
     typedef decltype(zeroOf(Var)*zeroOf(Var)) ResType;
 
     Expr(L _Var): Var(_Var)
@@ -636,14 +657,14 @@ public:
 };
 
 
-template<typename L, typename R>
-class Expr<L, R, opRtoU_4th, ntU>
+template<typename L, typename R, NodeType nodeType>
+class Expr<L, R, opRtoU_4th, nodeType>
 {
     L &Var;
     static_assert(L::nt == ntU || L::nt == ntAny);
 
 public:
-    static const NodeType nt = ntR;
+    static const NodeType nt = nodeType;
     typedef decltype(zeroOf(Var)*zeroOf(Var)) ResType;
 
     Expr(L _Var): Var(_Var)
@@ -671,7 +692,7 @@ class Expr<L, void, opDxRtoU, ntU>
 public:
     static const NodeType nt = ntU;
     typedef decltype(zeroOf(expr)*zeroOf(expr)) ResType;
-    typedef Expr<ResType, void, opStencil2D> OType;
+    typedef Expr<ResType, void, opStencil2D, ntU> OType;
     OType &on_u;
 
     Expr(L _expr, OType _on_u): expr(_expr), on_u(_on_u)
@@ -693,6 +714,7 @@ public:
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
 };
 
+
 template<typename L>
 class Expr<L, void, opDyRtoV, ntV>
 {
@@ -702,7 +724,7 @@ class Expr<L, void, opDyRtoV, ntV>
 public:
     static const NodeType nt = ntV;
     typedef decltype(zeroOf(expr)*zeroOf(expr)) ResType;
-    typedef Expr<ResType, void, opStencil2D> OType;
+    typedef Expr<ResType, void, opStencil2D, ntV> OType;
     OType &om_v;
 
     Expr(L _expr, OType _om_v): expr(_expr), om_v(_om_v)
@@ -755,6 +777,7 @@ public:
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
 };
 
+
 template<typename L>
 class Expr<L, void, opDEVtoR, ntR>
 {
@@ -787,8 +810,8 @@ public:
 
 
 
-template<typename L>
-class Expr<L, void, opDX>
+template<typename L, NodeType nodeType>
+class Expr<L, void, opDX, nodeType>
 {
     L &expr;
 
@@ -796,6 +819,8 @@ protected:
     typedef decltype(zeroOf(expr)*zeroOf(expr)) ResType;
 
 public:
+    static const NodeType nt = nodeType;
+
     Expr(L _expr): expr(_expr)
     {
     }
@@ -816,8 +841,8 @@ public:
 };
 
 
-template<typename L>
-class Expr<L, void, opDE>
+template<typename L, NodeType nodeType>
+class Expr<L, void, opDE, nodeType>
 {
     L &expr;
 
@@ -825,6 +850,8 @@ protected:
     typedef decltype(zeroOf(expr)*zeroOf(expr)) ResType;
 
 public:
+    static const NodeType nt = nodeType;
+
     Expr(L _expr): expr(_expr)
     {
     }
@@ -846,15 +873,15 @@ public:
 
 
 
-template<typename L>
-class Expr<L, void, opDsigWtoR, ntR>
+template<typename L, NodeType nodeType>
+class Expr<L, void, opDsigWtoR, nodeType>
 {
     L &expr;
 
-    static_assert(L::nt == ntW || L::nt == ntAny);
+//    static_assert(L::nt == ntW || L::nt == ntAny);
 
 public:
-    static const NodeType nt = ntR;
+    static const NodeType nt = nodeType;
     typedef decltype(zeroOf(expr)*zeroOf(expr)) ResType;
 
     Expr(L _expr): expr(_expr)
@@ -876,7 +903,7 @@ class Expr<L, void, opDsigR, ntR>
 {
     L &expr;
 
-    static_assert(L::nt == ntR || L::nt == ntAny);
+//    static_assert(L::nt == ntR || L::nt == ntAny);
 
 public:
     static const NodeType nt = ntR;
@@ -930,8 +957,8 @@ public:
 };
 
 
-template<typename L>
-class Expr<L, void, opDXXcentered>
+template<typename L, NodeType nodeType>
+class Expr<L, void, opDXXcentered, nodeType>
 {
     L &Var;
 
@@ -959,8 +986,8 @@ public:
 };
 
 
-template<typename L>
-class Expr<L, void, opDEEcentered>
+template<typename L, NodeType nodeType>
+class Expr<L, void, opDEEcentered, nodeType>
 {
     L &Var;
 
@@ -1259,12 +1286,12 @@ auto upwindVtoR(const L &V, const R &velV) {
 
 template<typename L, typename R>
 auto upwindUtoP(const L &U, const R &velU) {
-    return Expr<L, R, opUpwindUtoR, ntP>(U, velU);  // TODO: CHECK if this and the next are correct (opUpwindUtoR instead of opUpwindUtoP).
+    return Expr<L, R, opUpwindUtoP, ntP>(U, velU);  // TODO: CHECK if this and the next are correct (opUpwindUtoR instead of opUpwindUtoP).
 }
 
 template<typename L, typename R>
 auto upwindVtoP(const L &V, const R &velV) {
-    return Expr<L, R, opUpwindVtoR, ntP>(V, velV);
+    return Expr<L, R, opUpwindVtoP, ntP>(V, velV);
 }
 
 

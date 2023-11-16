@@ -22,7 +22,6 @@ void addCoriolis(const double *_fomn, const double *_u, const double *_v, const 
 
     for (K = 0; K  <N; K++)
     {
-        printf("> %i, %i \n", K, i);
         auto cff = (Hz*fomn);
 
         auto UF = cff*(VtoR(v));
@@ -30,6 +29,7 @@ void addCoriolis(const double *_fomn, const double *_u, const double *_v, const 
 
         ru += RtoU(UF);
         rv -= RtoV(VF);
+
     }
 
 }
@@ -69,17 +69,18 @@ void addCurvedGridTerms(void)
 
 extern "C"  __global__
 void horizontalAdvection(const double *_u,  const double *_v, const double *_Huon, const double *_Hvom,
-                         const double *_ru, const double *_rv, const int *BC, const double Gadv, const int N)
+                         const double *_ru, const double *_rv, const int *BC)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+    const int N = szK;
 
     int K = 0;  // All stencils share this variable.
-    STENCIL3D(u,    K);
-    STENCIL3D(v,    K);
-    STENCIL3D(Huon, K);
-    STENCIL3D(Hvom, K);
-    STENCIL3D(ru,   K);
-    STENCIL3D(rv,   K);
+    STENCILU3D(u,    K);
+    STENCILV3D(v,    K);
+    STENCILU3D(Huon, K);
+    STENCILV3D(Hvom, K);
+    STENCILU3D(ru,   K);
+    STENCILV3D(rv,   K);
 
 
     if (i >= sz2D || BC[i] >= 0)
@@ -112,10 +113,11 @@ void horizontalAdvection(const double *_u,  const double *_v, const double *_Huo
     auto HvηηR = VtoR(DηηVtoV(Hvom));
 
     // See equations in section "Advection scheme" of the accompanying document.
+    constexpr double Gadv = -0.5;
     auto UFξR = (uR + Gadv*uξξR*(HuonR + Gadv*HuξξR));
     auto UFηP = (uP + Gadv*uηηP*(HvomP + Gadv*HvξξP));
 
-    auto VFξP = (vP + Gadv*uηηP*(HuonP + Gadv*HuηηP));  // TODO: CHECK all ξξ and ηη
+    auto VFξP = (vP + Gadv*uηηP*(HuonP + Gadv*HuηηP));  // TODO: CHECK all ξξ and ηη, (also adv)
     auto VFηR = (vR + Gadv*uξξR*(HvomR + Gadv*HvηηR));
 
 
@@ -131,12 +133,12 @@ void horizontalAdvection(const double *_u,  const double *_v, const double *_Huo
 
 }
 
-//--------------------------------------------------------------------------
 
 extern "C"  __global__
-void verticalAdvection(double const *_u, double const *_v, double const *_W, double const *_ru, double const *_rv, int const *BC, const int N)
+void verticalAdvection(double const *_u, double const *_v, double const *_W, double const *_ru, double const *_rv, int const *BC)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+    const int N = szK;
 
 //    if (((i % szI) == 0 || ((i % szI) >= (szI - 2) || (i/szI) == 0) || (i/szI) >= (szJ - 2)) || i >= sz2D) return;
 
@@ -164,22 +166,19 @@ void verticalAdvection(double const *_u, double const *_v, double const *_W, dou
         rv -= DσVWtoV(FsigmaVW);
     }
 
-    // vertical boundary conditions (TODO: can it be done inside DσVWtoV?, also revise, clearly there is an error with K and the indices used for k)
-    K = 1;
-    ru -= (9.0/16.0)*(ru(  0,0,0) + ru(  1,0,0)) - (1.0/16.0)*(ru(  0,0,0) + ru(  2,0,0));
-    rv -= (9.0/16.0)*(rv(  0,0,0) + rv(  1,0,0)) - (1.0/16.0)*(rv(  0,0,0) + rv(  2,0,0));
-
-    K = N-2;
-    ru -= (9.0/16.0)*(ru(N-1,0,0) + ru(N-2,0,0)) - (1.0/16.0)*(ru(N-1,0,0) + ru(N-3,0,0));
-    rv -= (9.0/16.0)*(rv(N-1,0,0) + rv(N-2,0,0)) - (1.0/16.0)*(rv(N-1,0,0) + rv(N-3,0,0));
-
+    // vertical boundary conditions (TODO: can it be done inside DσVWtoV?, also revise.
     K = 0;
-    ru = 0.0;
-    rv = 0.0;
+    ru[1]   -= (9.0/16.0)*(ru.Eval(  0,0,0) + ru.Eval(  1,0,0)) - (1.0/16.0)*(ru.Eval(  0,0,0) + ru.Eval(  2,0,0));
+    rv[1]   -= (9.0/16.0)*(rv.Eval(  0,0,0) + rv.Eval(  1,0,0)) - (1.0/16.0)*(rv.Eval(  0,0,0) + rv.Eval(  2,0,0));
 
-    K = N-1;
-    ru = 0.0;
-    rv = 0.0;
+    ru[N-2] -= (9.0/16.0)*(ru.Eval(N-1,0,0) + ru.Eval(N-2,0,0)) - (1.0/16.0)*(ru.Eval(N-1,0,0) + ru.Eval(N-3,0,0));
+    rv[N-2] -= (9.0/16.0)*(rv.Eval(N-1,0,0) + rv.Eval(N-2,0,0)) - (1.0/16.0)*(rv.Eval(N-1,0,0) + rv.Eval(N-3,0,0));
+
+    ru[0]   = 0.0;
+    rv[0]   = 0.0;
+
+    ru[N-1] = 0.0;
+    rv[N-1] = 0.0;
 
 }
 
@@ -200,3 +199,30 @@ void verticalHomogeneousBC()
 //    res = 0.0;
 
 }
+
+
+extern "C"  __global__
+void vertIntegral(double const *_var, double const *_sum)
+{
+    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+    const int N = szK;
+
+
+    if (i >= sz2D)
+    {
+        return;
+    }
+
+    int K = 0;  // All stencils share this variable.
+    STENCIL3D(var,  K);
+    STENCIL(sum);
+
+    double tmpSum = 0.0;
+    for (K=0; K<N; K++)
+    {
+        tmpSum += var.Eval(0,0,0);
+    }
+
+    sum = tmpSum;
+}
+

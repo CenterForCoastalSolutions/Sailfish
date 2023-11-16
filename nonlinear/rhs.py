@@ -1,6 +1,6 @@
 import mod_ocean
 import mod_boundary
-from mod_operators import horizontalAdvection, verticalAdvection, addCoriolis
+from mod_operators import horizontalAdvection, verticalAdvection, addCoriolis, vertIntegral
 
 # This subroutine evaluates right-hand-side terms for 3D momentum and tracers equations.
 import mod_grid
@@ -15,6 +15,7 @@ import mod_ocean
 def rhs3d(GRID, OCEAN, BOUNDARY):
     from mod_operators import grsz, bksz
 
+    # TODO: Check this BC
     BC = BOUNDARY.zetaBC.bcIdxFieldIdx2
 
 
@@ -37,7 +38,7 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
 
     # Add in Coriolis terms.
     if UV_COR:
-        addCoriolis(grsz, bksz, (GRID.fomn, OCEAN.u_t2, OCEAN.v_t2, OCEAN.ru_t2, OCEAN.rv_t2))   # TODO: Check that all must be _t2.
+        addCoriolis(grsz, bksz, (GRID.fomn, OCEAN.u_t2, OCEAN.v_t2, OCEAN.ru_t2, OCEAN.rv_t2, GRID.Hz))   # TODO: Check that all must be _t2.
 
 
 
@@ -60,7 +61,7 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
 
     # Compute horizontal advection of momentum.
     # -----------------------------------------------------------------------
-    horizontalAdvection(grsz, bksz, (OCEAN.u_t2, OCEAN.v_t2, OCEAN.u_t2, OCEAN.u_t2, OCEAN.ru_t2, OCEAN.rv_t2, BC, Gadv, 16))
+    horizontalAdvection(grsz, bksz, (OCEAN.u_t2, OCEAN.v_t2, OCEAN.u_t2, OCEAN.u_t2, OCEAN.ru_t2, OCEAN.rv_t2, BC))
     # TODO: remember to put the correct parameters Huvn... instead of ru_t2
     # pass
         # mod_ocean.T_OCEAN.,  const double *_v, const double *_Huon, const double *_Hvom,
@@ -99,40 +100,25 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
         # Add in vertical advection.
         # -----------------------------------------------------------------------
 
-        verticalAdvection(grsz, bksz, (0,0,0,0,BC,0))
+        verticalAdvection(grsz, bksz, (OCEAN.u_t2, OCEAN.v_t2, OCEAN.W, OCEAN.ru_t2, OCEAN.rv_t2, BC))
         # TODO: remember to put the correct parameters Huvn... instead of 0
 
 
         # Compute forcing term for the 2D momentum equations.
         # -----------------------------------------------------------------------
 
-        # Vertically integrate baroclinic right-hand-side terms. If not body force stresses, add in the difference between surface and
+        # Vertically integrate baroclinic right-hand-side terms. If not ***body force stresses***, add in the difference between surface and
         # bottom stresses.
 
-        rufrc += vertIntegral(ru)
-        rvfrc += vertIntegral(rv)
+        # TODO: Bring this back
+        # vertIntegral(OCEAN.ru_t2, rufrc)
+        # vertIntegral(OCEAN.rv_t2, rvfrc)
 
-        # DO i=IstrU,Iend
-        #   rufrc(i,j) = ru(i,j,1,nrhs)
-        # END DO
-        #
-        # DO k=2,N(ng)
-        #   DO i=IstrU,Iend
-        #     rufrc(i,j) = rufrc(i,j) + ru(i,j,k,nrhs)
-        #   END DO
-        # END DO
-        #
-        # DO i=IstrU,Iend
-        #     rufrc(i,j) += om_v(i,j)*on_v(i,j)*(sustr(i,j) - bustr(i,j))
-        #
-        #
-        # rvfrc(i,j)=rv(i,j,1,nrhs)
-        # DO i=Istr,Iend
-        #       rvfrc(i,j)=rvfrc(i,j) + rv(i,j,k,nrhs)
-        #
-        #   DO i=Istr,Iend
-        #     rvfrc(i,j) += om_v(i,j)*on_v(i,j)*(svstr(i,j) - bvstr(i,j))
-        #
-        # END IF
+        # if BODY_FORCE:
+        #     rufrc += om_u*on_u*(sustr - bustr)
+        #     rvfrc += om_v*on_v*(svstr - bvstr)
+
+
+
 
 

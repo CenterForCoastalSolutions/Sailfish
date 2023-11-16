@@ -38,8 +38,9 @@ def initModule(GRID):
     bksz = (blockSize,)
     grsz = (sz//blockSize + 1,)
 
-    initializeCPPKernels((1,), (1,), (GRID.N, shp[0], shp[1], G.on_u, G.om_v, G.pn, G.pm))
-    initializeRHSKernels((1,), (1,), (GRID.N, shp[0], shp[1], G.on_u, G.om_v, G.pn, G.pm))
+    initializeCPPKernels   ((1,), (1,), (GRID.N, shp[0], shp[1], G.on_u, G.om_v, G.pn, G.pm))
+    initializeRHSKernels   ((1,), (1,), (GRID.N, shp[0], shp[1], G.on_u, G.om_v, G.pn, G.pm))
+    initializeStep3DKernels((1,), (1,), (GRID.N, shp[0], shp[1], G.on_u, G.om_v, G.pn, G.pm))
 
 
 preamble2D = r'''
@@ -150,6 +151,7 @@ initializeRHSKernels = moduleRHSKernels.get_function('initialize')
 horizontalAdvection  = moduleRHSKernels.get_function('horizontalAdvection')
 verticalAdvection    = moduleRHSKernels.get_function('verticalAdvection')
 addCoriolis          = moduleRHSKernels.get_function('addCoriolis')
+vertIntegral         = moduleRHSKernels.get_function('vertIntegral')
 
 
 filename = os.path.join(exePath, r'nonlinear/step3D_uv.kernels.cpp')
@@ -164,6 +166,12 @@ moduleStep3DKernels = cp.RawModule(code=code, options=('-default-device', '--res
 initializeStep3DKernels  = moduleStep3DKernels.get_function('initialize')
 # adjustBarotropicVelocity = moduleStep3DKernels.get_function('adjustBarotropicVelocity')
 # correctBaroclinicVel     = moduleStep3DKernels.get_function('correctBaroclinicVel')
+set_maxflux              = moduleStep3DKernels.get_function('set_maxflux')
+omega                    = moduleStep3DKernels.get_function('omega')
+set_zeta                 = moduleStep3DKernels.get_function('set_zeta')
+set_depth                = moduleStep3DKernels.get_function('set_depth')
+
+
 
 
 # initOperators = moduleCPPKernels.get_function('initOperators')

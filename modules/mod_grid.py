@@ -9,8 +9,7 @@ import cupy as cp
 #   IJwaterU   Water points IJ couter for   U-points masked variables.
 #   IJwaterV   Water points IJ couter for   V-points masked variables.
 #   Hz         Thicknesses (m) of vertical RHO-points.
-#   Huon       Total U-momentum flux term, Hz*u/pn.
-#   Hvom       Total V-momentum flux term, Hz*v/pm.
+
 #   IcePress   Pressure under the ice shelf at RHO-points.
 #   Rscope     Adjoint sensitivity spatial scope mask at RHO-points.
 #   Tcline     Width (m) of surface or bottom boundary layer where
@@ -98,6 +97,7 @@ class Grid:
 
         # Set horizontal array size.
         shape2D = (self.L + 1, self.M + 1)
+
     
         # Nonlinear model state.
         self.angler    = cp.zeros(shape2D, dtype = cp.float64)
@@ -177,10 +177,16 @@ class Grid:
         self.hc = self.Tcline   # TODO: This value is re-computed in set_coords. Check if this value is ever used or we can remove it.
 
         # Vertical grid structure.
-        self.Cs_r = cp.zeros(self.N, dtype = cp.float64)          # Set of S-curves used to stretch the vertical grid that follows the bathymetry at vertical RHO-points.
-        self.Cs_w = cp.zeros(self.N, dtype = cp.float64)          # Set of S-curves used to stretch the vertical grid that follows the bathymetry at vertical W-points.
-        self.sc_r = cp.zeros(self.N, dtype = cp.float64)          # S-coordinate independent variable, [-1 < sc < 0] at vertical RHO-points.
-        self.sc_w = cp.zeros(self.N, dtype = cp.float64)          # S-coordinate independent variable, [-1 < sc < 0] at  vertical W-points.
+        self.Cs_r = cp.zeros(self.N,   dtype = cp.float64)          # Set of S-curves used to stretch the vertical grid that follows the bathymetry at vertical RHO-points.
+        self.Cs_w = cp.zeros(self.N+1, dtype = cp.float64)          # Set of S-curves used to stretch the vertical grid that follows the bathymetry at vertical W-points.
+        self.sc_r = cp.zeros(self.N,   dtype = cp.float64)          # S-coordinate independent variable, [-1 < sc < 0] at vertical RHO-points.
+        self.sc_w = cp.zeros(self.N+1, dtype = cp.float64)          # S-coordinate independent variable, [-1 < sc < 0] at  vertical W-points.
+
+        # These are filled in: set_depth()
+        self.z_r  = cp.zeros((self.N,  ) + shape2D, dtype = cp.float64)
+        self.z_w  = cp.zeros((self.N+1,) + shape2D, dtype = cp.float64)
+
+
 
 
 

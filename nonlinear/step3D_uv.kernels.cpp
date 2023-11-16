@@ -49,6 +49,8 @@ void applyPointSources()
 //    #   END IF
 }
 
+
+
 extern "C"  __global__
 void omega(const double *_W, const double *_u, const double *_v, const double *_Huon, const double *_Hvom, const double *_z_w, const int *idxFieldBC)
 // This routine computes S-coordinate vertical velocity (m^3/s),
@@ -211,7 +213,7 @@ void omega(const double *_W, const double *_u, const double *_v, const double *_
 
 
 extern "C"  __global__
-void set_depth(const int Vtransform, const double *_Zt_avg1, const double *_z, const double *_z_w, const double *_z_r, const double *_h, const double hc, const double *_Hz,
+void set_depth(const int Vtransform, const double *_Zt_avg1, const double *_z_w, const double *_z_r, const double *_h, const double hc, const double *_Hz,
                const double *sc_r,  const double *sc_w, const double *Cs_r,  const double *Cs_w)
 //This routine computes the time evolving depths of the model grid and its associated vertical transformation metric (thickness).      !
 //Currently, two vertical coordinate transformations are available with various possible vertical stretching, C(s), functions, (see
@@ -224,7 +226,6 @@ void set_depth(const int Vtransform, const double *_Zt_avg1, const double *_z, c
     if (!isRNode(i)) return;
 
     STENCIL(Zt_avg1);
-    STENCIL(z);
     STENCIL(z_w);
     STENCIL(z_r);
     STENCIL(h);
@@ -292,14 +293,14 @@ void set_zeta(const double *_zeta1, const double *_zeta2, const double *_Zt_avg1
 
     if (!isRNode(i)) return;
 
-    STENCIL(zeta2);
-    STENCIL(zeta1);
-    STENCIL(Zt_avg1);
+    STENCILR(zeta2);
+    STENCILR(zeta1);
+    STENCILR(Zt_avg1);
 
     // Prepare to time-step 2D equations:  set initial free-surface to its fast-time averaged values (which corresponds
     // to the time step "n").
-    zeta2 = Zt_avg1(0,0);
-    zeta1 = Zt_avg1(0,0);
+    zeta2 = Zt_avg1;
+    zeta1 = Zt_avg1;
 }
 
 

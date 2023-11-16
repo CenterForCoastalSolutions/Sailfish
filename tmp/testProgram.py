@@ -19,6 +19,7 @@ from set_coords import set_coords   # TODO I believe this can be inside mod_grid
 
 from rhs import rhs3d
 from main2d import main2d
+from main3d import main3d
 
 import ana_grid
 

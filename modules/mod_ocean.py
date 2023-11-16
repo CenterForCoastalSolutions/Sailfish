@@ -64,12 +64,22 @@ class T_OCEAN:
         # -----------
         self.ru = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
         self.rv = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
-        self.rz = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
 
         # Nonlinear model state.
         self.u  = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
         self.v  = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
-        self.z  = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
+        self.W  = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
+
+
+        self.Huon  = cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64)    # Total U-momentum flux term, Hz*u/pn.
+        self.Hvom  = cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64)    # Total V-momentum flux term, Hz*v/pm.
+
+
+        # Coupling averages.
+        # TODO: This needs to be filled somewhere.
+        self.Zt_avg1 = cp.zeros((M + 1, L + 1), dtype = cp.float64)
+        self.U_avg1 = cp.zeros((M + 1, L + 1), dtype = cp.float64)
+        self.V_avg1 = cp.zeros((M + 1, L + 1), dtype = cp.float64)
 
 
         # These aliases are used in the predictor/corrector steps. t2, t1 and t0 always mean t+2LΔt, t+LΔt and t,
@@ -82,6 +92,8 @@ class T_OCEAN:
         self.v_t1 = self.v[1, :, :, :].ravel()
         self.v_t0 = self.v[0, :, :, :].ravel()
 
+
+
         self.ru_t2 = self.ru[2, :, :, :].ravel()
         self.ru_t1 = self.ru[1, :, :, :].ravel()
         self.ru_t0 = self.ru[0, :, :, :].ravel()
@@ -89,6 +101,11 @@ class T_OCEAN:
         self.rv_t2 = self.rv[2, :, :, :].ravel()
         self.rv_t1 = self.rv[1, :, :, :].ravel()
         self.rv_t0 = self.rv[0, :, :, :].ravel()
+
+
+
+
+
 
 
     def cycleTimes2D(self):
