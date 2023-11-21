@@ -78,9 +78,11 @@ constexpr unsigned int bcShchepetkin        = 1 << 13;      // (2D momentum)
 
 struct VerticalVelEq
 {
-    const double *D, *SD, *RHS;
+    double *D, *SD, *RHS;
 
-    VerticalVelEq(const double * _D, const double * _SD, const double * _RHS): D(_D), SD(_SD), RHS(_RHS) {};
+    VerticalVelEq(double * _D, double * _SD, double * _RHS): D(_D), SD(_SD), RHS(_RHS) {};
+    VerticalVelEq(void) {};
+
 };
 
 //-------------------------------------------
@@ -127,7 +129,7 @@ bool isVNode(const int idx)
 extern "C" __global__ void initialize(unsigned int sizeK, unsigned int sizeJ, unsigned int sizeI,
                                       double *on_u, double *om_v, double *pn, double *pm)
 {
-    printf("Initialazing kernel information: %i %i %i \n", sizeK, sizeJ, sizeI);
+    printf("Initializing kernel information: %i %i %i \n", sizeK, sizeJ, sizeI);
 
     // Stores some global variables that are used a lot (instead of passing the as parameters on each function).
     szI  = sizeI;
@@ -261,7 +263,7 @@ public:
 
     auto operator[](int const k) const
     {
-        Expr<double, void, opStencil2D>  res(p + K*sz2D);
+        Expr<double, void, opStencil2D>  res(p + k*sz2D);
         return res;
     }
 

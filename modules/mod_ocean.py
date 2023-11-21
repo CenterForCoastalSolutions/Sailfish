@@ -78,8 +78,16 @@ class T_OCEAN:
         # Coupling averages.
         # TODO: This needs to be filled somewhere.
         self.Zt_avg1 = cp.zeros((M + 1, L + 1), dtype = cp.float64)
-        self.U_avg1 = cp.zeros((M + 1, L + 1), dtype = cp.float64)
-        self.V_avg1 = cp.zeros((M + 1, L + 1), dtype = cp.float64)
+        self.U_avg1  = cp.zeros((M + 1, L + 1), dtype = cp.float64)
+        self.V_avg1  = cp.zeros((M + 1, L + 1), dtype = cp.float64)
+        self.DU_avg1  = cp.zeros((M + 1, L + 1), dtype = cp.float64)
+        self.DV_avg1  = cp.zeros((M + 1, L + 1), dtype = cp.float64)
+
+        # Turbulence.
+        # TODO: This needs to be filled somewhere.
+        self.AKv  = 0.1 + cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64)
+        self.AK   = 0.01
+
 
 
         # These aliases are used in the predictor/corrector steps. t2, t1 and t0 always mean t+2LΔt, t+LΔt and t,

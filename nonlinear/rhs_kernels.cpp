@@ -122,11 +122,10 @@ void horizontalAdvection(const double *_u,  const double *_v, const double *_Huo
 
 
 
-    for (int k=0; k<N; k++)
+    for (int K=0; K<N; K++)
     {
-        K = k;  // Sets the current k index.
-
         // Add horizontal advection of momentum to the RHS vector.
+        printf("###### %i,%i  %f   %f\n", i, K, (uR + Gadv*uξξR*(HuonR + Gadv*HuξξR)).Eval(0,0,0), HuξξR.Eval(0,0,0));
         ru -= DξRtoU(UFξR) + DηPtoU(UFηP);
         rv -= DξPtoV(VFξP) + DηRtoV(VFηR);
     }

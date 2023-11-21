@@ -7,7 +7,7 @@ def getBasicGridParameters():
 
     Xsize = 3600.0E+03
     Esize = 2800.0E+03
-    depth = 1.0
+    depth = 100.0
     f0 = 1.0E-04
     beta = 2.0E-11
 

@@ -10,6 +10,7 @@
   <component name="ChangeListManager">
     <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="...">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functionals/anaBasin.py" beforeDir="false" afterPath="$PROJECT_DIR$/functionals/anaBasin.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/mod_cppkernels.h" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_cppkernels.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/mod_grid.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_grid.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/mod_ocean.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_ocean.py" afterDir="false" />
@@ -17,6 +18,7 @@
       <change beforePath="$PROJECT_DIR$/nonlinear/main3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main3d.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/rhs.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/rhs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/rhs_kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/rhs_kernels.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/set_coords.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/set_coords.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/step3D_uv.kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step3D_uv.kernels.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tmp/testProgram.py" beforeDir="false" afterPath="$PROJECT_DIR$/tmp/testProgram.py" afterDir="false" />
     </list>
@@ -200,7 +202,7 @@
       <updated>1675796239226</updated>
       <workItem from="1697479459355" duration="45702000" />
       <workItem from="1697808491144" duration="51436000" />
-      <workItem from="1698255457335" duration="230955000" />
+      <workItem from="1698255457335" duration="277000000" />
     </task>
     <task id="LOCAL-00166" summary="...">
       <created>1688678591767</created>
@@ -545,7 +547,7 @@
       <option name="project" value="LOCAL" />
       <updated>1696539411616</updated>
     </task>
-    <option name="localTasksCounter" value="221" />
+    <option name="localTasksCounter" value="222" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -604,7 +606,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/modules/mod_grid.py</url>
-          <line>332</line>
+          <line>334</line>
           <option name="timeStamp" value="115" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -619,8 +621,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/nonlinear/main3d.py</url>
-          <line>172</line>
-          <option name="timeStamp" value="194" />
+          <line>189</line>
+          <option name="timeStamp" value="218" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/nonlinear/main3d.py</url>
+          <line>180</line>
+          <option name="timeStamp" value="219" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/nonlinear/rhs.py</url>
+          <line>63</line>
+          <option name="timeStamp" value="226" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -633,6 +645,6 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/oceangpu$testProgram.coverage" NAME="testProgram Coverage Results" MODIFIED="1700171495338" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp" />
+    <SUITE FILE_PATH="coverage/oceangpu$testProgram.coverage" NAME="testProgram Coverage Results" MODIFIED="1700605348573" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp" />
   </component>
 </project>

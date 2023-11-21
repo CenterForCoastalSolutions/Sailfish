@@ -1,9 +1,9 @@
-from misc import *
 # from get_data import get_data
 # from set_data import set_data
 from rhs import rhs3d
 from step2d import step2dPredictor, step2dCorrector
-from mod_operators import set_maxflux, omega, set_zeta, set_depth
+from mod_operators import step3d_UV, set_maxflux, omega, set_zeta, set_depth, setVerticalVelEq
+import cupy as cp
 
 import matplotlib.pyplot as plt
 
@@ -16,10 +16,17 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
     model only.
     """
 
+    eqSD =  cp.zeros(GRID.shape3D, dtype = cp.float64)
+    eqD  =  cp.zeros(GRID.shape3D, dtype = cp.float64)
+    eqRHS = cp.zeros(GRID.shape3D, dtype = cp.float64)
     from mod_operators import grsz, bksz
 
     # TODO: Check this BC
     BC = BOUNDARY.zetaBC.bcIdxFieldIdx2
+
+
+    # Initialize the arrays for the matrix equations.
+    setVerticalVelEq((1,), (1,), (eqSD, eqD, eqRHS))
 
 
     # Time-step nonlinear 3D primitive equations by the specified time.
@@ -170,17 +177,20 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
 
             # Time-step 3D momentum equations and couple with vertically integrated equations.
-            step3d_uv(OCEAN.u_t2, OCEAN.v_t2, OCEAN.ru_t1, OCEAN.rv_t1, VerticalVelEq)
+            λ = 0.1  # REDO: Use the right value
+            step3d_UV(grsz, bksz, (OCEAN.u_t2, OCEAN.v_t2, OCEAN.ru_t1, OCEAN.rv_t1,
+                                   OCEAN.ubar_t2, OCEAN.vbar_t2, GRID.Hz, OCEAN.AKv, GRID.z_r, OCEAN.DU_avg1, OCEAN.DV_avg1,
+                                   compTimes.iic, compTimes.ntfirst, λ, OCEAN.AK, compTimes.dt))   # TODO: Is this the right dt?
 
 
-            setLateralUVBCs(OCEAN.u_t2, OCEAN.v_t2)
+            # setLateralUVBCs(OCEAN.u_t2, OCEAN.v_t2)
 
             #   Time-step vertical mixing turbulent equations and passive tracer
             #   source and sink terms, if applicable.
-            omega(grsz, bksz, (OCEAN.W, OCEAN.u_t2, OCEAN.v_t2, OCEAN.Huon, OCEAN.Hvom, OCEAN.z_w, BC))
+            omega(grsz, bksz, (OCEAN.W, OCEAN.u_t2, OCEAN.v_t2, OCEAN.Huon, OCEAN.Hvom, GRID.z_w, BC))
             # bc_w3d()
 
-            cycleTimes3D()
+            OCEAN.cycleTimes3D()
             compTimes.nextTimeStep()
 
 

@@ -166,10 +166,12 @@ moduleStep3DKernels = cp.RawModule(code=code, options=('-default-device', '--res
 initializeStep3DKernels  = moduleStep3DKernels.get_function('initialize')
 # adjustBarotropicVelocity = moduleStep3DKernels.get_function('adjustBarotropicVelocity')
 # correctBaroclinicVel     = moduleStep3DKernels.get_function('correctBaroclinicVel')
+setVerticalVelEq         = moduleStep3DKernels.get_function('setVerticalVelEq')
 set_maxflux              = moduleStep3DKernels.get_function('set_maxflux')
 omega                    = moduleStep3DKernels.get_function('omega')
 set_zeta                 = moduleStep3DKernels.get_function('set_zeta')
 set_depth                = moduleStep3DKernels.get_function('set_depth')
+step3d_UV                = moduleStep3DKernels.get_function('step3d_UV')
 
 
 

@@ -61,7 +61,7 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
 
     # Compute horizontal advection of momentum.
     # -----------------------------------------------------------------------
-    horizontalAdvection(grsz, bksz, (OCEAN.u_t2, OCEAN.v_t2, OCEAN.u_t2, OCEAN.u_t2, OCEAN.ru_t2, OCEAN.rv_t2, BC))
+    horizontalAdvection(grsz, bksz, (OCEAN.u_t2, OCEAN.v_t2, OCEAN.Huon, OCEAN.Hvom, OCEAN.ru_t2, OCEAN.rv_t2, BC))
     # TODO: remember to put the correct parameters Huvn... instead of ru_t2
     # pass
         # mod_ocean.T_OCEAN.,  const double *_v, const double *_Huon, const double *_Hvom,

@@ -1,4 +1,4 @@
-
+//#include "cusparse.h"
 
 // The Eq. are:
 // $$\frac{\partial\boldsymbol{u}}{\partial t}+\frac{\partial}{\partial z}K_{v}\frac{\partial\boldsymbol{u}}{\partial z}=\boldsymbol{ru}$$
@@ -16,7 +16,15 @@
 
 
 
-VerticalVelEq *velEq;
+VerticalVelEq velEq;
+
+extern "C"  __global__
+void setVerticalVelEq(double *D, double *SD, double *RHS)
+{
+    velEq.D   = D;
+    velEq.SD  = SD;
+    velEq.RHS = RHS;
+}
 
 
 void applyPointSources()
@@ -225,11 +233,12 @@ void set_depth(const int Vtransform, const double *_Zt_avg1, const double *_z_w,
 
     if (!isRNode(i)) return;
 
-    STENCIL(Zt_avg1);
-    STENCIL(z_w);
-    STENCIL(z_r);
-    STENCIL(h);
-    STENCIL3D(Hz, K);
+    STENCILR(Zt_avg1);
+    STENCILR(h);
+    STENCILR3D(z_w, K);
+    STENCILR3D(z_r, K);
+    STENCILR3D(Hz,  K);
+
 
     if (Vtransform == 1)
     //Original formulation: Compute vertical depths (meters, negative) at RHO- and W-points, and vertical grid
@@ -237,20 +246,20 @@ void set_depth(const int Vtransform, const double *_Zt_avg1, const double *_z_w,
     //        z_w(x,y,s,t)  =  Zo_w  +  zeta(x,y,t) * [1.0 + Zo_w / h(x,y)]
     //                Zo_w  =  hc * [s(k) - C(k)]  +  C(k) * h(x,y)
     {
-        z_w = -h;
+        z_w[N] = 0.0;
 
-        for (K=1; K<=N; K++) // TODO: Is it K=1..N or 1..N-1?
+        for (K=0; K<N; K++) // TODO: Is it K=1..N or 1..N-1?
         {
             double cff_r  = hc*(sc_r[K] - Cs_r[K]);
             double cff_w  = hc*(sc_w[K] - Cs_w[K]);
             double cff1_r = Cs_r[K];
             double cff1_w = Cs_w[K];
 
-            auto z_w0 = cff_w + cff1_w*h(0,0);
-            auto z_r0 = cff_r + cff1_r*h(0,0);
+            double z_w0 = (cff_w + cff1_w*h).Eval(0,0,0);
+            double z_r0 = (cff_r + cff1_r*h).Eval(0,0,0);
 
-            z_w = z_w0 + Zt_avg1(0,0)*(1.0 + z_w0/h(0,0));
-            z_r = z_r0 + Zt_avg1(0,0)*(1.0 + z_r0/h(0,0));
+            z_w = z_w0 + Zt_avg1*(1.0 + z_w0/h);
+            z_r = z_r0 + Zt_avg1*(1.0 + z_r0/h);
 
             Hz = DσWtoR(z_w);
         }
@@ -260,9 +269,9 @@ void set_depth(const int Vtransform, const double *_Zt_avg1, const double *_z_w,
     // Various stretching functions are possible.
     //       z_w(x,y,s,t)  =  zeta(x,y,t)  +  [zeta(x,y,t) +  h(x,y)] * Zo_w
     {
-        z_w = -h;
-
-        for (K=1; K<=N; K++)
+        K = 0;
+        z_w[N] = 0.0;
+        for (K=0; K<N; K++)
         {
             double cff_r = hc*sc_r[K];
             double cff_w = hc*sc_w[K];
@@ -270,12 +279,11 @@ void set_depth(const int Vtransform, const double *_Zt_avg1, const double *_z_w,
             double cff1_r = Cs_r[K];
             double cff1_w = Cs_w[K];
 
-            auto cff2_r = (cff_r + cff1_r*h)/(hc + h);
-            auto cff2_w = (cff_w + cff1_w*h)/(hc + h);
+            double cff2_r = ((cff_r + cff1_r*h)/(hc + h)).Eval(0,0);
+            double cff2_w = ((cff_w + cff1_w*h)/(hc + h)).Eval(0,0);
 
             z_w = Zt_avg1 + (Zt_avg1 + h)*cff2_w;
             z_r = Zt_avg1 + (Zt_avg1 + h)*cff2_r;
-
 
             Hz = DσWtoR(z_w);
         }
@@ -479,17 +487,39 @@ void correctBaroclinicMeanVel(const double *_u, const double *_Hz, const double 
 }
 
 
-double solveTri(const void *velEq, double AK, const double *z_r, const double *u)
+double solveTri(const VerticalVelEq &velEq, double AK, const double *z_r, const double *u)
 // Solve tridiagonal system.
 // -------------------------
 {
     // See https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm.
+    // These defines are to make the code more consistent with the algorithm in Wikipedia. The defines only apply to this specific function.
+    #define a (velEq.SD)
+    #define b (velEq.D)
+    #define c (velEq.SD + 1)
+    #define d (velEq.RHS)
 
+    const int N = szK;
+
+
+
+    for (int i=0; i<N; i++)
+    {
+        double w = a[i]/b[i-1];
+
+        b[i] -= w*c[i-1];
+
+        d[i] -= w*d[i-1];
+
+
+//        printf(">> %f - %f\n",a[i], b[i]);
+
+//        b(i) = b(i);
+    }
 
 //    // Forward substitution.
 //    CF[1] = FC[1]/BC[1];
 //    DC[1] = DC[1]/BC[1];
-//
+
 //    for (int k=2; k<=N; k++)
 //    {
 //        double denom = 1.0/(BC[k] - FC[k-1]*CF[k-1]);
@@ -549,6 +579,12 @@ double solveTri(const void *velEq, double AK, const double *z_r, const double *u
 //        #   END DO
 //        # END DO
     return 0.0;
+
+    #undef a
+    #undef b
+    #undef c
+    #undef d
+
 }
 
 
@@ -563,8 +599,8 @@ void createVertViscousOpMatrix(int &K, double cff, double Δt, double lambda, Ve
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
     const int N = szK;
 
-    STENCIL3D(u,   K);
-    STENCIL3D(ru,  K);
+    STENCIL3D(u,    K);
+    STENCIL3D(ru,   K);
     STENCILR3D(Akv, K);
     STENCILR3D(z_r, K);
     STENCILR3D(Hz,  K);
@@ -599,15 +635,20 @@ void createVertViscousOpMatrix(int &K, double cff, double Δt, double lambda, Ve
         // Δz is the vertical distance between two U nodes.
         auto Δz = DσR(z_r).to<nt>();
 
-        RHS = u(0,0,0) + cΔt_mn*ru(0,0,0);
+        RHS = u + cΔt_mn*ru;
+
+        printf("GGG  %i %f %f %f\n", i, cΔt_mn.Eval(0,0,0), u.Eval(0,0,0), ru.Eval(0,0,0));
 
         // Off-diagonal elements
-        FC = -lambda*Δt*AKvU(0,0,0)/Δz;
+        FC = -lambda*Δt*AKvU/Δz;
+//        printf("JJJJ %f %f %f %f %f\n", lambda, Δt, AKvU.Eval(0,0,0), Δz.Eval(0,0,0), z_r.Eval(0,0,0));
 
         //Diagonal elements.
         BC = HzU(0,0,0) - FC(0,0,0) - FC(-1,0,0);
     }
     BC[N] = HzU(0,0,0) - FC(0,0,0) - FC(0,0,-1);
+
+//    printf("GGGGGGGGG %f\n", BC.Eval(4,0,0));
 
     // At this point, RHS contains the RHS, BC is the main diagonal and FC[1:-1], FC[:,-2] the other two diagonals.
 
@@ -620,7 +661,7 @@ void createVertViscousOpMatrix(int &K, double cff, double Δt, double lambda, Ve
 // The vertical viscosity terms are time-stepped using an implicit algorithm.
 extern "C"  __global__
 void step3d_UV(const double *_u, const double *_v, const double *ru, const double *rv, const double *ubar_t2, const double *vbar_t2,
-               const double *Hz, const double *Akv, const double *z_r, const double *DU_avg1, const double *DV_avg1,
+               const double *_Hz, const double *_Akv, const double *_z_r, const double *DU_avg1, const double *DV_avg1,
                int iic, int ntfirst, double lambda, double AK, double Dt)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
@@ -636,36 +677,42 @@ void step3d_UV(const double *_u, const double *_v, const double *ru, const doubl
 
     int K = 0;
 
-    STENCIL3D(u, K);
-    STENCIL3D(v, K);
+    printf("$$$$ > %i\n", i);
 
-//    for (K=0 ; K<N; K++)
-//    {
+    STENCILU3D(u,   K);
+    STENCILV3D(v,   K);
+
+//    return;
+//    STENCILR3D(Hz,  K);
+//    STENCILR3D(Akv, K);
+//    STENCILR3D(z_r, K);
+
 
     // ξ-direction.
-    createVertViscousOpMatrix<ntU, isUNode>(K, cff, Δt, lambda, velEq, Hz, Akv, z_r, _u, ru);
+    createVertViscousOpMatrix<ntU, isUNode>(K, cff, Δt, lambda, &velEq, _Hz, _Akv, _z_r, _u, ru);
 
-    u = solveTri(velEq, AK, z_r, _u);
+    u = solveTri(velEq, AK, _z_r, _u);
 
 //    correctBaroclinicMeanVel<decltype(u), isUNode, RtoU<decltype(u)> >(_u, Hz, DU_avg1, _on_u);
 
 
 
     // η-direction.
-//    createVertViscousOpMatrix<RtoV<double>, isVNode>(K, cff, Δt, lambda, velEq, Hz, Akv, z_r, _v, rv);
+//    TODO: uncomment
+//    createVertViscousOpMatrix<RtoV<double>, isVNode>(K, cff, Δt, lambda, &velEq, Hz, Akv, z_r, _v, rv);
 
-    v = solveTri(velEq, AK, z_r, _v);
+    v = solveTri(velEq, AK, _z_r, _v);
 
+//    TODO: uncomment???
 //    correctBaroclinicMeanVel<isVNode, RtoV>(_v, Hz, DV_avg1, _on_u);
 
-//    }
 
     applyPointSources();
 
 
     // Couple 2D and 3D momentum equations.
     // -----------------------------------------------------------------------
-    adjustBarotropicVelocity(Hz, _u, _v, DU_avg1, DV_avg1);
+    adjustBarotropicVelocity(_Hz, _u, _v, DU_avg1, DV_avg1);
 
 
 }

@@ -17,7 +17,6 @@ import mod_physical_params
 import mod_operators
 from set_coords import set_coords   # TODO I believe this can be inside mod_grid
 
-from rhs import rhs3d
 from main2d import main2d
 from main3d import main3d
 
@@ -66,7 +65,7 @@ mod_operators.initModule(GRID)
 # mod_operators.initOperators((1,), (1,), (10, *(GRID.h.shape)))
 
 
-rhs3d(GRID, OCEAN, BOUNDARY)
+# rhs3d(GRID, OCEAN, BOUNDARY)
 
 main3d(compTimes, GRID, OCEAN, BOUNDARY)
 main2d(compTimes, GRID, OCEAN, BOUNDARY)

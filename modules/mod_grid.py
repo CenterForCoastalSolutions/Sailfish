@@ -96,7 +96,8 @@ class Grid:
         self.M = self.Mm + 1
 
         # Set horizontal array size.
-        shape2D = (self.L + 1, self.M + 1)
+        shape2D = (self.M + 1, self.L + 1)
+        self.shape2D = shape2D
 
     
         # Nonlinear model state.
@@ -104,8 +105,6 @@ class Grid:
         self.CosAngler = cp.zeros(shape2D, dtype = cp.float64)
         self.SinAngler = cp.zeros(shape2D, dtype = cp.float64)
 
-
-        self.Hz     = cp.zeros(shape2D, dtype = cp.float64)
         self.f      = cp.zeros(shape2D, dtype = cp.float64)
         self.fomn   = cp.zeros(shape2D, dtype = cp.float64)
         self.grdscl = cp.zeros(shape2D, dtype = cp.float64)
@@ -163,7 +162,10 @@ class Grid:
 
         # Vertical part.
         self.N = input.getVal('N', minVal = 0, dtype = int)       # Number of vertical levels.
+        shape3D = (self.N, self.M + 1, self.L + 1)
+        self.shape3D = shape3D
 
+        self.Hz = cp.zeros(shape3D, dtype = cp.float64)
 
         # sigma coordinates.
         self.Vtransform  = input.getVal('Vtransform',  validValues = (1, 2), dtype = int)

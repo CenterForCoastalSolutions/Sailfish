@@ -369,56 +369,58 @@ def set_coords(GRID):
     if GRID.Vstretching == 1:
 
         for k in range(1,N+1):
-            GRID.sc_w[k] = ds*(k - N)
-            GRID.sc_r[k] = ds*(k - N - 0.5)
+            GRID.sc_w[k  ] = ds*(k - N)
+            GRID.sc_r[k-1] = ds*(k - N - 0.5)
 
-            GRID.Cs_w[k] = calcCs1(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
-            GRID.Cs_r[k] = calcCs1(GRID.theta_b, GRID.theta_s, GRID.sc_r[k])
+            GRID.Cs_w[k  ] = calcCs1(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
+            GRID.Cs_r[k-1] = calcCs1(GRID.theta_b, GRID.theta_s, GRID.sc_r[k-1])
 
 
     elif GRID.Vstretching == 2:
 
         for k in range(1,N+1):
 
-            GRID.sc_w[k] = ds*(k - N)
-            GRID.sc_r[k] = ds*(k - N - 0.5)
+            GRID.sc_w[k  ] = ds*(k - N)
+            GRID.sc_r[k-1] = ds*(k - N - 0.5)
 
-            GRID.Cs_w[k] = calcCs2(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
-            GRID.Cs_r[k] = calcCs2(GRID.theta_b, GRID.theta_s, GRID.sc_r[k])
+            GRID.Cs_w[k  ] = calcCs2(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
+            GRID.Cs_r[k-1] = calcCs2(GRID.theta_b, GRID.theta_s, GRID.sc_r[k-1])
 
 
     elif GRID.Vstretching == 3:
 
         for k in range(1,N+1):
 
-            GRID.sc_w[k] = ds*(k - N)
-            GRID.sc_r[k] = ds*(k - N - 0.5)
+            GRID.sc_w[k  ] = ds*(k - N)
+            GRID.sc_r[k-1] = ds*(k - N - 0.5)
 
-            GRID.Cs_w[k] = calcCs3(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
-            GRID.Cs_r[k] = calcCs3(GRID.theta_b, GRID.theta_s, GRID.sc_r[k])
+            GRID.Cs_w[k  ] = calcCs3(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
+            GRID.Cs_r[k-1] = calcCs3(GRID.theta_b, GRID.theta_s, GRID.sc_r[k-1])
 
 
     elif GRID.Vstretching == 4:
 
-        for k in range(0, N):
-            GRID.sc_w[k] = ds*(k - N + 1)
-            GRID.sc_r[k] = ds*(k - N + 0.5)
+        for k in range(1,N+1):
+            GRID.sc_w[k  ] = ds*(k - N )
+            GRID.sc_r[k-1] = ds*(k - N - 0.5)
 
-            GRID.Cs_w[k] = calcCs4(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
-            GRID.Cs_r[k] = calcCs4(GRID.theta_b, GRID.theta_s, GRID.sc_r[k])
+            GRID.Cs_w[k  ] = calcCs4(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
+            GRID.Cs_r[k-1] = calcCs4(GRID.theta_b, GRID.theta_s, GRID.sc_r[k-1])
 
 
     elif GRID.Vstretching == 5:
-
-        for k in range(1, N+1):
+        msgError('WARNING: Vstretching == 5 has never been tested. it is possible that it has off-by-one bugs among others')
+        for k in range(1,N+1):
             k2 = k + 0.5
-            GRID.sc_w[k] = -(k*k   - 2.0*k*N  + k  + N*N - N)/(N*N - N) - 0.01*(k *k  - k *N)/(1.0 - N)
-            GRID.sc_r[k] = -(k2*k2 - 2.0*k2*N + k2 + N*N - N)/(N*N - N) - 0.01*(k2*k2 - k2*N)/(1.0 - N)
+            GRID.sc_w[k  ] = -(k*k   - 2.0*k*N  + k  + N*N - N)/(N*N - N) - 0.01*(k *k  - k *N)/(1.0 - N)
+            GRID.sc_r[k-1] = -(k2*k2 - 2.0*k2*N + k2 + N*N - N)/(N*N - N) - 0.01*(k2*k2 - k2*N)/(1.0 - N)
 
-            GRID.Cs_w[k] = calcCs5(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
-            GRID.Cs_r[k] = calcCs5(GRID.theta_b, GRID.theta_s, GRID.sc_r[k])
+            GRID.Cs_w[k  ] = calcCs5(GRID.theta_b, GRID.theta_s, GRID.sc_w[k])
+            GRID.Cs_r[k-1] = calcCs5(GRID.theta_b, GRID.theta_s, GRID.sc_r[k-1])
 
 
+    GRID.sc_w[N] = 0.0
+    GRID.Cs_w[N] = 0.0
 
     # Report information about vertical transformation.
     # -----------------------------------------------------------------------
