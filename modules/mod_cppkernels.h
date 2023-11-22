@@ -87,6 +87,21 @@ struct VerticalVelEq
 
 //-------------------------------------------
 
+
+bool isInnerCell(const int idx)
+// It is a little unfortunate that i sometimes mean the flat index and other times on the the 2D/3D indices i,j,k.
+// In these functions the flat index is called idx to avoid confusion.
+// A U node here means that it is a U node not in the boundaries, that is, only an internal node (horizontally).
+{
+    if (idx >= sz2D) return false;
+
+    const int i = idx % szI;
+    const int j = idx / szI;
+
+    return (i > 1) && (i < szI-2 ) && (j > 1) && (j < szJ-2);
+}
+
+
 bool isRNode(const int idx)
 // It is a little unfortunate that i sometimes mean the flat index and other times on the the 2D/3D indices i,j,k.
 // In these functions the flat index is called idx to avoid confusion.
@@ -110,7 +125,7 @@ bool isUNode(const int idx)
     const int i = idx % szI;
     const int j = idx / szI;
 
-    return (i > 1) && (i < szI) && (j > 0) && (j < szJ);
+    return (i > 1) && (i < szI ) && (j > 0) && (j < szJ);
 }
 
 bool isVNode(const int idx)
@@ -123,7 +138,7 @@ bool isVNode(const int idx)
     const int i = idx % szI;
     const int j = idx / szI;
 
-    return (i > 0) && (i < szI) && (j > 1) && (j < szJ);
+    return (i > 0) && (i < szI) && (j > 1) && (j < szJ - 1);
 }
 
 extern "C" __global__ void initialize(unsigned int sizeK, unsigned int sizeJ, unsigned int sizeI,
@@ -532,8 +547,8 @@ public:
     {
     }
 
-    ResType Eval(int const k, int const j, int const i) const { (vel.Eval(k,j,i) + vel.Eval(k,j,i+1) >= 0)?expr.Eval(k,j,i):expr.Eval(k,j,i+1); };
-    ResType Eval(int const j, int const i) const              { (vel.Eval(j,i)   + vel.Eval(j,i+1)   >= 0)?expr.Eval(j,i)  :expr.Eval(j,i+1); };
+    ResType Eval(int const k, int const j, int const i) const { return (vel.Eval(k,j,i) + vel.Eval(k,j,i+1) >= 0)?expr.Eval(k,j,i):expr.Eval(k,j,i+1); };
+    ResType Eval(int const j, int const i) const              { return (vel.Eval(j,i)   + vel.Eval(j,i+1)   >= 0)?expr.Eval(j,i)  :expr.Eval(j,i+1); };
 
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
 };
@@ -556,8 +571,8 @@ public:
 
     TO_ACCESS
 
-    ResType Eval(int const k, int const j, int const i) const { (vel.Eval(k,j,i) + vel.Eval(k,j+1,i) >= 0)?expr.Eval(k,j,i):expr.Eval(k,j+1,i); };
-    ResType Eval(int const j, int const i) const              { (vel.Eval(j,i)   + vel.Eval(j+1,i)   >= 0)?expr.Eval(j,i)  :expr.Eval(j+1,i); };
+    ResType Eval(int const k, int const j, int const i) const { return (vel.Eval(k,j,i) + vel.Eval(k,j+1,i) >= 0)?expr.Eval(k,j,i):expr.Eval(k,j+1,i); };
+    ResType Eval(int const j, int const i) const              { return (vel.Eval(j,i)   + vel.Eval(j+1,i)   >= 0)?expr.Eval(j,i)  :expr.Eval(j+1,i); };
 
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
 };
@@ -581,8 +596,8 @@ public:
 
     TO_ACCESS
 
-    ResType Eval(int const k, int const j, int const i) const { (vel.Eval(k,j,i) + vel.Eval(k,j-1,i) >= 0)?expr.Eval(k,j,i):expr.Eval(k,j-1,i); };
-    ResType Eval(int const j, int const i) const              { (vel.Eval(j,i)   + vel.Eval(j-1,i)   >= 0)?expr.Eval(j,i)  :expr.Eval(j-1,i); };
+    ResType Eval(int const k, int const j, int const i) const { return (vel.Eval(k,j,i) + vel.Eval(k,j-1,i) >= 0)?expr.Eval(k,j,i):expr.Eval(k,j-1,i); };
+    ResType Eval(int const j, int const i) const              { return (vel.Eval(j,i)   + vel.Eval(j-1,i)   >= 0)?expr.Eval(j,i)  :expr.Eval(j-1,i); };
 
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
 };
@@ -606,8 +621,8 @@ public:
 
     TO_ACCESS
 
-    ResType Eval(int const k, int const j, int const i) const { (vel.Eval(k,j,i) + vel.Eval(k,j,i-1) >= 0)?expr.Eval(k,j,i):expr.Eval(k,j,i-1); };
-    ResType Eval(int const j, int const i) const              { (vel.Eval(j,i)   + vel.Eval(j,i-1)   >= 0)?expr.Eval(j,i)  :expr.Eval(j,i-1); };
+    ResType Eval(int const k, int const j, int const i) const { return (vel.Eval(k,j,i) + vel.Eval(k,j,i-1) >= 0)?expr.Eval(k,j,i):expr.Eval(k,j,i-1); };
+    ResType Eval(int const j, int const i) const              { return (vel.Eval(j,i)   + vel.Eval(j,i-1)   >= 0)?expr.Eval(j,i)  :expr.Eval(j,i-1); };
 
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
 };

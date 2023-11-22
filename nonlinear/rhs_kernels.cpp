@@ -20,7 +20,7 @@ void addCoriolis(const double *_fomn, const double *_u, const double *_v, const 
     STENCIL3D(Hz, K);
 
 
-    for (K = 0; K  <N; K++)
+    for (K = 0; K < N; K++)
     {
         auto cff = (Hz*fomn);
 
@@ -71,6 +71,7 @@ extern "C"  __global__
 void horizontalAdvection(const double *_u,  const double *_v, const double *_Huon, const double *_Hvom,
                          const double *_ru, const double *_rv, const int *BC)
 {
+
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
     const int N = szK;
 
@@ -122,10 +123,13 @@ void horizontalAdvection(const double *_u,  const double *_v, const double *_Huo
 
 
 
-    for (int K=0; K<N; K++)
+    for (K=0; K<N; K++)
     {
         // Add horizontal advection of momentum to the RHS vector.
-        printf("###### %i,%i  %f   %f\n", i, K, (uR + Gadv*uξξR*(HuonR + Gadv*HuξξR)).Eval(0,0,0), HuξξR.Eval(0,0,0));
+//        auto a = (DηRtoV(VFηR) + DξPtoV(VFξP)).Eval(0,0,0);
+//        double a = (DξRtoU(UFξR) + DηPtoU(UFηP)).Eval(0,0,0);
+//        double b = (DηRtoV(VFηR) + DξPtoV(VFξP)).Eval(0,0,0); //(DξPtoV(VFξP) + DηRtoV(VFηR)).Eval(0,0,0);
+//        printf("###### %i,%i  %f   %f\n", i, K,  b, a);
         ru -= DξRtoU(UFξR) + DηPtoU(UFηP);
         rv -= DξPtoV(VFξP) + DηRtoV(VFηR);
     }
@@ -145,6 +149,8 @@ void verticalAdvection(double const *_u, double const *_v, double const *_W, dou
     {
         return;
     }
+
+    if (!isInnerCell(i)) return;
 
     int K = 0;  // All stencils share this variable.
     STENCIL3D(u,  K);
@@ -166,7 +172,6 @@ void verticalAdvection(double const *_u, double const *_v, double const *_W, dou
     }
 
     // vertical boundary conditions (TODO: can it be done inside DσVWtoV?, also revise.
-    K = 0;
     ru[1]   -= (9.0/16.0)*(ru.Eval(  0,0,0) + ru.Eval(  1,0,0)) - (1.0/16.0)*(ru.Eval(  0,0,0) + ru.Eval(  2,0,0));
     rv[1]   -= (9.0/16.0)*(rv.Eval(  0,0,0) + rv.Eval(  1,0,0)) - (1.0/16.0)*(rv.Eval(  0,0,0) + rv.Eval(  2,0,0));
 

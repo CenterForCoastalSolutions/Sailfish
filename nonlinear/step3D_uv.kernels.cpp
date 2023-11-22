@@ -152,13 +152,13 @@ void omega(const double *_W, const double *_u, const double *_v, const double *_
 
     K = 0;
     auto z_w_bed = z_w.Eval(0,0,0);
-    auto h = z_w.Eval(0,0,N-1) - z_w_bed;
-    auto Ws = W.Eval(0,0,N-1);  // Vertical velocity at the surface
+    auto h = z_w.Eval(N-1,0,0) - z_w_bed;
+    auto Ws = W.Eval(N-1,0,0);  // Vertical velocity at the surface
     for (K = N-1; K > 0; K--)
     {
-        W -= Ws*(z_w(0,0,0) - z_w_bed)/h;
+        W -= Ws*(z_w.Eval(0,0,0) - z_w_bed)/h;
     }
-    W[N - 1] = 0.0;
+    W[N-1] = 0.0;
 
 }
 
@@ -637,7 +637,7 @@ void createVertViscousOpMatrix(int &K, double cff, double Δt, double lambda, Ve
 
         RHS = u + cΔt_mn*ru;
 
-        printf("GGG  %i %f %f %f\n", i, cΔt_mn.Eval(0,0,0), u.Eval(0,0,0), ru.Eval(0,0,0));
+//        printf("GGG  %i %f %f %f\n", i, cΔt_mn.Eval(0,0,0), u.Eval(0,0,0), ru.Eval(0,0,0));
 
         // Off-diagonal elements
         FC = -lambda*Δt*AKvU/Δz;
@@ -677,7 +677,7 @@ void step3d_UV(const double *_u, const double *_v, const double *ru, const doubl
 
     int K = 0;
 
-    printf("$$$$ > %i\n", i);
+//    printf("$$$$ > %i\n", i);
 
     STENCILU3D(u,   K);
     STENCILV3D(v,   K);

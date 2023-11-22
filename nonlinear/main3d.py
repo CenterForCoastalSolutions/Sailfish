@@ -29,6 +29,11 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
     setVerticalVelEq((1,), (1,), (eqSD, eqD, eqRHS))
 
 
+    # Recompute depths and thicknesses using the new time filtered free-surface.
+    set_depth(grsz, bksz, (GRID.Vtransform, OCEAN.Zt_avg1, GRID.z_w, GRID.z_r, GRID.h, GRID.hc, GRID.Hz,
+                           GRID.sc_r,  GRID.sc_w, GRID.Cs_r, GRID.Cs_w))
+
+
     # Time-step nonlinear 3D primitive equations by the specified time.
     # =======================================================================
 
@@ -178,7 +183,8 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
             # Time-step 3D momentum equations and couple with vertically integrated equations.
             λ = 0.1  # REDO: Use the right value
-            step3d_UV(grsz, bksz, (OCEAN.u_t2, OCEAN.v_t2, OCEAN.ru_t1, OCEAN.rv_t1,
+            # TODO: I had to reduce the number of threads because an error related to GPU's limited resources. This has to be done in a better way.
+            step3d_UV((grsz[0]*2,), (bksz[0]//2,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.ru_t1, OCEAN.rv_t1,
                                    OCEAN.ubar_t2, OCEAN.vbar_t2, GRID.Hz, OCEAN.AKv, GRID.z_r, OCEAN.DU_avg1, OCEAN.DV_avg1,
                                    compTimes.iic, compTimes.ntfirst, λ, OCEAN.AK, compTimes.dt))   # TODO: Is this the right dt?
 
