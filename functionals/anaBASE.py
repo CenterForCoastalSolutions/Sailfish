@@ -60,8 +60,8 @@ def computeStatistics():
 
 
 def computeCoordinateTransform(GRID):
-    GRID.pm[:,:] = 1/GRID.dx
-    GRID.pn[:,:] = 1/GRID.dy
+    GRID.pm[:,:] = 1.0/GRID.dx
+    GRID.pn[:,:] = 1.0/GRID.dy
 
     GRID.dndξ[:, :] = 0.0
     GRID.dmdη[:, :] = 0.0

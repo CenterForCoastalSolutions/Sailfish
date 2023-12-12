@@ -34,7 +34,8 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
     # Compute right-hand-side terms for the 3D momentum equations.
     # -----------------------------------------------------------------------
 
-
+    OCEAN.ru_t2[:] = 0.0
+    OCEAN.rv_t2[:] = 0.0
 
     # Add in Coriolis terms.
     if UV_COR:
@@ -63,6 +64,8 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
     # -----------------------------------------------------------------------
     # TODO: I had to reduce the number of threads because an error related to GPU's limited resources. This has to be done in a better way.
     horizontalAdvection((grsz[0]*2,), (bksz[0]//2,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.Huon.ravel(), OCEAN.Hvom.ravel(), OCEAN.ru_t2, OCEAN.rv_t2, BC))
+
+
     # pass
         # mod_ocean.T_OCEAN.,  const double *_v, const double *_Huon, const double *_Hvom,
         #                  const double *_ru, const double *_rv, const int N)
@@ -92,7 +95,7 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
     # #       Huξξ(Iend+1,j) = Huξξ(Iend,j)
     # #     END DO
     # # END IF
-    pass
+
 
 
     if UV_ADV:
@@ -100,9 +103,38 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
         # Add in vertical advection.
         # -----------------------------------------------------------------------
 
-        verticalAdvection(grsz, bksz, (OCEAN.u_t2, OCEAN.v_t2, OCEAN.W, OCEAN.ru_t2, OCEAN.rv_t2, BC))
-        # TODO: remember to put the correct parameters Huvn... instead of 0
-        pass
+        verticalAdvection((grsz[0]*2,), (bksz[0]//2,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.W, OCEAN.ru_t2, OCEAN.rv_t2, BC))
+
+          # TODO: remember
+    OCEAN.u_t2.reshape(17,402,402)[:,:,0] = OCEAN.u_t2.reshape(17,402,402)[:,:,2]
+    OCEAN.u_t2.reshape(17,402,402)[:,:,1] = OCEAN.u_t2.reshape(17,402,402)[:,:,2]
+    OCEAN.rv_t2[:] = 0.0
+    # OCEAN.ru_t2.reshape(17,402,402)[:,0,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
+    # OCEAN.ru_t2.reshape(17,402,402)[:,1,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
+    # OCEAN.ru_t2.reshape(17,402,402)[:,2,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
+    # OCEAN.ru_t2.reshape(17,402,402)[:,3,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
+    # OCEAN.ru_t2.reshape(17,402,402)[:,4,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
+    # OCEAN.ru_t2.reshape(17,402,402)[:,5,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
+    # # OCEAN.ru_t2.reshape(17,402,402)[:,2:6,:] = 0.0
+    # OCEAN.u_t2.reshape(17,402,402)[:,0,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
+    # OCEAN.u_t2.reshape(17,402,402)[:,1,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
+    # OCEAN.u_t2.reshape(17,402,402)[:,2,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
+    # OCEAN.u_t2.reshape(17,402,402)[:,3,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
+    # OCEAN.u_t2.reshape(17,402,402)[:,4,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
+    # OCEAN.u_t2.reshape(17,402,402)[:,5,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
+    OCEAN.u_t2.reshape(17,402,402)[-1,:,:] = OCEAN.u_t2.reshape(17,402,402)[-2,:,:]
+    OCEAN.ru_t2.reshape(17,402,402)[-1,:,:] = OCEAN.ru_t2.reshape(17,402,402)[-2,:,:]
+    # XXXXX
+    OCEAN.ru_t2.reshape(17,402,402)[0,:,:] = OCEAN.ru_t2.reshape(17,402,402)[1,:,:]
+    # OCEAN.ru_t2.reshape(17,402,402)[1,:,:] = OCEAN.ru_t2.reshape(17,402,402)[6,:,:]
+    # OCEAN.ru_t2.reshape(17,402,402)[2,:,:] = OCEAN.ru_t2.reshape(17,402,402)[6,:,:]
+    # OCEAN.ru_t2.reshape(17,402,402)[3,:,:] = OCEAN.ru_t2.reshape(17,402,402)[6,:,:]
+    # OCEAN.ru_t2.reshape(17,402,402)[4,:,:] = OCEAN.ru_t2.reshape(17,402,402)[6,:,:]
+    # OCEAN.ru_t2.reshape(17,402,402)[5,:,:] = OCEAN.ru_t2.reshape(17,402,402)[6,:,:]
+    # OCEAN.u_t2.reshape(17,402,402)[0,:,:] = 0.0
+    # OCEAN.u_t2.reshape(17,402,402)[1,:,:] = OCEAN.u_t2.reshape(17,402,402)[3,:,:]
+    # OCEAN.u_t2.reshape(17,402,402)[2,:,:] = OCEAN.u_t2.reshape(17,402,402)[3,:,:]
+    # OCEAN.u_t2.reshape(17,402,402)[:,2:6,:] = 0.0
 
         # Compute forcing term for the 2D momentum equations.
         # -----------------------------------------------------------------------

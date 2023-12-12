@@ -164,6 +164,8 @@ class Grid:
         self.N = input.getVal('N', minVal = 0, dtype = int)       # Number of vertical levels.
         shape3D = (self.N, self.M + 1, self.L + 1)
         self.shape3D = shape3D
+        shape3DW = (self.N + 1, self.M + 1, self.L + 1)
+        self.shape3DW = shape3DW
 
         self.Hz = cp.zeros(shape3D, dtype = cp.float64)
 

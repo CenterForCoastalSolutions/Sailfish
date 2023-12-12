@@ -172,6 +172,7 @@ omega                    = moduleStep3DKernels.get_function('omega')
 set_zeta                 = moduleStep3DKernels.get_function('set_zeta')
 set_depth                = moduleStep3DKernels.get_function('set_depth')
 step3d_UV                = moduleStep3DKernels.get_function('step3d_UV')
+setLateralUVBCs          = moduleStep3DKernels.get_function('setLateralUVBCs')
 
 
 

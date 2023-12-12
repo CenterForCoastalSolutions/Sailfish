@@ -84,7 +84,7 @@ void horizontalAdvection(const double *_u,  const double *_v, const double *_Huo
     STENCILV3D(rv,   K);
 
 
-    if (i >= sz2D || BC[i] >= 0)
+    if (i >= sz2D) // || BC[i] > 0)  // REDO: recover
     {
         ru = 0.0;
         rv = 0.0;
@@ -93,45 +93,44 @@ void horizontalAdvection(const double *_u,  const double *_v, const double *_Huo
 
 //    if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D) return;
 
-    auto uR = UtoR(u);
-    auto uP = UtoP(u);
-    auto vR = VtoR(v);
-    auto vP = VtoP(v);
 
-    auto HuonR = UtoR(Huon);
-    auto HuonP = UtoP(Huon);
-    auto HvomP = VtoP(Hvom);
-    auto HvomR = VtoR(Hvom);
-
-    auto uξξR = upwindUtoR(DξξUtoU(u), uR);
-    auto uηηP = upwindUtoP(DηηUtoU(u), HvomP);
-    auto vξξP = upwindVtoP(DξξVtoV(v), HuonP);
-    auto vηηR = upwindVtoR(DηηVtoV(v), vR);
-
-    auto HuξξR = UtoR(DξξUtoU(Huon));
-    auto HuηηP = UtoP(DηηUtoU(Huon));
-    auto HvξξP = VtoP(DξξVtoV(Hvom));
-    auto HvηηR = VtoR(DηηVtoV(Hvom));
-
-    // See equations in section "Advection scheme" of the accompanying document.
-    constexpr double Gadv = -0.5;
-    auto UFξR = (uR + Gadv*uξξR*(HuonR + Gadv*HuξξR));
-    auto UFηP = (uP + Gadv*uηηP*(HvomP + Gadv*HvξξP));
-
-    auto VFξP = (vP + Gadv*uηηP*(HuonP + Gadv*HuηηP));  // TODO: CHECK all ξξ and ηη, (also adv)
-    auto VFηR = (vR + Gadv*uξξR*(HvomR + Gadv*HvηηR));
 
 
 
     for (K=0; K<N; K++)
     {
+
+        auto uR = UtoR(u);
+        auto uP = UtoP(u);
+        auto vR = VtoR(v);
+        auto vP = VtoP(v);
+
+        auto HuonR = UtoR(Huon);
+        auto HuonP = UtoP(Huon);
+        auto HvomP = VtoP(Hvom);
+        auto HvomR = VtoR(Hvom);
+
+        auto uξξR = upwindUtoR(DξξUtoU(u), uR);
+        auto uηηP = upwindUtoP(DηηUtoU(u), HvomP);
+        auto vξξP = upwindVtoP(DξξVtoV(v), HuonP);
+        auto vηηR = upwindVtoR(DηηVtoV(v), vR);
+
+        auto HuξξR = UtoR(DξξUtoU(Huon));
+        auto HuηηP = UtoP(DηηUtoU(Huon));
+        auto HvξξP = VtoP(DξξVtoV(Hvom));
+        auto HvηηR = VtoR(DηηVtoV(Hvom));
+
+        // See equations in section "Advection scheme" of the accompanying document.
+        constexpr double Gadv = -0.5;
+        auto UFξR = (uR + Gadv*uξξR*(HuonR + Gadv*HuξξR));
+        auto UFηP = (uP + Gadv*uηηP*(HvomP + Gadv*HvξξP));
+
+        auto VFξP = (vP + Gadv*uηηP*(HuonP + Gadv*HuηηP));  // TODO: CHECK all ξξ and ηη, (also adv)
+        auto VFηR = (vR + Gadv*uξξR*(HvomR + Gadv*HvηηR));
+
         // Add horizontal advection of momentum to the RHS vector.
-//        auto a = (DηRtoV(VFηR) + DξPtoV(VFξP)).Eval(0,0,0);
-//        double a = (DξRtoU(UFξR) + DηPtoU(UFηP)).Eval(0,0,0);
-//        double b = (DηRtoV(VFηR) + DξPtoV(VFξP)).Eval(0,0,0); //(DξPtoV(VFξP) + DηRtoV(VFηR)).Eval(0,0,0);
-//        printf("###### %i,%i  %f   %f\n", i, K,  b, a);
-        ru -= DξRtoU(UFξR) + DηPtoU(UFηP);
-        rv -= DξPtoV(VFξP) + DηRtoV(VFηR);
+        ru -= (DξRtoU(UFξR) + DηPtoU(UFηP));
+        rv -= (DξPtoV(VFξP) + DηRtoV(VFηR));
     }
 
 }
@@ -159,50 +158,34 @@ void verticalAdvection(double const *_u, double const *_v, double const *_W, dou
     STENCIL3D(ru, K);
     STENCIL3D(rv, K);
 
+    auto FsigmaUW = UtoUW_4th(u)*WtoUW_4th(W);
+    auto FsigmaVW = VtoVW_4th(v)*WtoVW_4th(W);
 
     for (K=2; K<N-2; K++)
     {
         // Product of the fourth order centered interpolations (at R points) of u (or v) and W  (internal vertical nodes,
         // the ones near the surface or botton are dealt with as BC)
-        auto FsigmaUW = UtoUW_4th(u)*WtoUW_4th(W);
-        auto FsigmaVW = VtoVW_4th(v)*WtoVW_4th(W);
-
         ru -= DσUWtoU(FsigmaUW);
         rv -= DσVWtoV(FsigmaVW);
     }
 
+    K = 0;
     // vertical boundary conditions (TODO: can it be done inside DσVWtoV?, also revise.
-    ru[1]   -= (9.0/16.0)*(ru.Eval(  0,0,0) + ru.Eval(  1,0,0)) - (1.0/16.0)*(ru.Eval(  0,0,0) + ru.Eval(  2,0,0));
-    rv[1]   -= (9.0/16.0)*(rv.Eval(  0,0,0) + rv.Eval(  1,0,0)) - (1.0/16.0)*(rv.Eval(  0,0,0) + rv.Eval(  2,0,0));
+    ru[1]   -= (9.0/16.0)*(FsigmaUW.Eval(  0,0,0) + FsigmaUW.Eval(  1,0,0)) - (1.0/16.0)*(FsigmaUW.Eval(  0,0,0) + FsigmaUW.Eval(  2,0,0));
+    rv[1]   -= (9.0/16.0)*(FsigmaVW.Eval(  0,0,0) + FsigmaVW.Eval(  1,0,0)) - (1.0/16.0)*(FsigmaVW.Eval(  0,0,0) + FsigmaVW.Eval(  2,0,0));
 
-    ru[N-2] -= (9.0/16.0)*(ru.Eval(N-1,0,0) + ru.Eval(N-2,0,0)) - (1.0/16.0)*(ru.Eval(N-1,0,0) + ru.Eval(N-3,0,0));
-    rv[N-2] -= (9.0/16.0)*(rv.Eval(N-1,0,0) + rv.Eval(N-2,0,0)) - (1.0/16.0)*(rv.Eval(N-1,0,0) + rv.Eval(N-3,0,0));
+    ru[N-2] -= (9.0/16.0)*(FsigmaUW.Eval(N-1,0,0) + FsigmaUW.Eval(N-2,0,0)) - (1.0/16.0)*(FsigmaUW.Eval(N-1,0,0) + FsigmaUW.Eval(N-3,0,0));
+    rv[N-2] -= (9.0/16.0)*(FsigmaVW.Eval(N-1,0,0) + FsigmaVW.Eval(N-2,0,0)) - (1.0/16.0)*(FsigmaVW.Eval(N-1,0,0) + FsigmaVW.Eval(N-3,0,0));
 
     ru[0]   = 0.0;
     rv[0]   = 0.0;
 
-    ru[N-1] = 0.0;
-    rv[N-1] = 0.0;
+    ru[N-1] = ru[N-2].Eval(0,0); //0.0;
+    rv[N-1] = rv[N-2].Eval(0,0); //0.0;
 
 }
 
 
-
-extern "C"  __global__
-void verticalHomogeneousBC()
-{
-//
-//    setK(1);
-//    res = (9.0/16.0)*(var(  0,0,0) + var(  1,0,0)) - (1.0/16.0)*(var(  0,0,0) + var(2,0,0));
-//    setK(N-2);
-//    res = (9.0/16.0)*(var(N-1,0,0) + var(N-2,0,0)) - (1.0/16.0)*(var(N-1,0,0) + var(N-3,0,0));
-//
-//    setK(0);
-//    res = 0.0;
-//    setK(N-1);
-//    res = 0.0;
-
-}
 
 
 extern "C"  __global__

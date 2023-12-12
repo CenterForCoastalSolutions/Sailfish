@@ -130,7 +130,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
     Δt = compTimes.dtfast
 
-    print('time step: ', compTimes.iic)
+    # print('time step: ', compTimes.iic)
 
     # Free-surface equation.
     # =================================
@@ -224,7 +224,91 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # Apply lateral boundary conditions.
     barotropicVelocityBC(ubar_t2, vbar_t2, compTimes, BOUNDARY)
 
-    pass
+    # TODO: REMEMBER XXXXX
+    OCEAN.DUon = OCEAN.ubar_t2*GRID.h.flatten()
+    OCEAN.DVon = OCEAN.vbar_t2*GRID.h.flatten()
+    OCEAN.DU_avg2 = OCEAN.DUon
+    OCEAN.DV_avg2 = OCEAN.DVon
+    OCEAN.DU_avg1 = OCEAN.DUon
+    OCEAN.DV_avg1 = OCEAN.DVon
+
+
+
+  #   # Compute time averaged fields over all short time-steps.
+  #   IF (PREDICTOR_2D_STEP(ng)) THEN
+  #       IF (FIRST_2D_STEP) THEN
+  #
+  #       # Reset arrays for 2D fields averaged within the short time-steps.
+  #       cff2=(-1.0_r8/12.0_r8)*weight(2,iif(ng)+1,ng)
+  #             DO j=JstrR,JendR
+  #               DO i=IstrR,IendR
+  #                 Zt_avg1(i,j)=0.0_r8
+  #               END DO
+  #               DO i=Istr,IendR
+  #                 DU_avg1(i,j)=0.0_r8
+  #                 DU_avg2(i,j)=cff2*DUon(i,j)
+  #               END DO
+  #             END DO
+  #
+  #             DO j=Jstr,JendR
+  #               DO i=IstrR,IendR
+  #                 DV_avg1(i,j)=0.0_r8
+  #                 DV_avg2(i,j)=cff2*DVom(i,j)
+  #               END DO
+  #             END DO
+  #       ELSE
+  #
+  # # Accumulate field averages of previous time-step after they are
+  # # computed in the previous corrector step, updated their boundaries,
+  # # and synchronized.
+  #
+  #         cff1=weight(1,iif(ng)-1,ng)
+  #         cff2=(8.0_r8/12.0_r8)*weight(2,iif(ng)  ,ng)-                 &
+  #    &         (1.0_r8/12.0_r8)*weight(2,iif(ng)+1,ng)
+  #         DO j=JstrR,JendR
+  #           DO i=IstrR,IendR
+  #             Zt_avg1(i,j)=Zt_avg1(i,j)+cff1*zeta(i,j,krhs)
+  #           END DO
+  #           DO i=Istr,IendR
+  #             DU_avg1(i,j)=DU_avg1(i,j)+cff1*DUon(i,j)
+  #             DU_avg2(i,j)=DU_avg2(i,j)+cff2*DUon(i,j)
+  #           END DO
+  #         END DO
+  #         DO j=Jstr,JendR
+  #           DO i=IstrR,IendR
+  #             DV_avg1(i,j)=DV_avg1(i,j)+cff1*DVom(i,j)
+  #
+  #             DV_avg2(i,j)=DV_avg2(i,j)+cff2*DVom(i,j)
+  #           END DO
+  #         END DO
+  #
+  #       END IF
+  #     ELSE
+  #
+  #       IF (FIRST_2D_STEP) THEN
+  #         cff2=weight(2,iif(ng),ng)
+  #       ELSE
+  #         cff2=(5.0_r8/12.0_r8)*weight(2,iif(ng),ng)
+  #       END IF
+  #
+  #
+  #       DO j=JstrR,JendR
+  #         DO i=Istr,IendR
+  #           DU_avg2(i,j)=DU_avg2(i,j)+cff2*DUon(i,j)
+  #         END DO
+  #       END DO
+  #       DO j=Jstr,JendR
+  #         DO i=IstrR,IendR
+  #           DV_avg2(i,j)=DV_avg2(i,j)+cff2*DVom(i,j)
+  #         END DO
+  #       END DO
+  #     END IF
+
+
+     # After all fast time steps are completed, apply boundary conditions to time averaged fields.
+
+
+
 
 
 

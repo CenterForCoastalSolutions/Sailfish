@@ -85,8 +85,8 @@ class T_OCEAN:
 
         # Turbulence.
         # TODO: This needs to be filled somewhere.
-        self.AKv  = 0.1 + cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64)
-        self.AK   = 0.01
+        self.AKv  = 0.00001 + cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64)
+        self.AK   = 0.00001
 
 
 

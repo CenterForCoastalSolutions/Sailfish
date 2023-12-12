@@ -107,7 +107,7 @@ def step3d_UV():
     #     END DO
 
     MvU = createVertViscousOpMatrix()
-    u = solveTri(MvV, AK, z_r, u)
+    solveTri(MvV, AK, z_r, u)
     # Solve the tridiagonal system.
 
         # DO k=1,N(ng)
@@ -186,7 +186,7 @@ def step3d_UV():
 
 
     MvV = createVertViscousOpMatrix()
-    v = solveTri(MvV, AK, z_r, v)
+    solveTri(MvV, AK, z_r, v)
     #     IF (j.ge.JstrV) THEN
     #       DO i=Istr,Iend
     #         AK(i,0) = 0.5*(Akv(i,j-1,0) + Akv(i,j  ,0))
@@ -316,7 +316,7 @@ def step3d_UV():
     #   END DO
 
 
-    setBCs______()
+    setLateralUVBCs(t, u, v)
     # # Set lateral boundary conditions.
     # # -----------------------------------------------------------------------
     #

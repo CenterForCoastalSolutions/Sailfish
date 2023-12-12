@@ -25,7 +25,7 @@ setBC = None
 copyBC = None
 
 # REMEMBER: This code has to be syncronized with the same definitions in C++ code.
-bcNone               = 0;
+bcNone               = 0
 bcAcquire            = 1 << 0       # Read lateral boundary data from files
 bcChapman_explicit   = 1 << 1
 bcChapman_implicit   = 1 << 2

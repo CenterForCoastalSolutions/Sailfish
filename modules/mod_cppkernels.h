@@ -24,7 +24,9 @@
 //                    template<> decltype(RtoV(*this)) to<ntV>() const { if constexpr(nt == ntR) return RtoV(*this);  }
 
 
-#define TO_ACCESS   template<NodeType ntTo> auto to() const { if constexpr((nt == ntR) && (ntTo == ntU)) return RtoU(*this);  }                               \
+#define TO_ACCESS   template<NodeType ntTo> auto to() const { if constexpr((nt == ntR) && (ntTo == ntU)) return RtoU(*this); \
+                                                              if constexpr((nt == ntR) && (ntTo == ntV)) return RtoV(*this); \
+                                                              else printf("IIIIIIIIII\n");  }
 
 
 int sz2D, sz3D, szI, szJ, szK;
@@ -116,7 +118,7 @@ bool isRNode(const int idx)
 }
 
 bool isUNode(const int idx)
-// It is a little unfortunate that i sometimes mean the flat index and other times on the the 2D/3D indices i,j,k.
+// It is a little unfortunate that i sometimes mean the flat index and other times one of the 2D/3D indices i,j,k.
 // In these functions the flat index is called idx to avoid confusion.
 // A U node here means that it is a U node not in the boundaries, that is, only an internal node (horizontally).
 {
@@ -421,12 +423,12 @@ public:
 
     ResType Eval(int const j, int const i) const
     {
-        return (expr.Eval(j,i) + expr.Eval(j-1,i))*0.5;
+        return (expr.Eval(j,i) + expr.Eval(j,i-1))*0.5;
     }
 
     ResType Eval(int const k, int const j, int const i) const
     {
-        return (expr.Eval(k,j,i) + expr.Eval(k,j-1,i))*0.5;
+        return (expr.Eval(k,j,i) + expr.Eval(k,j,i-1))*0.5;
     }
 
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
@@ -909,7 +911,7 @@ public:
 
     ResType Eval(int const k, int const j, int const i) const
     {
-        return expr.Eval(k,j,i) - expr.Eval(k-1,j,i);
+        return expr.Eval(k+1,j,i) - expr.Eval(k,j,i);
     }
 
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
@@ -1125,7 +1127,7 @@ public:
 
     TO_ACCESS
 
-    ResType Eval(int const j, int const i)              const { return l.Eval(j,i) - r.Eval(j,i); };
+    ResType Eval(int const j, int const i)              const { return l.Eval(j,i)   - r.Eval(j,i); };
     ResType Eval(int const k, int const j, int const i) const { return l.Eval(k,j,i) - r.Eval(k,j,i); };
 
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
@@ -1170,7 +1172,7 @@ public:
     TO_ACCESS
 
     ResType Eval(int const j, int const i)              const { return l.Eval(j,i)   / r.Eval(j,i); };
-    ResType Eval(int const k, int const j, int const i) const { return l.Eval(k,j,i) + r.Eval(k,j,i); };
+    ResType Eval(int const k, int const j, int const i) const { return l.Eval(k,j,i) / r.Eval(k,j,i); };
 
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
 };

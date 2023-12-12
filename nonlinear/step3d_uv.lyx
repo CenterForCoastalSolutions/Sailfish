@@ -75,7 +75,7 @@
 
 \begin_body
 
-\begin_layout Title
+\begin_layout Section*
 Step3D_uv
 \end_layout
 
@@ -177,6 +177,90 @@ FC[1] & BC[2] & FC[2]\\
 
 \begin_layout Standard
 Each 
+\end_layout
+
+\begin_layout Section*
+RHS.py
+\end_layout
+
+\begin_layout Section
+Advection scheme:
+\begin_inset Formula 
+\[
+\frac{\partial}{\partial t}\frac{H_{z}C}{mn}=\frac{\partial}{\partial\xi}F^{\xi}-\frac{\partial}{\partial\eta}F^{\eta}-\frac{\partial}{\partial\sigma}F^{\sigma}
+\]
+
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+For some definitions of the fluxes (see manual).
+ These expressions can be also used for the momentum:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial}{\partial t}\frac{H_{z}u}{mn}=\frac{\partial}{\partial\xi}UF^{\xi}-\frac{\partial}{\partial\eta}UF^{\eta}-\frac{\partial}{\partial\sigma}UF^{\sigma}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\frac{\partial}{\partial t}\frac{H_{z}v}{mn}=\frac{\partial}{\partial\xi}VF^{\xi}-\frac{\partial}{\partial\eta}VF^{\eta}-\frac{\partial}{\partial\sigma}VF^{\sigma}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+UF^{\xi}=\left(u-\gamma\frac{\partial^{2}u}{\partial\xi^{2}}\right)\left[\frac{H_{z}u}{n}-\gamma\frac{\partial^{2}}{\partial\xi^{2}}\left(\frac{H_{z}u}{n}\right)\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+UF^{\eta}=\left(u-\gamma\frac{\partial^{2}u}{\partial\eta^{2}}\right)\left[\frac{H_{z}v}{m}-\gamma\frac{\partial^{2}}{\partial\eta^{2}}\left(\frac{H_{z}v}{m}\right)\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+VF^{\xi}=\left(v-\gamma\frac{\partial^{2}v}{\partial\xi^{2}}\right)\left[\frac{H_{z}u}{n}-\gamma\frac{\partial^{2}}{\partial\xi^{2}}\left(\frac{H_{z}u}{n}\right)\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+VF^{\eta}=\left(v-\gamma\frac{\partial^{2}v}{\partial\eta^{2}}\right)\left[\frac{H_{z}v}{m}-\gamma\frac{\partial^{2}}{\partial\eta^{2}}\left(\frac{H_{z}v}{m}\right)\right]
+\]
+
+\end_inset
+
+
 \end_layout
 
 \end_body

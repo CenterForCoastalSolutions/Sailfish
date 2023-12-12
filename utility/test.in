@@ -185,12 +185,14 @@ ad_Vadvection == C4       \                     ! temperature
    LBC(isFsur) ==   Clo     Clo     Clo     Clo         ! free-surface
    LBC(isUbar) ==   Cla     Clo     Clo     Clo         ! 2D U-momentum
    LBC(isVbar) ==   Clo     Clo     Clo     Clo         ! 2D V-momentum
-   LBC(isUvel) ==   Cla     Clo     Cla     Clo         ! 3D U-momentum
-   LBC(isVvel) ==   Cla     Clo     Cla     Clo         ! 3D V-momentum
+   LBC(isUvel) ==   Cla     Clo     Clo     Clo         ! 3D U-momentum
+   LBC(isVvel) ==   Cla     Clo     Clo     Clo         ! 3D V-momentum
    LBC(isMtke) ==   Cla     Clo     Cla     Clo         ! mixing TKE
 
    LBC(isTvar) ==   Cla     Clo     Cla     Clo \       ! temperature
                     Cla     Clo     Cla     Clo         ! salinity
+
+
 
 ! Adjoint-based algorithms can have different lateral boundary
 ! conditions keywords.
@@ -223,8 +225,8 @@ ad_VolCons(north) ==  F                            ! northern boundary
 ! Time-Stepping parameters.
 
       NTIMES == 1000
-          DT == 0.010d0
-     NDTFAST == 30
+          DT == 5.0
+     NDTFAST == 10
 
 ! Number of timesteps for computing observation impacts during the
 ! analysis-forecast cycle.

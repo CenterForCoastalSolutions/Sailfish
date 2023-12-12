@@ -1,0 +1,122 @@
+!  SAILFISH uses at staggered stencil:
+!
+!        -------v(i,j+1,k)-------               ------W(i,j,k+1)-----
+!        |                      |               |                   |
+!     u(i,j,k)   r(i,j,k)   u(i+1,j,k)          |     r(i,j,k)      |  <----- NOTICE, this is different from ROMS!!!
+!        |                      |               |                   |         This is because in Fortran W points go from 0 to N
+!        --------v(i,j,k)--------               -----W(i,j,k)--------         and Rho from 1 to N, the best we can do in Python is
+!                                                                             W from 0..N and Rho, from 0..N-1
+!            horizontal stencil                   vertical stencil
+!                 C-grid
+!
+!
+!  M   r..u..r..u..r..u..r..u..r..u..r..u..r..u..r..u..r..u..r..u..r
+!      :                                                           :
+!   M  v  p++v++p++v++p++v++p++v++p++v++p++v++p++v++p++v++p++v++p  v
+!      :  +     |     |     |     |     |     |     |     |     +  :
+!  Mm  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r
+!      :  +     |     |     |     |     |     |     |     |     +  :
+!   Mm v  p--v--p--v--p--v--p--v--p--v--p--v--p--v--p--v--p--v--p  v
+!      :  +     |     |     |     |     |     |     |     |     +  :
+!      r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r
+!      :  +     |     |     |     |     |     |     |     |     +  :
+!      v  p--v--p--v--p--v--p--v--p--v--p--v--p--v--p--v--p--v--p  v
+!      :  +     |     |     |     |     |     |     |     |     +  :
+!      r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r
+!      :  +     |     |     |     |     |     |     |     |     +  :
+!      v  p--v--p--v--p--v--p--v--p--v--p--v--p--v--p--v--p--v--p  v
+!      :  +     |     |     |     |     |     |     |     |     +  :
+!  2   r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r
+!      :  +     |     |     |     |     |     |     |     |     +  :
+!   2  v  p--v--p--v--p--v--p--v--p--v--p--v--p--v--p--v--p--v--p  v
+!      :  +     |     |     |     |     |     |     |     |     +  :
+!  1   r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r  u  r
+!      :  +     |     |     |     |     |     |     |     |     +  :
+!   1  v  p++v++p++v++p++v++p++v++p++v++p++v++p++v++p++v++p++v++p  v
+!      :                                                           :
+!  0   r..u..r..u..r..u..r..u..r..u..r..u..r..u..r..u..r..u..r..u..r
+!         1     2                                         Lm    L
+!      0     1     2                                         Lm    L
+!
+!                           interior       Boundary Conditions
+!                         computations     W     E     S     N
+!
+!    RH0-type variables:  [1:Lm, 1:Mm]   [0,:] [L,:] [:,0] [:,M]
+!    PSI-type variables:  [2:Lm, 2:Mm]   [1,:] [L,:] [:,1] [:,M]
+!      U-type variables:  [2:Lm, 1:Mm]   [1,:] [L,:] [:,0] [:,M]
+!      V-type variables:  [1:Lm, 2:Mm]   [0,:] [L,:] [:,1] [:,M]
+!
+!  Compute derived bounds for the loop indices over a subdomain tile.
+!  The extended bounds (labelled by suffix R) are designed to cover
+!  also the outer grid points (outlined above with :), if the subdomain
+!  tile is adjacent to the physical boundary (outlined above with +).
+!  Notice that IstrR, IendR, JstrR, JendR tile bounds computed here
+!  DO NOT COVER ghost points (outlined below with *) associated with
+!  periodic boundaries (if any) or the computational margins of MPI
+!  subdomains.
+!
+!           Left/Top Tile                        Right/Top Tile
+!
+! JendR r..u..r..u..r..u..r..u  *  *      *  *  u..r..u..r..u..r..u..r
+!       : Istr             Iend                Istr             Iend :
+!       v  p++v++p++v++p++v++p  *  * Jend *  *  p++v++p++v++p++v++p  v
+!       :  +     |     |     |                  |     |     |     +  :
+!       r  u  r  u  r  u  r  u  *  *      *  *  u  r  u  r  u  r  u  r
+!       :  +     |     |     |                  |     |     |     +  :
+!       v  p--v--p--v--p--v--p  *  *      *  *  p--v--p--v--p--v--p  v
+!       :  +     |     |     |                  |     |     |     +  :
+!       r  u  r  u  r  u  r  u  *  *      *  *  u  r  u  r  u  r  u  r
+!       :  +     |     |     |                  |     |     |     +  :
+!       v  p--v--p--v--p--v--p  *  * Jstr *  *  p--v--p--v--p--v--p  v
+!
+!       *  *  *  *  *  *  *  *  *  *      *  *  *  *  *  *  *  *  *  *
+!
+!       *  *  *  *  *  *  *  *  *  *      *  *  *  *  *  *  *  *  *  *
+!
+!     IstrR    IstrU                                               IendR
+!              IstrM
+!
+!                                                              IstrB=Istr
+!                     *  *  *  *  *  *  *  *  *  *  *          IstrM=Istr
+!                               Ghost Points                   IstrP=Istr
+!                     *  *  *  *  *  *  *  *  *  *  *          IstrR=Istr
+!                                                              IstrT=Istr
+!                     *  *  p--v--p--v--p--v--p  *  *   Jend   IstrU=Istr
+!                           |     |     |     |                IendB=Iend
+!     Interior        *  *  u  r  u  r  u  r  u  *  *          IendP=Iend
+!     Tile                  |     |     |     |                IendR=Iend
+!                     *  *  p--v--p--v--p--v--p  *  *          IendT=Iend
+!                           |     |     |     |                JstrB=Jstr
+!                     *  *  u  r  u  r  u  r  u  *  *          JstrM=Jstr
+!                           |     |     |     |                JstrP=Jstr
+!                     *  *  p--v--p--v--p--v--p  *  *   Jstr   JstrR=Jstr
+!                                                              JstrT=Jstr
+!                     *  *  *  *  *  *  *  *  *  *  *          JstrV=Jstr
+!                                                              JendB=Jend
+!                     *  *  *  *  *  *  *  *  *  *  *          JendP=Jend
+!                                                              JendR=Jend
+!                          Istr              Iend              JendT=Jend
+!
+!
+!
+!       *  *  *  *  *  *  *  *  *  *      *  *  *  *  *  *  *  *  *  *
+!
+!       *  *  *  *  *  *  *  *  *  *      *  *  *  *  *  *  *  *  *  *
+!         Istr             Iend
+!       v  p--v--p--v--p--v--p  *  * Jend *  *  p--v--p--v--p--v--p  v
+!       :  +     |     |     |                  |     |     |     +  :
+!       r  u  r  u  r  u  r  u  *  *      *  *  u  r  u  r  u  r  u  r
+!       :  +     |     |     |                  |     |     |     +  :
+! JstrV v  p--v--p--v--p--v--p  *  *      *  *  p--v--p--v--p--v--p  v JstrM
+!       :  +     |     |     |                  |     |     |     +  :
+!       r  u  r  u  r  u  r  u  *  *      *  *  u  r  u  r  u  r  u  r
+!       :  +     |     |     |                  |     |     |     +  :
+!       v  p++v++p++v++p++v++p  *  * Jstr *  *  p++v++p++v++p++v++p  v
+!       :                                                            :
+!       r..u..r..u..r..u..r..u  *  *      *  *  u..r..u..r..u..r..u..r
+!
+!     IstrR    IstrU                                               IendR
+!              IstrM
+!
+!           Left/Bottom Tile                    Right/Bottom Tile
+!
