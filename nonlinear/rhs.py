@@ -109,6 +109,7 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
     # OCEAN.u_t2.reshape(17,402,402)[:,:,0] = OCEAN.u_t2.reshape(17,402,402)[:,:,2]
     # OCEAN.u_t2.reshape(17,402,402)[:,:,1] = OCEAN.u_t2.reshape(17,402,402)[:,:,2]
     OCEAN.rv_t2[:] = 0.0
+    # YYYY
     # OCEAN.ru_t2.reshape(17,402,402)[:,0,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
     # OCEAN.ru_t2.reshape(17,402,402)[:,1,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
     # OCEAN.ru_t2.reshape(17,402,402)[:,2,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
