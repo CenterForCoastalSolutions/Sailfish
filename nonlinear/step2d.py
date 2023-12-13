@@ -225,8 +225,8 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     barotropicVelocityBC(ubar_t2, vbar_t2, compTimes, BOUNDARY)
 
     # TODO: REMEMBER XXXXX
-    OCEAN.DUon = OCEAN.ubar_t2*GRID.h.flatten()
-    OCEAN.DVon = OCEAN.vbar_t2*GRID.h.flatten()
+    OCEAN.DUon = OCEAN.ubar_t2*GRID.h.ravel()
+    OCEAN.DVon = OCEAN.vbar_t2*GRID.h.ravel()
     OCEAN.DU_avg2 = OCEAN.DUon
     OCEAN.DV_avg2 = OCEAN.DVon
     OCEAN.DU_avg1 = OCEAN.DUon
