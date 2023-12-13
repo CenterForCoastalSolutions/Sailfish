@@ -202,7 +202,7 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
     computeZetaRHS(grsz, bksz, (zeta_t2, h, ubar_t2, vbar_t2, rzeta_t1))
 
-    cp.cuda.runtime.deviceSynchronize()
+
 
     # Adams-Moulton order 3
     AdamsMoultonCorr3rd(grsz, bksz, (Δt, zeta_t2, rzeta_t0, rzeta_t1, rzeta_t2))
