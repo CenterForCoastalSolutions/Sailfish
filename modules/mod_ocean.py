@@ -74,8 +74,8 @@ class T_OCEAN:
         self.Huon  = cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64)    # Total U-momentum flux term, Hz*u/pn.
         self.Hvom  = cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64)    # Total V-momentum flux term, Hz*v/pm.
 
-        self.DUon  = cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64).ravel()
-        self.DVom  = cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64).ravel()
+        self.DUon  = cp.zeros((M + 1, L + 1), dtype = cp.float64).ravel()
+        self.DVom  = cp.zeros((M + 1, L + 1), dtype = cp.float64).ravel()
 
 
         # Coupling averages.
