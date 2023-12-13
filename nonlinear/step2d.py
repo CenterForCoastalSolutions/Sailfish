@@ -202,6 +202,8 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
     computeZetaRHS(grsz, bksz, (zeta_t2, h, ubar_t2, vbar_t2, rzeta_t1))
 
+    cp.cuda.runtime.deviceSynchronize()
+
     # Adams-Moulton order 3
     AdamsMoultonCorr3rd(grsz, bksz, (Δt, zeta_t2, rzeta_t0, rzeta_t1, rzeta_t2))
 
@@ -229,8 +231,8 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # print("uuuuuu", OCEAN.DUon.data, OCEAN.DVom.data, OCEAN.ubar_t2.data, OCEAN.vbar_t2.data, GRID.h.ravel().data)
     cp.cuda.runtime.deviceSynchronize()
     print("uuuuuu", OCEAN.ubar_t2.data, OCEAN.vbar_t2.data)
-    OCEAN.DUon[:] = OCEAN.ubar_t2*GRID.h.ravel()
-    OCEAN.DVom[:] = OCEAN.vbar_t2*GRID.h.ravel()
+    OCEAN.DUon[:] = OCEAN.ubar_t2*h
+    OCEAN.DVom[:] = OCEAN.vbar_t2*h
     # OCEAN.DU_avg2[:] = OCEAN.DUon
     # OCEAN.DV_avg2[:] = OCEAN.DVom
     OCEAN.DU_avg1[:] = OCEAN.DUon
