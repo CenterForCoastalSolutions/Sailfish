@@ -226,7 +226,8 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
     # TODO: REMEMBER XXXXX
     # YYYY
-    print("uuuuuu", OCEAN.DUon.data, OCEAN.DVom.data, OCEAN.ubar_t2.data, OCEAN.vbar_t2.data, GRID.h.ravel().data)
+    # print("uuuuuu", OCEAN.DUon.data, OCEAN.DVom.data, OCEAN.ubar_t2.data, OCEAN.vbar_t2.data, GRID.h.ravel().data)
+    print("uuuuuu", OCEAN.ubar_t2.data, OCEAN.vbar_t2.data)
     OCEAN.DUon[:] = OCEAN.ubar_t2*GRID.h.ravel()
     OCEAN.DVom[:] = OCEAN.vbar_t2*GRID.h.ravel()
     # OCEAN.DU_avg2[:] = OCEAN.DUon
