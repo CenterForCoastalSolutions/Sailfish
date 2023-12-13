@@ -227,9 +227,10 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # TODO: REMEMBER XXXXX
     # YYYY
     # print("uuuuuu", OCEAN.DUon.data, OCEAN.DVom.data, OCEAN.ubar_t2.data, OCEAN.vbar_t2.data, GRID.h.ravel().data)
+    cp.cuda.runtime.deviceSynchronize()
     print("uuuuuu", OCEAN.ubar_t2.data, OCEAN.vbar_t2.data)
-    OCEAN.DUon[:] = OCEAN.ubar_t2
-    OCEAN.DVom[:] = OCEAN.vbar_t2
+    OCEAN.DUon[:] = OCEAN.ubar_t2*GRID.h.ravel()
+    OCEAN.DVom[:] = OCEAN.vbar_t2*GRID.h.ravel()
     # OCEAN.DU_avg2[:] = OCEAN.DUon
     # OCEAN.DV_avg2[:] = OCEAN.DVom
     OCEAN.DU_avg1[:] = OCEAN.DUon
