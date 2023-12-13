@@ -80,9 +80,9 @@ class T_OCEAN:
 
         # Coupling averages.
         # TODO: This needs to be filled somewhere.
-        self.Zt_avg1 = cp.zeros((M + 1, L + 1), dtype = cp.float64).ravel()
-        self.U_avg1  = cp.zeros((M + 1, L + 1), dtype = cp.float64).ravel()
-        self.V_avg1  = cp.zeros((M + 1, L + 1), dtype = cp.float64).ravel()
+        self.Zt_avg1  = cp.zeros((M + 1, L + 1), dtype = cp.float64).ravel()
+        self.U_avg1   = cp.zeros((M + 1, L + 1), dtype = cp.float64).ravel()
+        self.V_avg1   = cp.zeros((M + 1, L + 1), dtype = cp.float64).ravel()
         self.DU_avg1  = cp.zeros((M + 1, L + 1), dtype = cp.float64).ravel()
         self.DV_avg1  = cp.zeros((M + 1, L + 1), dtype = cp.float64).ravel()
 
