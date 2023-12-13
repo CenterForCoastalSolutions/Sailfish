@@ -35,8 +35,8 @@ void computeMomentumRHSPred(const double *_h,
     auto gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1;
     auto gzeta2 = gzeta*gzeta;   // TODO : sqr expression.
 
-    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta2,on_u));
-    rhs_vbar = 0.5*g*(RtoV(h)*DXRtoV(gzeta,om_v) + DXRtoV(gzeta2,om_v));
+    rhs_ubar = 0.5*g*(RtoU(h)*DξRtoU(gzeta) + DξRtoU(gzeta2));
+    rhs_vbar = 0.5*g*(RtoV(h)*DηRtoV(gzeta) + DηRtoV(gzeta2));
 
 }
 
@@ -71,8 +71,8 @@ void computeMomentumRHSCorr(const double *_h,
     auto gzeta = (1 - weight)*zeta_t1 + weight*0.5*(zeta_t2 + zeta_t0);
 
     auto gzeta2 = gzeta*gzeta;
-    rhs_ubar = 0.5*g*(RtoU(h)*DERtoU(gzeta,on_u) + DERtoU(gzeta2,on_u));
-    rhs_vbar = 0.5*g*(RtoV(h)*DXRtoV(gzeta,om_v) + DXRtoV(gzeta2,om_v));
+    rhs_ubar = 0.5*g*(RtoU(h)*DξRtoU(gzeta) + DξRtoU(gzeta2));
+    rhs_vbar = 0.5*g*(RtoV(h)*DηRtoV(gzeta) + DηRtoV(gzeta2));
 }
 
 
