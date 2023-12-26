@@ -424,7 +424,6 @@ def set_coords(GRID):
 
     # Report information about vertical transformation.
     # -----------------------------------------------------------------------
-    LwrtInfo = True
     if LwrtInfo:
 
         msgInfo('Vertical S-coordinate System:\nlevel   S-coord     Cs-curve   Z  at hmin       at hc    half way     at hmax')

@@ -68,14 +68,14 @@ class T_OCEAN:
         # Nonlinear model state.
         self.u  = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
         self.v  = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
-        self.W  = cp.zeros((3, N + 1, M + 1, L + 1), dtype = cp.float64)
+        self.W  = cp.zeros((   N + 1, M + 1, L + 1), dtype = cp.float64)
 
 
         self.Huon  = cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64)    # Total U-momentum flux term, Hz*u/pn.
         self.Hvom  = cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64)    # Total V-momentum flux term, Hz*v/pm.
 
-        self.DUon  = cp.zeros((M + 1, L + 1), dtype = cp.float64).ravel()
-        self.DVom  = cp.zeros((M + 1, L + 1), dtype = cp.float64).ravel()
+        # self.DUon  = cp.zeros((M + 1, L + 1), dtype = cp.float64).ravel()
+        # self.DVom  = cp.zeros((M + 1, L + 1), dtype = cp.float64).ravel()
 
 
         # Coupling averages.
@@ -88,7 +88,7 @@ class T_OCEAN:
 
         # Turbulence.
         # TODO: This needs to be filled somewhere.
-        self.AKv  = 0.00001 + cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64)
+        self.AKv  = 0.01 + cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64)
         self.AK   = 0.00001
 
 

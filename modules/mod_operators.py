@@ -6,15 +6,17 @@ import mod_grid
 import cupy as cp
 from misc import *
 
-
-import rmm
-pool = rmm.mr.PoolMemoryResource(
-    rmm.mr.ManagedMemoryResource(),
-    initial_pool_size=5*(2**35),
-    maximum_pool_size=5*(2**35)
-)
-rmm.mr.set_current_device_resource(pool)
-cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
+try:
+    import rmm
+    pool = rmm.mr.PoolMemoryResource(
+        rmm.mr.ManagedMemoryResource(),
+        initial_pool_size=5*(2**35),
+        maximum_pool_size=5*(2**35)
+    )
+    rmm.mr.set_current_device_resource(pool)
+    cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
+except:
+    pass
 
 
 G    = None   # GRID
@@ -122,7 +124,7 @@ preamble3D = r'''
 
 filePath = os.path.dirname(os.path.abspath(__file__))
 
-filename = os.path.join(exePath, r'modules/mod_cppkernels.cpp')
+filename = os.path.join(exePath, r'modules', 'mod_cppkernels.cpp')
 with open(filename, 'r') as file:
     code = file.read()
 with codecs.open(filename, encoding='utf-8') as file:
@@ -145,7 +147,7 @@ AdamsMoultonCorr3rd2   = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
 computeMomentumPred    = moduleCPPKernels.get_function('computeMomentumPred')
 computeMomentumRHSCorr = moduleCPPKernels.get_function('computeMomentumRHSCorr')
 
-filename = os.path.join(exePath, r'nonlinear/rhs_kernels.cpp')
+filename = os.path.join(exePath, r'nonlinear', 'rhs_kernels.cpp')
 with codecs.open(filename, encoding='utf-8') as file:
     code = file.read()
 code = code.replace('η', 'E')
@@ -161,7 +163,7 @@ addCoriolis          = moduleRHSKernels.get_function('addCoriolis')
 vertIntegral         = moduleRHSKernels.get_function('vertIntegral')
 
 
-filename = os.path.join(exePath, r'nonlinear/step3D_uv.kernels.cpp')
+filename = os.path.join(exePath, r'nonlinear', 'step3D_uv.kernels.cpp')
 with codecs.open(filename, encoding='utf-8') as file:
     code = file.read()
 code = code.replace('η', 'E')

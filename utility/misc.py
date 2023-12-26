@@ -1,8 +1,14 @@
 import sys
+import os
 
 
 # exePath = r'D:\projects\src\oceangpu'
-exePath = r'/home/jo.gonzalez/src/Sailfish'
+# exePath = r'/home/jo.gonzalez/src/Sailfish'
+
+LwrtInfo = True
+
+filePath = os.path.dirname(os.path.abspath(__file__))
+exePath, _ = os.path.split(filePath)
 
 blockSize = 1024
 

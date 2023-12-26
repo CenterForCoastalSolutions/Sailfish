@@ -13,6 +13,9 @@
 #define STENCILV3D(var, K) class Expr<double, void, opStencil3D, ntV>  const var((double *)(_##var + i), K)
 
 
+
+
+
 #define OPERATOR_ACCESS ResType operator()(int const k, int const j, int const i) const { return Eval(k,j,i); } \
                         ResType operator()(int const j, int const i) const { return Eval(j,i); }
 
@@ -955,20 +958,24 @@ class Expr<L, R, opdivUVtoR, ntR>
 public:
     static const NodeType nt = ntR;
     typedef decltype(zeroOf(U)*zeroOf(V)) ResType;
-    typedef Expr<ResType, void, opStencil2D> OType;
-    OType &on_u;
-    OType &om_v;
-    OType &pn;
-    OType &pm;
+    typedef Expr<ResType, void, opStencil2D, ntR> OTypeR;
+    typedef Expr<ResType, void, opStencil2D, ntU> OTypeU;
+    typedef Expr<ResType, void, opStencil2D, ntV> OTypeV;
+    const OTypeU &on_u;
+    const OTypeV &om_v;
+    const OTypeR &pn;
+    const OTypeR &pm;
 
-    Expr(L _U, R _V, OType _on_u, OType _om_v, OType _pn, OType _pm): U(_U), V(_V), on_u(_on_u), om_v(_om_v), pn(_pn), pm(_pm)
+    Expr(L _U, R _V, OTypeU const &_on_u, OTypeV const &_om_v, OTypeR const &_pn, OTypeR const &_pm): U(_U), V(_V), on_u(_on_u), om_v(_om_v), pn(_pn), pm(_pm)
     {
+
     }
 
     TO_ACCESS
 
     ResType Eval(int const j, int const i) const
     {
+
         return  ( (U.Eval(j, i+1)*on_u.Eval(j, i+1) - U.Eval(j, i)*on_u.Eval(j, i)) + (V.Eval(j+1, i)*om_v.Eval(j+1, i) - V.Eval(j, i)*om_v.Eval(j, i)) )*pm.Eval(j, i)*pn.Eval(j, i);
     }
 
@@ -1341,10 +1348,16 @@ auto DyRtoV(const T &R, const Expr<double, void, opStencil2D> &om_v)
 }
 
 
+
+
+typedef class Expr<double, void, opStencil2D, ntR> DblStencil2DR;
+typedef class Expr<double, void, opStencil2D, ntU> DblStencil2DU;
+typedef class Expr<double, void, opStencil2D, ntV> DblStencil2DV;
+//, const Expr<double, void, opStencil2D, ntU> &on_u, const Expr<double, void, opStencil2D, ntV> &om_v, const Expr<double, void, opStencil2D, ntR> &pn, const Expr<double, void, opStencil2D, ntR> &pm    , on_u, om_v, pn, pm
 template<typename T1, typename T2>
-auto divUVtoR(const T1 &U, const T2 &V, const Expr<double, void, opStencil2D> &on_u, const Expr<double, void, opStencil2D> &om_v, const Expr<double, void, opStencil2D> &pn, const Expr<double, void, opStencil2D> &pm)
+auto divUVtoR(const T1 &U, const T2 &V, DblStencil2DU const &_on_u, DblStencil2DV const &_om_v, DblStencil2DR const &_pn, DblStencil2DR const &_pm)
 {
-    return Expr<T1, T2, opdivUVtoR, ntR>(U, V, on_u, om_v, pn, pm);
+    return Expr<T1, T2, opdivUVtoR, ntR>(U, V, _on_u, _om_v, _pn, _pm);
 }
 
 
@@ -1397,3 +1410,5 @@ auto DsigR(const T &W) { return Expr<T, void, opDsigR, ntR>(W); }
 
 
 // ---------------------------------------------------------------
+
+

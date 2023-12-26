@@ -1,4 +1,5 @@
 import sys
+import cupy as cp
 
 # import mod_operators
 
@@ -19,6 +20,8 @@ from set_coords import set_coords   # TODO I believe this can be inside mod_grid
 
 from main2d import main2d
 from main3d import main3d
+
+import set_weights
 
 import ana_grid
 
@@ -44,7 +47,7 @@ GRID.updateMetrics()
 
 set_coords(GRID)
 
-    # TODO: Change 10 by the Z dimension
+
 
 
 v = OCEAN.zeta[0,:,:]
@@ -59,7 +62,7 @@ v = OCEAN.zeta[0,:,:]
 input.printReport()
 
 
-
+set_weights.set_weights(compTimes)
 
 mod_operators.initModule(GRID)
 # mod_operators.initOperators((1,), (1,), (10, *(GRID.h.shape)))

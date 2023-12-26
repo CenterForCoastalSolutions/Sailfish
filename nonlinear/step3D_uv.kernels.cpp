@@ -71,28 +71,30 @@ void omega(const double *_W, const double *_u, const double *_v, const double *_
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
-//    if (((i % szI) == 0 || ((i % szI) >= (szI - 2) || (i/szI) == 0) || (i/szI) >= (szJ - 2)) || i >= sz2D) return;
 
     if (i >= sz2D) return;
+
+//    if (!isRNode(i)) return;
 
     const int N = szK;
     int K = 0;
 
-    STENCIL3D(W,  K);
+    STENCILR3D(W,  K);
 
     if (idxFieldBC[i] >= 0)
     // This is a homogenous gradient BC
     {
-        W = _W[idxFieldBC[i]]; // Makes W at the BC equal to W at cell BC[i], which is the closest one normal to the BC.
+//        TODO: Finish
+//        W = _W[idxFieldBC[i]]; // Makes W at the BC equal to W at cell BC[i], which is the closest one normal to the BC.
         return;
     }
 
 
-    STENCIL3D(u,    K);
-    STENCIL3D(v,    K);
-    STENCIL3D(Huon, K);
-    STENCIL3D(Hvom, K);
-    STENCIL3D(z_w,  K);
+    STENCILU3D(u,    K);
+    STENCILV3D(v,    K);
+    STENCILU3D(Huon, K);
+    STENCILV3D(Hvom, K);
+    STENCILR3D(z_w,  K);
 
 
 
@@ -104,7 +106,7 @@ void omega(const double *_W, const double *_u, const double *_v, const double *_
 
     for (K = 1; K < N; K++)
     {
-        W = W(-1,0,0) - (DξUtoR(Huon) + DηVtoR(Hvom));
+        W = W.Eval(-1,0,0) - (DξUtoR(Huon) + DηVtoR(Hvom));
     }
 
 // TODO : Finish this.
@@ -158,7 +160,7 @@ void omega(const double *_W, const double *_u, const double *_v, const double *_
     {
         W -= Ws*(z_w - z_w_bed)/h;
     }
-    W[N-1] = 0.0;
+    W[N] = 0.0;
 
 }
 
@@ -334,10 +336,10 @@ void setLateralUVBCs(double t, double *u, double *v, const int *bcUIdxFieldIdx2,
         }
         else if ((bcUType & bcClamped) != 0)
         {
-            double omega = 0.02;
-            double val = min(t*omega,1.0)*.1; //0.4*sin(t*omega);
+            double omega = 0.0002;
+            double val = 0.01*sin(t*omega) ; ///min(t*omega,1.0)*.1; //0.4*sin(t*omega);
 
-            for (int k = 0; k < N; k++) u[i + k*sz2D] = val*((1.0*k)/(N-1));
+            for (int k = 0; k <= N; k++) u[i + k*sz2D] = val; //*((2.0*k)/(N-1));
             // TODO: Remember, this is a fake clamped BC just for tests.
         }
         else if ((bcUType & bcGradient) != 0)
@@ -374,7 +376,7 @@ void set_maxflux(const double *_u, const double *_v, const double *_Huon, const 
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
-    int K = 0;  // All stencils share this variable.
+    int K = 0;  // All 3D stencils share this variable.
     const int N = szK;
 
     STENCIL3D(u,    K);
@@ -382,8 +384,8 @@ void set_maxflux(const double *_u, const double *_v, const double *_Huon, const 
     STENCIL3D(Huon, K);
     STENCIL3D(Hvom, K);
     STENCIL3D(Hz,   K);
-    STENCIL(on_u);
-    STENCIL(om_v);
+    STENCILU(on_u);
+    STENCILV(om_v);
 
     if (isUNode(i))
     {
@@ -456,7 +458,7 @@ void adjustBarotropicVelocity(const unsigned int i, const double *_Hz, const dou
 
 
     // Update new solution.
-    for (K=0; K<N; K++)
+    for (K=0; K<=N; K++)
     {
 //        TODO: THis has a sweeping error. uUpdate depends on adyacent u's.
         tmpU -= uUpdate;
@@ -467,8 +469,8 @@ void adjustBarotropicVelocity(const unsigned int i, const double *_Hz, const dou
 
 //template<typename RtoU, typename isUNode>
 
-template<typename T>
-void correctBaroclinicMeanVel(const unsigned int i, double *_u, const double *_Hz, const double *_DU_avg1, double *_on_u)
+template<NodeType nt, decltype(isUNode) isNode>
+void correctBaroclinicMeanVel(const unsigned int i, double *_u, const double *_Hz, const double *_DU_avg1, double *_on_u, const double *_tmpU)
 {
     // Replace INTERIOR POINTS incorrect vertical mean with more accurate barotropic component, vbar=DV_avg1/(D*om_v).
     // Recall that, D=CF(:,0).
@@ -479,15 +481,16 @@ void correctBaroclinicMeanVel(const unsigned int i, double *_u, const double *_H
     const int N = szK;
     int K = 0;
 
-    if (!isUNode(i)) return;
+    if (!isNode(i)) return;
 
-    STENCIL3D(u,   K);
-    STENCIL3D(Hz,  K);
+    STENCILR3D(u,   K);
+    STENCILR3D(Hz,  K);
     STENCIL(on_u);
     STENCIL(DU_avg1);
+    STENCIL3D(tmpU, K);
 
 //TODO: write RtoU in terms of to<>
-    auto HzU = RtoU(Hz);
+    const auto HzU = Hz.to<nt>();
 
     double H = 0.0;
     double Hu = 0.0;
@@ -495,16 +498,16 @@ void correctBaroclinicMeanVel(const unsigned int i, double *_u, const double *_H
     for (K=0; K<N; K++)
     {
         H += HzU.Eval(0,0,0);
-        Hu += (u*HzU).Eval(0,0,0);
+        Hu += (tmpU*HzU).Eval(0,0,0);
     }
-
 
     const double udiff = ((Hu - DU_avg1/on_u)/H).Eval(0,0);
 
+
     // Couple and update new solution.
-    for (K=0; K<N; K++)
+    for (K=0; K<=N; K++)
     {
-    //        TODO: Sweeping error.
+    //        TODO: Sweeping error.?
             // recursive  ???
 
 //if (udiff!=0.0) printf(">>> %f    %f    %f    %f\n", udiff, Hu, on_u.Eval(0,0), DU_avg1.Eval(0,0));
@@ -545,23 +548,23 @@ void solveTri(const unsigned int i, const VerticalVelEq &velEq, double AK, const
 
     for (int k=1; k<N; k++)
     {
-        const int ii = i % szI;
-        const int jj = i / szI;
-
-        double w = a[k]/b[k-1];
+        const double w = a[k]/b[k-1];
 
         b[k] -= w*c[k-1];
 
         d[k] -= w*d[k-1];
+//        printf("@@@@2 %g   %g  %g\n", w, d[k], b[k]);
     }
 
 
     u[N-1] = d[N-1]/b[N-1];
+
     for (int k=N-2; k>=0; k--)
     {
         // Forward substitution
         u[k] = (d[k] - c[k]*u[k+1])/b[k];
     }
+//    u[N] = u[N-1];
 
 }
 
@@ -606,11 +609,11 @@ void createVertViscousOpMatrix(int i, int &K, double cff, double Δt, double lam
 
 
     FC[0] = 0.0;
-    FC[N] = 0.0;
+    FC[N-1] = 0.0;
     K = 0;
     BC[0] = HzU.Eval(0,0,0);
     RHS[0] = (HzU*(u + cΔt_mn*ru)).Eval(0,0,0);
-    for (K=1; K < N; K++)
+    for (K=1; K < N-1; K++)
     {
 
         RHS = HzU*(u + cΔt_mn*ru);
@@ -624,9 +627,15 @@ void createVertViscousOpMatrix(int i, int &K, double cff, double Δt, double lam
         //Diagonal elements.
         BC = HzU.Eval(0,0,0) - FC.Eval(0,0,0) - FC.Eval(-1,0,0);
     }
-    K = N;
-    BC = HzU.Eval(0,0,0) - FC.Eval(0,0,0) - FC.Eval(-1,0,0);
-    RHS = (HzU*(u + cΔt_mn*ru)).Eval(0,0,0);
+    K = N-1;
+
+//    FC[N-1] = -1.0;
+    BC = FC[N-2];
+    RHS = 0.0;
+//    printf("##### %g\n", BC.Eval(0,0,0));
+
+//    BC = HzU.Eval(0,0,0) - FC.Eval(0,0,0) - FC.Eval(-1,0,0);
+//    RHS = (HzU*(u + cΔt_mn*ru)).Eval(0,0,0);
 
 
     // At this point, RHS contains the RHS, BC is the main diagonal and FC[1:-1], FC[:,-2] the other two diagonals.
@@ -664,22 +673,15 @@ void step3d_UV(double *_u, double *_v, const double *ru, const double *rv, const
     STENCILV3D(tmpV,   K);
 
 
-//    STENCILR3D(Hz,  K);
-//    STENCILR3D(Akv, K);
-//    STENCILR3D(z_r, K);
-
-
     // ξ-direction.
-    // todo: remember tempU
+    // TODO: remember tempU
     createVertViscousOpMatrix<ntU, isUNode>(i, K, cff, Δt, lambda, &velEq, _Hz, _Akv, _z_r, _tmpU, ru);
 
-//    const int ii = i % szI;
-//    const int jj = i / szI;
 
     solveTri(i, velEq, AK, _z_r, _u);
 
 
-    correctBaroclinicMeanVel<decltype(u) >(i, _u, _Hz, DU_avg1, _on_u);
+    correctBaroclinicMeanVel<ntU, isUNode>(i, _u, _Hz, DU_avg1, _on_u, _tmpU);
 
 
 
@@ -689,8 +691,7 @@ void step3d_UV(double *_u, double *_v, const double *ru, const double *rv, const
 
     solveTri(i, velEq, AK, _z_r, _v);
 
-//    TODO: uncomment???
-//    correctBaroclinicMeanVel<isVNode, RtoV>(i, _v, Hz, DV_avg1, _on_u);
+    correctBaroclinicMeanVel<ntV, isVNode>(i, _v, _Hz, DV_avg1, _om_v, _tmpV);
 
 
     applyPointSources();
@@ -699,9 +700,8 @@ void step3d_UV(double *_u, double *_v, const double *ru, const double *rv, const
     // Couple 2D and 3D momentum equations.
     // -----------------------------------------------------------------------
 
-//    adjustBarotropicVelocity(i, _Hz, _u, _v, DU_avg1, DV_avg1, _tmpU, _tmpV);
+    adjustBarotropicVelocity(i, _Hz, _u, _v, DU_avg1, DV_avg1, _tmpU, _tmpV);
 
-//    if (u.Eval(0,0,0)!=u.Eval(0,0,0)) printf("----- %i  %i - %f\n", i, K, u.Eval(0,0,0));
 
 
 }

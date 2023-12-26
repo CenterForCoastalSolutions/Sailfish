@@ -9,7 +9,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="...">
+      <change afterPath="$PROJECT_DIR$/nonlinear/set_weights.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functionals/anaBasin.py" beforeDir="false" afterPath="$PROJECT_DIR$/functionals/anaBasin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_comptimes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_comptimes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_cppkernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_cppkernels.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_cppkernels.h" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_cppkernels.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_ocean.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_ocean.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_operators.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_operators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/barotropicVelocityBC.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/barotropicVelocityBC.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/main2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/main3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main3d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/set_coords.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/set_coords.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/step2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/step3D_uv.kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step3D_uv.kernels.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp/testProgram.py" beforeDir="false" afterPath="$PROJECT_DIR$/tmp/testProgram.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utility/misc.py" beforeDir="false" afterPath="$PROJECT_DIR$/utility/misc.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,23 +61,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/jo.gonzalez/OneDrive - University of Florida/Documents",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "editing.templates",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/jo.gonzalez/OneDrive - University of Florida/Documents&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.tabs&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\projects\src\oceangpu\nonlinear" />
@@ -192,76 +207,8 @@
       <workItem from="1697479459355" duration="45702000" />
       <workItem from="1697808491144" duration="51436000" />
       <workItem from="1698255457335" duration="348722000" />
-    </task>
-    <task id="LOCAL-00180" summary="...">
-      <created>1688751059889</created>
-      <option name="number" value="00180" />
-      <option name="presentableId" value="LOCAL-00180" />
-      <option name="project" value="LOCAL" />
-      <updated>1688751059890</updated>
-    </task>
-    <task id="LOCAL-00181" summary="...">
-      <created>1688751196400</created>
-      <option name="number" value="00181" />
-      <option name="presentableId" value="LOCAL-00181" />
-      <option name="project" value="LOCAL" />
-      <updated>1688751196400</updated>
-    </task>
-    <task id="LOCAL-00182" summary="...">
-      <created>1688751288328</created>
-      <option name="number" value="00182" />
-      <option name="presentableId" value="LOCAL-00182" />
-      <option name="project" value="LOCAL" />
-      <updated>1688751288328</updated>
-    </task>
-    <task id="LOCAL-00183" summary="...">
-      <created>1688751493525</created>
-      <option name="number" value="00183" />
-      <option name="presentableId" value="LOCAL-00183" />
-      <option name="project" value="LOCAL" />
-      <updated>1688751493525</updated>
-    </task>
-    <task id="LOCAL-00184" summary="...">
-      <created>1688754843831</created>
-      <option name="number" value="00184" />
-      <option name="presentableId" value="LOCAL-00184" />
-      <option name="project" value="LOCAL" />
-      <updated>1688754843831</updated>
-    </task>
-    <task id="LOCAL-00185" summary="...">
-      <created>1688755484395</created>
-      <option name="number" value="00185" />
-      <option name="presentableId" value="LOCAL-00185" />
-      <option name="project" value="LOCAL" />
-      <updated>1688755484396</updated>
-    </task>
-    <task id="LOCAL-00186" summary="...">
-      <created>1688755547750</created>
-      <option name="number" value="00186" />
-      <option name="presentableId" value="LOCAL-00186" />
-      <option name="project" value="LOCAL" />
-      <updated>1688755547750</updated>
-    </task>
-    <task id="LOCAL-00187" summary="...">
-      <created>1688755907738</created>
-      <option name="number" value="00187" />
-      <option name="presentableId" value="LOCAL-00187" />
-      <option name="project" value="LOCAL" />
-      <updated>1688755907738</updated>
-    </task>
-    <task id="LOCAL-00188" summary="...">
-      <created>1688756061404</created>
-      <option name="number" value="00188" />
-      <option name="presentableId" value="LOCAL-00188" />
-      <option name="project" value="LOCAL" />
-      <updated>1688756061405</updated>
-    </task>
-    <task id="LOCAL-00189" summary="...">
-      <created>1688759062256</created>
-      <option name="number" value="00189" />
-      <option name="presentableId" value="LOCAL-00189" />
-      <option name="project" value="LOCAL" />
-      <updated>1688759062256</updated>
+      <workItem from="1703106751106" duration="35218000" />
+      <workItem from="1703253566604" duration="35547000" />
     </task>
     <task id="LOCAL-00190" summary="...">
       <created>1688759100667</created>
@@ -536,7 +483,77 @@
       <option name="project" value="LOCAL" />
       <updated>1702486113191</updated>
     </task>
-    <option name="localTasksCounter" value="238" />
+    <task id="LOCAL-00238" summary="...">
+      <created>1702486453249</created>
+      <option name="number" value="00238" />
+      <option name="presentableId" value="LOCAL-00238" />
+      <option name="project" value="LOCAL" />
+      <updated>1702486453249</updated>
+    </task>
+    <task id="LOCAL-00239" summary="...">
+      <created>1702486671482</created>
+      <option name="number" value="00239" />
+      <option name="presentableId" value="LOCAL-00239" />
+      <option name="project" value="LOCAL" />
+      <updated>1702486671482</updated>
+    </task>
+    <task id="LOCAL-00240" summary="...">
+      <created>1702486790920</created>
+      <option name="number" value="00240" />
+      <option name="presentableId" value="LOCAL-00240" />
+      <option name="project" value="LOCAL" />
+      <updated>1702486790921</updated>
+    </task>
+    <task id="LOCAL-00241" summary="...">
+      <created>1702486925951</created>
+      <option name="number" value="00241" />
+      <option name="presentableId" value="LOCAL-00241" />
+      <option name="project" value="LOCAL" />
+      <updated>1702486925951</updated>
+    </task>
+    <task id="LOCAL-00242" summary="...">
+      <created>1702486988463</created>
+      <option name="number" value="00242" />
+      <option name="presentableId" value="LOCAL-00242" />
+      <option name="project" value="LOCAL" />
+      <updated>1702486988463</updated>
+    </task>
+    <task id="LOCAL-00243" summary="...">
+      <created>1702487261329</created>
+      <option name="number" value="00243" />
+      <option name="presentableId" value="LOCAL-00243" />
+      <option name="project" value="LOCAL" />
+      <updated>1702487261329</updated>
+    </task>
+    <task id="LOCAL-00244" summary="...">
+      <created>1702487397802</created>
+      <option name="number" value="00244" />
+      <option name="presentableId" value="LOCAL-00244" />
+      <option name="project" value="LOCAL" />
+      <updated>1702487397802</updated>
+    </task>
+    <task id="LOCAL-00245" summary="...">
+      <created>1702487882185</created>
+      <option name="number" value="00245" />
+      <option name="presentableId" value="LOCAL-00245" />
+      <option name="project" value="LOCAL" />
+      <updated>1702487882185</updated>
+    </task>
+    <task id="LOCAL-00246" summary="...">
+      <created>1702487962674</created>
+      <option name="number" value="00246" />
+      <option name="presentableId" value="LOCAL-00246" />
+      <option name="project" value="LOCAL" />
+      <updated>1702487962674</updated>
+    </task>
+    <task id="LOCAL-00247" summary="...">
+      <created>1702492420687</created>
+      <option name="number" value="00247" />
+      <option name="presentableId" value="LOCAL-00247" />
+      <option name="project" value="LOCAL" />
+      <updated>1702492420687</updated>
+    </task>
+    <option name="localTasksCounter" value="248" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -595,13 +612,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/modules/mod_grid.py</url>
-          <line>351</line>
+          <line>353</line>
           <option name="timeStamp" value="115" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/nonlinear/step2d.py</url>
-          <line>10</line>
-          <option name="timeStamp" value="147" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/nonlinear/step3d_uv.py</url>
@@ -609,15 +621,20 @@
           <option name="timeStamp" value="167" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <condition expression="cp.isnan(OCEAN.u_t2).any()" language="Python" />
           <url>file://$PROJECT_DIR$/nonlinear/main3d.py</url>
-          <line>209</line>
-          <option name="timeStamp" value="485" />
+          <line>69</line>
+          <option name="timeStamp" value="533" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/nonlinear/set_weights.py</url>
+          <line>104</line>
+          <option name="timeStamp" value="546" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <condition expression="cp.isnan(OCEAN.u_t2).any()" language="Python" />
           <url>file://$PROJECT_DIR$/nonlinear/main3d.py</url>
-          <line>64</line>
-          <option name="timeStamp" value="533" />
+          <line>309</line>
+          <option name="timeStamp" value="556" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -628,5 +645,13 @@
         </breakpoint>
       </default-breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="compTimes.iif" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/oceangpu$testProgram.coverage" NAME="testProgram Coverage Results" MODIFIED="1703338022718" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp" />
   </component>
 </project>

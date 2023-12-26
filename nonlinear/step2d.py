@@ -7,21 +7,6 @@ from misc          import *
 import time
 
 
-# filename = os.path.join(exePath, r'nonlinear/step2d_kernels.cpp')
-# filename = os.path.join(exePath, r'modules/mod_cppkernels.cpp')
-# with open(filename, 'r') as file:
-#     code = file.read()
-# moduleCPPKernels = cp.RawModule(code=code, options=('-default-device',  '--restrict', '--std=c++17'))
-#
-# computeMomentumRHSCorr = moduleCPPKernels.get_function('computeMomentumRHSCorr')
-# computeMomentumRHSPred = moduleCPPKernels.get_function('computeMomentumRHSPred')
-# computeZetaRHS3     = moduleCPPKernels.get_function('computeZetaRHS')
-# aaa     = moduleCPPKernels.get_function('aaa')
-# bbb     = moduleCPPKernels.get_function('bbb')
-# AdamsMoultonCorr3rd = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
-# AdamsMoultonCorr3rd2 = moduleCPPKernels.get_function('AdamsMoultonCorr3rd')
-# Pred  = moduleCPPKernels.get_function('Pred')
-# Pred2 = moduleCPPKernels.get_function('Pred2')
 
 #
 # import rmm
@@ -32,88 +17,6 @@ import time
 # )
 # rmm.mr.set_current_device_resource(pool)
 # cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
-
-# In this module, t2, t1 and t0 refer to
-
-# cp.cuda.set_allocator(cp.cuda.MemoryPool().malloc)
-
-# @cp.fuse
-# import numba.cuda
-# @numba.cuda.jit('float64(float64, float64, float64, float64)', device=True, inline=True)
-# def computeZetaRHS(zeta, h, ubar, vbar):
-#
-#     #Apply mass point sources (volume vertical influx), if any
-#     # TODO: Implement XXXX
-#     # if LwSrc:
-#     #     ij = SOURCES.IJsrc   # This has to be precomputed as i + j*width
-#     #     zeta[knew,:,:].ravel()[ij] += SOURCES.Qbar*pm.ravel()[ij]*pn.ravel()[ij]*dtfast
-#     # addForcings()
-#
-#     # compute the water column depth
-#     D = zeta + h
-#
-#     DU = ubar*RtoU(D)
-#     DV = vbar*RtoV(D)
-#
-#     return divUVtoR(DU, DV)
-
-
-# computeMomentumRHS = cp.ElementwiseKernel(
-#     'float64 h, float64 gzeta',
-#     'float64 rx, float64 ry',
-#     'z = (x - y) * (x - y)',
-#     'computeMomentumRHS')
-
-
-
-
-# def computeMomentumRHS2(h, gzeta):
-#     rhs_ubar = 0.5*g*(RtoU(h)*DξRtoU(gzeta) + DξRtoU(gzeta*gzeta))
-#     rhs_vbar = 0.5*g*(RtoV(h)*DξRtoU(gzeta) + DξRtoU(gzeta*gzeta))
-
-
-    # if UV_ADV:
-    #     #!---------------------------------------------------------------------------
-    #     #! Contribution of a term corresponding to product of
-    #     #! Stokes and Eulerian Velocity Eqn. 26 and 27.
-    #     #! This removes terms that were unneccessarily added in flux form.
-    #     #!---------------------------------------------------------------------------
-    #     cff         = 0.5 * (Drhs(i-1,j) + Drhs(i,j))
-    #     DUSon(i,j)  = cff * on_u(i, j) * ubar_stokes(i, j)
-    #     DVSon(i, j) = 0.25 * cff * on_u(i, j) * (vbar_stokes(i  ,j  ) + vbar_stokes(i  ,j+1) + vbar_stokes(i-1,j  ) + vbar_stokes(i-1,j+1))
-    #
-    #     UFx(i,j)    = 0.5 * (ubar(i, j, krhs) + ubar(i+1, j, krhs))
-    #     VFx(i,j)    = 0.5 * (vbar(i, j, krhs) + vbar(i, j+1, krhs))
-    #
-    #     cff         = 0.5 * (Drhs(i,j) + Drhs(i,j-1))
-    #     DUSom(i,j)  = cff * 0.25 * om_v(i,j) * (ubar_stokes(i,j) + ubar_stokes(i+1, j) + ubar_stokes(i  , j-1) + ubar_stokes(i+1, j-1))
-    #
-    #     DVSom(i,j)    = cff * om_v(i, j) * vbar_stokes(i, j)
-    #     cff           = 0.5 * (Drhs(i, j) + Drhs(i, j-1))
-    #     UFe(i,j)      = 0.5 * (ubar(i+1, j, krhs) + ubar(i, j, krhs))
-    #     VFe(i,j)      = 0.5 * (vbar(i, j, krhs) + vbar(i, j+1, krhs))
-    #     cff1          = UFx(i,j) - UFx(i-1,j) # line 2215
-    #     cff2          = VFx(i,j) - VFx(i-1,j)
-    #     cff3          = DUSon(i,j) * cff1
-    #     cff4          = DVSon(i,j) * cff2
-    #     rhs_ubar(i,j) = rhs_ubar(i,j) + cff3 + cff4
-    #
-    #     cff1          = UFe(i,j) - UFe(i,j-1)
-    #     cff2          = VFe(i,j) - VFe(i,j-1)
-    #     cff3          = DUSom(i,j) * cff1
-    #     cff4          = DVSom(i,j) * cff2
-    #     rhs_vbar(i,j) = rhs_vbar(i,j) + cff3 + cff4
-
-    # # add in bottom stress
-    # rhs_ubar[:,:] -= bustr*om_u*on_u
-    # rhs_vbar[:,:] -= bvstr*om_v*on_v
-
-    #  Time step 2D momentum equations.
-
-    # compute the water column depth at times "new" and "stp"
-
-    # return rhs_ubar, rhs_vbar
-
 
 
 def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
@@ -130,14 +33,15 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
     Δt = compTimes.dtfast
 
+
+
     # print('time step: ', compTimes.iic)
 
     # Free-surface equation.
     # =================================
 
     # During the first time-step, the predictor step is Forward-Euler. Otherwise, the predictor step is Leap-frog.
-    # rhs_zeta_t1 = computeZetaRHS(zeta_t1, h, ubar_t1, vbar_t1)
-    computeZetaRHS(grsz, bksz, (zeta_t1, h, ubar_t1, vbar_t1, rzeta_t1))
+    computeZetaRHS((grsz[0]*2,), (bksz[0]//2,), (zeta_t1, h, ubar_t1, vbar_t1, OCEAN.DU_avg1, OCEAN.DV_avg1, OCEAN.Zt_avg1, True, compTimes.weight1, compTimes.weight2, compTimes.iif, rzeta_t1))
 
     if compTimes.isFirst2DStep():
         # The first time it performs a simple Euler time step. RHS is computed at tn and time derivatives are
@@ -145,14 +49,14 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
         zeta_t2[:] = zeta_t1 + Δt*rzeta_t1
 
-        weight = 0.5   # This is to compute gzeta (see computeMomentumRHSPred)
+        wGzeta = 0.5   # This is to compute gzeta (see computeMomentumRHSPred)
 
     else:
         # If is not the first time step, the predictor consists of a leapfrog time step where the RHS is computed at tn
         # and time derivatives are centered at tn (f(tn+1) - f(tn-1))/2*dtfast.
         computeZetaPred(grsz, bksz, (Δt, zeta_t0, zeta_t1, zeta_t2, rzeta_t1))
 
-        weight = 2.0 / 5.0  # This is to compute gzeta (see computeMomentumRHSPred)
+        wGzeta = 2.0 / 5.0  # This is to compute gzeta (see computeMomentumRHSPred)
 
 
     # Apply free-surface lateral BC
@@ -164,7 +68,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
 
     #compute right-hand-side for the 2D momentum equations
-    computeMomentumRHSPred(grsz, bksz, (h, rubar_t1, rvbar_t1, zeta_t1, zeta_t2, g, weight))
+    computeMomentumRHSPred(grsz, bksz, (h, rubar_t1, rvbar_t1, zeta_t1, zeta_t2, g, wGzeta))
 
 
     # During the first time-step, the predictor step is Forward-Euler
@@ -200,7 +104,8 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # Free-surface equation.
     # =================================
 
-    computeZetaRHS(grsz, bksz, (zeta_t2, h, ubar_t2, vbar_t2, rzeta_t1))
+    computeZetaRHS((grsz[0]*2,), (bksz[0]//2,), (zeta_t2, h, ubar_t2, vbar_t2, OCEAN.DU_avg1, OCEAN.DV_avg1, OCEAN.Zt_avg1, False,
+                                                 compTimes.weight1, compTimes.weight2, compTimes.iif, rzeta_t1))
 
 
 
@@ -226,12 +131,24 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # Apply lateral boundary conditions.
     barotropicVelocityBC(ubar_t2, vbar_t2, compTimes, BOUNDARY)
 
+
+    # DUon = ubar(i,j,krhs)*on_u*RtoU(zeta + h)
+
+    # # TODO: REMEMBER XXXXX
+    # # cp.cuda.runtime.deviceSynchronize()
+    # OCEAN.DUon[:] = OCEAN.ubar_t2*h
+    # OCEAN.DVom[:] = OCEAN.vbar_t2*h
+    # OCEAN.DU_avg1[:] = OCEAN.DUon
+    # OCEAN.DV_avg1[:] = OCEAN.DVom
+
     # TODO: REMEMBER XXXXX
-    # cp.cuda.runtime.deviceSynchronize()
-    OCEAN.DUon[:] = OCEAN.ubar_t2*h
-    OCEAN.DVom[:] = OCEAN.vbar_t2*h
-    OCEAN.DU_avg1[:] = OCEAN.DUon
-    OCEAN.DV_avg1[:] = OCEAN.DVom
+    # cff1 = weight(1,iif-1)
+    # cff2 = (8.0/12.0)*weight(2,iif) - (1.0/12.0)*weight(2,iif+1)
+    #
+    # Zt_avg1 += cff1*zeta(krhs)
+    #
+    # DU_avg1 += cff1*DUon(i,j)
+    # DU_avg2 += cff2*DUon(i,j)
 
 
 

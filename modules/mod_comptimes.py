@@ -1,4 +1,5 @@
 from misc import *
+import cupy as cp
 
 
 # Data about computational times.
@@ -11,7 +12,8 @@ class CompTimes:
                                                                   # is the total of barotropic timesteps.
         self.dt      = input.getVal('DT',      dtype = float)          # Baroclinic timestep (s)
         self.ndtfast = input.getVal('NDTFAST', dtype = int)            # Number of barotropic timesteps between each baroclinic timestep.
-        self.dtfast  = self.dt/self.ndtfast                                      # Barotropic timestep (s)
+        self.dtfast  = self.dt/self.ndtfast
+        self.nfast   = 0
 
         self.LastRec = (input.getVal('NRREC', dtype = int) < 0)
 
@@ -26,10 +28,10 @@ class CompTimes:
 
         self.nfast   = 0     # Number of barotropic timesteps needed to compute time-averaged barotropic variables centered at time level n+1.
 
-        self.tdays = 0.0     # (days)    Model time clock.
-        self.time  = 0.0     # (seconds) Model time clock
+        self.tdays  = 0.0     # (days)    Model time clock.
+        self.time   = 0.0     # (seconds) Model time clock
+        self.time2D = 0.0    # (seconds) Model 2D time clock
 
-        self.dtfast = 0.01  # TODO: REMEMBER $$$$XXX
 
         self.TimeEnd  = 0    # (s)
         self.IMPtime  = 0    # (s) Impulse forcing time to process.
@@ -57,7 +59,12 @@ class CompTimes:
         # First, starting, and ending timestepping parameters
         self.ntfirst = 0      # Forward-Euler step
         self.ntstart = 0      # Start step
-        self.ntend   = 10000      # End step  TODO: READ this from the file
+        self.ntend   = 1000000      # End step  TODO: READ this from the file
+
+
+        # Weights for time filtering.
+        self.weight1 = cp.zeros((257), dtype=cp.float64)
+        self.weight2 = cp.zeros((257), dtype=cp.float64)
 
 
     def isInitialTimeStep(self):
@@ -71,7 +78,17 @@ class CompTimes:
 
     def isFirst2DStep(self):
         # Not sure what is the difference between initial and First (or ntstart and ntfirst)
-        return self.iic == self.ntfirst
+        return self.iif == 0
+
+
+    def first2DTimeStep(self):
+        self.iif = 0
+
+    def next2DTimeStep(self):
+        """Advances one time step"""
+
+        self.iif += 1
+        self.time2D += self.dtfast
 
 
     def nextTimeStep(self):
@@ -79,6 +96,7 @@ class CompTimes:
 
         self.iic += 1
         self.time += self.dt
+        self.time2D = self.time
         # self.tdays = self.time * sec2day    TODO : Recover this
 
 

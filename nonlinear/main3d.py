@@ -6,6 +6,8 @@ from mod_operators import step3d_UV, set_maxflux, omega, set_zeta, set_depth, se
 import cupy as cp
 
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+mpl.use("TkAgg")
 
 
 def output():
@@ -54,6 +56,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         # # Initialize other state variables.
         # ini_fields()
 
+    aaaa = 0
 
     while not compTimes.isFinalTimeStep():
 
@@ -116,7 +119,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
 
 
-        omega(grsz, bksz, (OCEAN.W, OCEAN.u_t2, OCEAN.v_t2, OCEAN.Huon, OCEAN.Hvom, GRID.z_w, BC))
+        omega(grsz, bksz, (OCEAN.W, OCEAN.u_t2, OCEAN.v_t2, OCEAN.Huon.ravel(), OCEAN.Hvom.ravel(), GRID.z_w, BC))
         # bc_w3d()
 
         # This is needed only for output. I will not implement it just yet.
@@ -141,22 +144,66 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         # free-surface and barotropic momentum components.
         # -----------------------------------------------------------------------
 
-        for iif in range(compTimes.ndtfast + 1):     # WARNING: Used to be nfast, also +1 ??
+        compTimes.first2DTimeStep()
+        for iif in range(compTimes.nfast):     # WARNING: Used to be +1 ??
+
+            if compTimes.isFirst2DStep():
+                OCEAN.Zt_avg1[:] = 0.0
+                OCEAN.DU_avg1[:] = 0.0
+                OCEAN.DV_avg1[:] = 0.0
 
             # Set time indices for predictor step. The PREDICTOR_2D_STEP switch
             # it is assumed to be false before the first time-step.
-            compTimes.nextTimeStep()
+            compTimes.next2DTimeStep()
             OCEAN.cycleTimes2D()
 
-            Δt = compTimes.dtfast
 
             step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY)
 
-            if compTimes.iic % 1111100 == 0:
-                plt.clf()
-                # plt.imshow(OCEAN.zeta_t2.reshape(GRID.M+1, GRID.M+1).get())
-                plt.imshow(OCEAN.u_t2.get().reshape(17,402,402)[1,:,:])
-                plt.colorbar()
+            if compTimes.iic % 100==0 and compTimes.iif == 1:
+                plt.close(True)
+                fig = plt.figure(figsize=(20,12))
+                fig.suptitle('time = %.1f s' % compTimes.time)
+
+                ax1 = fig.add_subplot(221)
+                cmap = mpl.cm.RdBu
+                norm = mpl.colors.Normalize(vmin=-.03, vmax=.03)
+                # ax1.imshow(OCEAN.zeta_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.03, vmax = 0.03)
+                ax1.pcolormesh(GRID.xr[0,:].get()/1000, GRID.yr[:,0].get()/1000, OCEAN.zeta_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.03, vmax = 0.03)
+                ax1.title.set_text('Free surface (m)')
+                # plt.imshow(OCEAN.u_t2.get().reshape(17,402,402)[0,:,:])
+                fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax1)
+                plt.pause(1)
+                print('.... %.2f s   ' % (compTimes.time))
+
+                ax2 = fig.add_subplot(222)
+                cmap = mpl.cm.RdBu
+                norm = mpl.colors.Normalize(vmin=-.03, vmax=.03)
+                # ax2.imshow(OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.02, vmax = 0.02)
+                ax2.pcolormesh(GRID.xr[0,:].get()/1000, GRID.yr[:,0].get()/1000, OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.03, vmax = 0.03)
+                ax2.title.set_text('barotropic u (m/s)')
+                # plt.imshow(OCEAN.u_t2.get().reshape(17,402,402)[0,:,:])
+                fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax2)
+
+
+                ax3 = fig.add_subplot(223)
+                ax3.title.set_text('barotropic u (m/s) x-transect')
+                ax3.plot(OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1)[300,2:].get())
+                ax3.set_ylim((-.03,0.03))
+
+                ax4 = fig.add_subplot(224)
+                ax4.title.set_text('u  (m/s) z-profile')
+                ax4.plot(OCEAN.u_t2.reshape(GRID.N+1, GRID.M+1, GRID.M+1)[:,200,100].get(), GRID.z_w[:,0,0].get())
+                ax4.plot(OCEAN.u_t2.reshape(GRID.N+1, GRID.M+1, GRID.M+1)[:,200,200].get(), GRID.z_w[:,0,0].get())
+                ax4.plot(OCEAN.u_t2.reshape(GRID.N+1, GRID.M+1, GRID.M+1)[:,200,300].get(), GRID.z_w[:,0,0].get())
+                ax4.legend(['x=%.3f' % (GRID.xr[0,100].get()/1000), 'x=%.3f' % (GRID.xr[0,200].get()/1000), 'x=%.3f' % (GRID.xr[0,300].get()/1000)])
+
+                ax4.set_xlim((-.05,0.05))
+
+                aaaa += 1
+
+                plt.savefig(r'D:\projects\src\oceangpu\img%.4i' % aaaa)
+
                 plt.pause(1)
                 print('.... %.2f s    %.2f' % (compTimes.time, OCEAN.zeta_t2.sum()))
 
@@ -190,18 +237,67 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         # TODO: Remember I did this:
         tmpU[:] = OCEAN.u_t2
         tmpV[:] = OCEAN.v_t2
+
+        # OCEAN.u_t2 .reshape(17,402,402)[-1,:,:]=OCEAN.u_t2 .reshape(17,402,402)[-4,:,:]
+        # OCEAN.u_t2 .reshape(17,402,402)[-2,:,:]=OCEAN.u_t2 .reshape(17,402,402)[-4,:,:]
+        # OCEAN.u_t2 .reshape(17,402,402)[-3,:,:]=OCEAN.u_t2 .reshape(17,402,402)[-4,:,:]
+        # OCEAN.ru_t2 .reshape(17,402,402)[-3,:,:]=OCEAN.ru_t2 .reshape(17,402,402)[-4,:,:]
+        # OCEAN.ru_t2 .reshape(17,402,402)[-2,:,:]=OCEAN.ru_t2 .reshape(17,402,402)[-4,:,:]
+        # OCEAN.ru_t2 .reshape(17,402,402)[-1,:,:]=OCEAN.ru_t2 .reshape(17,402,402)[-4,:,:]
+
+        # OCEAN.u_t2 .reshape(17,402,402)[GRID.N:,:,:]=OCEAN.u_t2 .reshape(17,402,402)[GRID.N-2,:,:]
         # TODO: I had to reduce the number of threads because an error related to GPU's limited resources. This has to be done in a better way.
         step3d_UV((grsz[0]*2,), (bksz[0]//2,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.ru_t2, OCEAN.rv_t2,
-                               OCEAN.ubar_t2, OCEAN.vbar_t2, GRID.Hz, OCEAN.AKv, GRID.z_r, OCEAN.DU_avg1, OCEAN.DV_avg1, tmpU, tmpV,
-                               compTimes.iic, compTimes.ntfirst, λ, OCEAN.AK, compTimes.dt))   # TODO: Is this the right dt?
+                                                OCEAN.ubar_t2, OCEAN.vbar_t2, GRID.Hz, OCEAN.AKv, GRID.z_r, OCEAN.DU_avg1, OCEAN.DV_avg1, tmpU, tmpV,
+                                                compTimes.iic, compTimes.ntfirst, λ, OCEAN.AK, compTimes.dt))
 
-        # OCEAN.u_t2 .reshape(17,402,402)[:,2,:]=OCEAN.u_t2.reshape(17,402,402)[:,3,:]
-        # OCEAN.u_t2 .reshape(17,402,402)[:,1,:]=OCEAN.u_t2.reshape(17,402,402)[:,3,:]
-        # OCEAN.u_t2 .reshape(17,402,402)[:,0,:]=OCEAN.u_t2.reshape(17,402,402)[:,3,:]
+        # OCEAN.u_t2 .reshape(17,402,402)[-1,:,:]=OCEAN.u_t2 .reshape(17,402,402)[-4,:,:]
+        # OCEAN.u_t2 .reshape(17,402,402)[-2,:,:]=OCEAN.u_t2 .reshape(17,402,402)[-4,:,:]
+        # OCEAN.u_t2 .reshape(17,402,402)[-3,:,:]=OCEAN.u_t2 .reshape(17,402,402)[-4,:,:]
+        # OCEAN.ru_t2 .reshape(17,402,402)[-3,:,:]=OCEAN.ru_t2 .reshape(17,402,402)[-4,:,:]
+        # OCEAN.ru_t2 .reshape(17,402,402)[-2,:,:]=OCEAN.ru_t2 .reshape(17,402,402)[-3,:,:]
+        # OCEAN.ru_t2 .reshape(17,402,402)[-1,:,:]=OCEAN.ru_t2 .reshape(17,402,402)[-3,:,:]
+        # OCEAN.u_t2 .reshape(17,402,402)[-1,:,:]=OCEAN.u_t2 .reshape(17,402,402)[-3,:,:]
+        # OCEAN.u_t2 .reshape(17,402,402)[-2,:,:]=OCEAN.u_t2 .reshape(17,402,402)[-3,:,:]
+
+        # OCEAN.u_t2[:] = tmpU
+        # OCEAN.v_t2[:] = tmpV
+        # OCEAN.u_t2 .reshape(17,402,402)[GRID.N:,:,:]=OCEAN.u_t2 .reshape(17,402,402)[GRID.N-2,:,:]
+        # OCEAN.u_t2 .reshape(17,402,402)[GRID.N-1:,:,:]= OCEAN.u_t2 .reshape(17,402,402)[GRID.N-2,:,:]
+        OCEAN.u_t2 .reshape(17,402,402)[:,0,:]=OCEAN.u_t2.reshape(17,402,402)[:,2,:]
+        OCEAN.u_t2 .reshape(17,402,402)[:,1,:]=OCEAN.u_t2.reshape(17,402,402)[:,2,:]
+        # OCEAN.u_t2 .reshape(17,402,402)[:,1,:]=OCEAN.u_t2.reshape(17,402,402)[:,13,:]
+        # OCEAN.u_t2 .reshape(17,402,402)[:,0,:]=OCEAN.u_t2.reshape(17,402,402)[:,13,:]
+        # OCEAN.u_t2 .reshape(17,402,402)[:,3,:]=OCEAN.u_t2.reshape(17,402,402)[:,13,:]
+        # OCEAN.ubar_t2 .reshape(402,402)[2,:]=OCEAN.ubar_t2.reshape(402,402)[3,:]
+        # OCEAN.ubar_t2 .reshape(402,402)[1,:]=OCEAN.ubar_t2.reshape(402,402)[3,:]
+        # OCEAN.ubar_t2 .reshape(402,402)[0,:]=OCEAN.ubar_t2.reshape(402,402)[3,:]
+        # OCEAN.v_t2 .reshape(17,402,402)[:,2,:]=OCEAN.v_t2.reshape(17,402,402)[:,13,:]
+        # OCEAN.v_t2 .reshape(17,402,402)[:,1,:]=OCEAN.v_t2.reshape(17,402,402)[:,13,:]
+        # OCEAN.v_t2 .reshape(17,402,402)[:,0,:]=OCEAN.v_t2.reshape(17,402,402)[:,13,:]
+        # OCEAN.v_t2 .reshape(17,402,402)[:,3,:]=OCEAN.v_t2.reshape(17,402,402)[:,13,:]
+        # OCEAN.v_t2 .reshape(17,402,402)[:,4,:]=OCEAN.v_t2.reshape(17,402,402)[:,13,:]
+        # OCEAN.v_t2 .reshape(17,402,402)[:,5,:]=OCEAN.v_t2.reshape(17,402,402)[:,13,:]
+        # OCEAN.v_t2 .reshape(17,402,402)[:,6,:]=OCEAN.v_t2.reshape(17,402,402)[:,13,:]
+        # OCEAN.v_t2 .reshape(17,402,402)[:,7,:]=OCEAN.v_t2.reshape(17,402,402)[:,13,:]
+        OCEAN.vbar_t2 .reshape(402,402)[7,:]=OCEAN.vbar_t2.reshape(402,402)[13,:]
+        OCEAN.vbar_t2 .reshape(402,402)[6,:]=OCEAN.vbar_t2.reshape(402,402)[13,:]
+        OCEAN.vbar_t2 .reshape(402,402)[5,:]=OCEAN.vbar_t2.reshape(402,402)[13,:]
+        OCEAN.vbar_t2 .reshape(402,402)[4,:]=OCEAN.vbar_t2.reshape(402,402)[13,:]
+        OCEAN.vbar_t2 .reshape(402,402)[3,:]=OCEAN.vbar_t2.reshape(402,402)[13,:]
+        OCEAN.vbar_t2 .reshape(402,402)[2,:]=OCEAN.vbar_t2.reshape(402,402)[13,:]
+        OCEAN.vbar_t2 .reshape(402,402)[1,:]=OCEAN.vbar_t2.reshape(402,402)[13,:]
+        OCEAN.vbar_t2 .reshape(402,402)[0,:]=OCEAN.vbar_t2.reshape(402,402)[13,:]
+        # OCEAN.Huon .reshape(17,402,402)[:,2,:]=OCEAN.Huon.reshape(17,402,402)[:,3,:]
+        # OCEAN.Huon .reshape(17,402,402)[:,1,:]=OCEAN.Huon.reshape(17,402,402)[:,3,:]
+        # OCEAN.Huon .reshape(17,402,402)[:,0,:]=OCEAN.Huon.reshape(17,402,402)[:,3,:]
         # OCEAN.ru_t2.reshape(17,402,402)[:,2,:]=OCEAN.ru_t2.reshape(17,402,402)[:,3,:]
         # OCEAN.ru_t2.reshape(17,402,402)[:,1,:]=OCEAN.ru_t2.reshape(17,402,402)[:,3,:]
         # OCEAN.ru_t2.reshape(17,402,402)[:,0,:]=OCEAN.ru_t2.reshape(17,402,402)[:,3,:]
-        OCEAN.v_t2[:] = 0.0
+        # OCEAN.v_t2[:] = 0.0
+        OCEAN.u_t2 .reshape(17,402,402)[0:2,:,:]=0.0
+        OCEAN.v_t2 .reshape(17,402,402)[0:2,:,:]=0.0
+
 
         setLateralUVBCs((grsz[0],), (bksz[0],), (compTimes.time, OCEAN.u_t2, OCEAN.v_t2, BOUNDARY.uvelBC.bcIdxFieldIdx2, BOUNDARY.vvelBC.bcIdxFieldIdx2, BOUNDARY.uvelBC.bcIdxFieldType, BOUNDARY.vvelBC.bcIdxFieldType))
 

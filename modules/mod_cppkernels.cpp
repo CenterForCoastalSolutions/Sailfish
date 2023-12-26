@@ -35,8 +35,8 @@ void computeMomentumRHSPred(const double *_h,
     auto gzeta  = (1 - weight)*zeta_t2 + weight*zeta_t1;
     auto gzeta2 = gzeta*gzeta;   // TODO : sqr expression.
 
-    rhs_ubar = 0.5*g*(RtoU(h)*DξRtoU(gzeta) + DξRtoU(gzeta2));
-    rhs_vbar = 0.5*g*(RtoV(h)*DηRtoV(gzeta) + DηRtoV(gzeta2));
+    rhs_ubar = 0.5*g*on_u*(RtoU(h)*DξRtoU(gzeta) + DξRtoU(gzeta2));
+    rhs_vbar = 0.5*g*om_v*(RtoV(h)*DηRtoV(gzeta) + DηRtoV(gzeta2));
 
 }
 
@@ -71,13 +71,15 @@ void computeMomentumRHSCorr(const double *_h,
     auto gzeta = (1 - weight)*zeta_t1 + weight*0.5*(zeta_t2 + zeta_t0);
 
     auto gzeta2 = gzeta*gzeta;
-    rhs_ubar = 0.5*g*(RtoU(h)*DξRtoU(gzeta) + DξRtoU(gzeta2));
-    rhs_vbar = 0.5*g*(RtoV(h)*DηRtoV(gzeta) + DηRtoV(gzeta2));
+    rhs_ubar = 0.5*g*on_u*(RtoU(h)*DξRtoU(gzeta) + DξRtoU(gzeta2));
+    rhs_vbar = 0.5*g*om_v*(RtoV(h)*DηRtoV(gzeta) + DηRtoV(gzeta2));
 }
 
 
 extern "C"  __global__
-void computeZetaRHS(const double *_zeta, const double *_h, double *_ubar, const double *_vbar, double *_res)
+void computeZetaRHS(const double *_zeta, const double *_h, double *_ubar, const double *_vbar, const double *_DU_avg1, const double *_DV_avg1,
+                    const double *_Zt_avg1, bool isPredictor,
+                    const double *weight1, const double *weight2, const int iif, double *_res)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 //TODO: also (i % szJ) == N || (i/szJ) == M)
@@ -85,21 +87,22 @@ void computeZetaRHS(const double *_zeta, const double *_h, double *_ubar, const 
 
     if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D)
     {
-
         return;
     }
 
+
     STENCIL(res);
-    STENCIL(zeta);
-    STENCIL(h);
-    STENCIL(ubar);
-    STENCIL(vbar);
-    STENCIL(on_u);
-    STENCIL(om_v);
-    STENCIL(pn);
-    STENCIL(pm);
-
-
+    STENCILR(zeta);
+    STENCILR(h);
+    STENCILU(ubar);
+    STENCILV(vbar);
+    STENCILU(DU_avg1);
+    STENCILV(DV_avg1);
+    STENCILR(Zt_avg1);
+    STENCILU(on_u);
+    STENCILV(om_v);
+    STENCILR(pn);
+    STENCILR(pm);
     // Water column depth
     auto D = zeta + h;
 
@@ -108,6 +111,18 @@ void computeZetaRHS(const double *_zeta, const double *_h, double *_ubar, const 
     auto DV = vbar*RtoV(D);
 
     res = divUVtoR(DU, DV, on_u, om_v, pn, pm);
+
+    const double cff1 = weight1[iif - 1];
+    const double cff2 = (8.0/12.0)*weight2[iif] - (1.0/12.0)*weight2[iif + 1];
+
+    if (!isPredictor)
+    {
+        Zt_avg1 += cff1*zeta;
+
+        DU_avg1 += cff1*DU*on_u;
+        DV_avg1 += cff1*DV*om_v;
+    }
+
 
 }
 
@@ -134,22 +149,6 @@ void computeZetaPred(const double Dt, const double *_zeta_t0, const double *_zet
 
 
 
-extern "C"  __global__
-void Pred(const double Dt, const double *_v_t1, const double *_v_t2, const double *_rhs, const double *_D_t1, const double *_D_t2)
-{
-    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-
-    if (((i % szJ) == 0 || (i/szJ) == 0) || i >= sz2D) return;
-
-    STENCIL(v_t1);
-    STENCIL(v_t2);
-    STENCIL(D_t1);
-    STENCIL(D_t2);
-    STENCIL(rhs);
-
-    v_t2 = (v_t1(0,0)*D_t1(0,0) + Dt*rhs(0,0))/D_t2(0,0);
-
-}
 
 extern "C"  __global__
 void computeMomentumPred(const double Dt, const double *_u_t1, const double *_u_t2, const double *_v_t1, const double *_v_t2,
@@ -169,6 +168,8 @@ void computeMomentumPred(const double Dt, const double *_u_t1, const double *_u_
     STENCIL(h);
     STENCIL(rhsu);
     STENCIL(rhsv);
+    STENCIL(pn);
+    STENCIL(pm);
 
     auto D_t1 = zeta_t1 + h;
     auto D_t2 = zeta_t2 + h;
@@ -177,8 +178,8 @@ void computeMomentumPred(const double Dt, const double *_u_t1, const double *_u_
     auto D_t2U = RtoU(D_t2);
     auto D_t2V = RtoV(D_t2);
 
-    u_t2 = (u_t1(0,0)*D_t1U(0,0) + Dt*rhsu(0,0))/D_t2U(0,0);
-    v_t2 = (v_t1(0,0)*D_t1V(0,0) + Dt*rhsv(0,0))/D_t2V(0,0);
+    u_t2 = (u_t1*D_t1U + Dt*rhsu*pm*pn)/D_t2U;
+    v_t2 = (v_t1*D_t1V + Dt*rhsv*pm*pn)/D_t2V;
 
 }
 
@@ -200,7 +201,7 @@ void AdamsMoultonCorr3rd(const double Dt, const double *_v_t2, const double *_rh
     STENCIL(rhs_t2);
     STENCIL(v_t2);
 
-    v_t2 = v_t2(0,0) + Dt*(AM3_2*rhs_t2(0,0) + AM3_1*rhs_t1(0,0) + AM3_0*rhs_t0(0,0));
+    v_t2 = v_t2 + Dt*(AM3_2*rhs_t2 + AM3_1*rhs_t1 + AM3_0*rhs_t0);
 }
 
 
@@ -230,6 +231,8 @@ void AdamsMoultonCorr3rd2(const double Dt, const double *_u_t2, const double *_v
     STENCIL(zeta_t1);
     STENCIL(zeta_t2);
     STENCIL(h);
+    STENCIL(pn);
+    STENCIL(pm);
 
     auto D_t1 = zeta_t1 + h;
     auto D_t2 = zeta_t2 + h;
@@ -238,6 +241,6 @@ void AdamsMoultonCorr3rd2(const double Dt, const double *_u_t2, const double *_v
     auto D_t2U = RtoU(D_t2);
     auto D_t2V = RtoV(D_t2);
 
-    u_t2 = (u_t2(0,0)*D_t1U + Dt*(AM3_2*rhsu_t2(0,0) + AM3_1*rhsu_t1(0,0) + AM3_0*rhsu_t0(0,0)))/D_t2U;
-    v_t2 = (v_t2(0,0)*D_t1V + Dt*(AM3_2*rhsv_t2(0,0) + AM3_1*rhsv_t1(0,0) + AM3_0*rhsv_t0(0,0)))/D_t2V;
+    u_t2 = (u_t2(0,0)*D_t1U + Dt*pm*pn*(AM3_2*rhsu_t2(0,0) + AM3_1*rhsu_t1(0,0) + AM3_0*rhsu_t0(0,0)))/D_t2U;
+    v_t2 = (v_t2(0,0)*D_t1V + Dt*pm*pn*(AM3_2*rhsv_t2(0,0) + AM3_1*rhsv_t1(0,0) + AM3_0*rhsv_t0(0,0)))/D_t2V;
 }
