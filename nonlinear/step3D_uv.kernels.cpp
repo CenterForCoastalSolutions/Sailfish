@@ -634,7 +634,7 @@ void createVertViscousOpMatrix(int i, double cff, double Δt, double lambda, Ver
         //Diagonal elements.
         BC = HzU.Eval(0,0,0) - FC.Eval(0,0,0) - FC.Eval(-1,0,0);
 
-        if (i == 73408 && K<N-1) printf("##### %i %i (%g) %g  %g  %g  %g {%g,%g}\n", i, K, AKvU.Eval(0,0,0), cΔt_mn.Eval(0,0,0), RHS.Eval(0,0,0), FC.Eval(0,0,0) , BC.Eval(0,0,0), u.Eval(0,0,0), ru.Eval(0,0,0));
+//        if (i == 73408 && K<N-1) printf("##### %i %i (%g) %g  %g  %g  %g {%g,%g}\n", i, K, AKvU.Eval(0,0,0), cΔt_mn.Eval(0,0,0), RHS.Eval(0,0,0), FC.Eval(0,0,0) , BC.Eval(0,0,0), u.Eval(0,0,0), ru.Eval(0,0,0));
     }
     K = N-1;
 
