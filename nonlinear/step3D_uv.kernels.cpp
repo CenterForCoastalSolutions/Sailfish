@@ -339,12 +339,12 @@ void setLateralUVBCs(double t, double *u, double *v, const int *bcUIdxFieldIdx2,
             double omega = 0.0002;
             double val = 0.01*sin(t*omega) ; ///min(t*omega,1.0)*.1; //0.4*sin(t*omega);
 
-            for (int k = 0; k <= N; k++) u[i + k*sz2D] = val; //*((2.0*k)/(N-1));
+            for (int k = 0; k < N; k++) u[i + k*sz2D] = val; //*((2.0*k)/(N-1));
             // TODO: Remember, this is a fake clamped BC just for tests.
         }
         else if ((bcUType & bcGradient) != 0)
         {
-            for (int k = 0; k < N; k++) u[i + k*sz2D] = u[bcUIdxFieldIdx2[i + k*sz2D]];
+//            for (int k = 0; k < N; k++) u[i + k*sz2D] = u[bcUIdxFieldIdx2[i + k*sz2D]];
         }
     }
 
@@ -418,6 +418,8 @@ void adjustBarotropicVelocity(const unsigned int i, const double *_Hz, const dou
     const int N = szK;
     int K = 0;   // This variable is used by all stencils to define the level they act upon.
 
+
+//TODO: Only Bounday POINTS????!!!!
 //TODO: should include V.
     if (!isUNode(i)) return;
 
@@ -428,8 +430,8 @@ void adjustBarotropicVelocity(const unsigned int i, const double *_Hz, const dou
     STENCIL(om_v);
     STENCIL(DU_avg1);
     STENCIL(DV_avg1);
-    STENCIL(tmpU);
-    STENCIL(tmpV);
+    STENCILU3D(tmpU,       K);
+    STENCILV3D(tmpV,       K);
 
     auto HzU = RtoU(Hz);
     auto HzV = RtoV(Hz);
@@ -483,6 +485,7 @@ void correctBaroclinicMeanVel(const unsigned int i, double *_u, const double *_H
 
     if (!isNode(i)) return;
 
+//    TODO make u a U node.
     STENCILR3D(u,   K);
     STENCILR3D(Hz,  K);
     STENCIL(on_u);
@@ -505,13 +508,9 @@ void correctBaroclinicMeanVel(const unsigned int i, double *_u, const double *_H
 
 
     // Couple and update new solution.
-    for (K=0; K<=N; K++)
+    for (K=0; K<N; K++)
     {
-    //        TODO: Sweeping error.?
             // recursive  ???
-
-//if (udiff!=0.0) printf(">>> %f    %f    %f    %f\n", udiff, Hu, on_u.Eval(0,0), DU_avg1.Eval(0,0));
-
 
         u -= udiff;
     }
@@ -523,6 +522,7 @@ void solveTri(const unsigned int i, const VerticalVelEq &velEq, double AK, const
 // Solve tridiagonal system.
 // -------------------------
 {
+
 //    printf(">aaaasaaa> %i \n",i);
     if (!isUNode(i)) return; // TODO: remember V
 
@@ -557,6 +557,7 @@ void solveTri(const unsigned int i, const VerticalVelEq &velEq, double AK, const
     }
 
 
+//    if (fabs(d[N-1])>0.0001) printf("@@@@2 %i   %g  %g\n", i, d[N-1], b[N-1]);
     u[N-1] = d[N-1]/b[N-1];
 
     for (int k=N-2; k>=0; k--)
@@ -570,9 +571,10 @@ void solveTri(const unsigned int i, const VerticalVelEq &velEq, double AK, const
 
 
 template<NodeType nt, decltype(isUNode) isNode>
-void createVertViscousOpMatrix(int i, int &K, double cff, double Δt, double lambda, VerticalVelEq *velEq,
+void createVertViscousOpMatrix(int i, double cff, double Δt, double lambda, VerticalVelEq *velEq,
                                const double *_Hz, const double *_Akv, const double *_z_r, const double *_u, const double *_ru)
 {
+    int K = 0;
     const double *_FC  = velEq->SD;
     const double *_BC  = velEq->D;
     const double *_RHS = velEq->RHS;
@@ -581,15 +583,16 @@ void createVertViscousOpMatrix(int i, int &K, double cff, double Δt, double lam
 
     STENCIL3D(u,    K);
     STENCIL3D(ru,   K);
-    STENCILR3D(Akv, K);
+    STENCILW3D(Akv, K);
     STENCILR3D(z_r, K);
     STENCILR3D(Hz,  K);
-    STENCILR3D(FC,  K);
+    STENCIL3D(FC,  K);
     STENCILR3D(BC,  K);
     STENCILR3D(RHS, K);
     STENCILR(pm);
     STENCILR(pn);
 
+    constexpr NodeType ntUW = NodeType(int(ntW) + int(nt)); // This is the UW or VW node.
 
 
     // If the index is not a U (or V-node), leaves.
@@ -597,7 +600,7 @@ void createVertViscousOpMatrix(int i, int &K, double cff, double Δt, double lam
 
     // Builds matrix M and vector RHS.
     //-------------------------------
-    const auto AKvU = Akv.to<nt>();  // to<nt>() interpolates Akv from R node to the node defined by nt (either U or V).
+    const auto AKvU = Akv.to<ntUW>();  // to<nt>() interpolates Akv from W node to the node defined by ntUW (either UW or VW).
     const auto HzU  = Hz.to<nt>();
 
     const auto pmU  = pm.to<nt>();
@@ -615,24 +618,33 @@ void createVertViscousOpMatrix(int i, int &K, double cff, double Δt, double lam
     RHS[0] = (HzU*(u + cΔt_mn*ru)).Eval(0,0,0);
     for (K=1; K < N-1; K++)
     {
-
-        RHS = HzU*(u + cΔt_mn*ru);
-
         // Δz is the vertical distance between two U nodes.
-        auto Δz = DσR(z_r).to<nt>();
+        auto Δz = DσRtoW(z_r).to<ntUW>();  // FC are located at W point
 
         // Off-diagonal elements
         FC = -lambda*Δt*AKvU/Δz;
 
+    }
+
+    for (K=0; K < N; K++)
+    {
+
+        RHS = HzU*(u + cΔt_mn*ru);
+
         //Diagonal elements.
         BC = HzU.Eval(0,0,0) - FC.Eval(0,0,0) - FC.Eval(-1,0,0);
+
+        if (i == 73408 && K<N-1) printf("##### %i %i (%g) %g  %g  %g  %g {%g,%g}\n", i, K, AKvU.Eval(0,0,0), cΔt_mn.Eval(0,0,0), RHS.Eval(0,0,0), FC.Eval(0,0,0) , BC.Eval(0,0,0), u.Eval(0,0,0), ru.Eval(0,0,0));
     }
     K = N-1;
 
-//    FC[N-1] = -1.0;
-    BC = FC[N-2];
-    RHS = 0.0;
-//    printf("##### %g\n", BC.Eval(0,0,0));
+////    FC[N-1] = -1.0;
+//    BC = FC[N-2];
+    RHS = RHS.Eval(-1,0,0);
+    BC = HzU.Eval(0,0,0) - FC.Eval(-1,0,0);
+
+//    if (i == 73408) printf(":#### %i %i (%g) %g  [%g,%g]  %g  %g {%g,%g}\n", i, K, AKvU.Eval(0,0,0), cΔt_mn.Eval(0,0,0), RHS[N-1].Eval(0,0),RHS[N-4].Eval(0,0), FC.Eval(0,0,0) , BC.Eval(0,0,0), u.Eval(0,0,0), ru.Eval(0,0,0));
+
 
 //    BC = HzU.Eval(0,0,0) - FC.Eval(0,0,0) - FC.Eval(-1,0,0);
 //    RHS = (HzU*(u + cΔt_mn*ru)).Eval(0,0,0);
@@ -666,16 +678,16 @@ void step3d_UV(double *_u, double *_v, const double *ru, const double *rv, const
 
 
 
-    STENCILU3D(u,   K);
-    STENCILV3D(v,   K);
-
-    STENCILU3D(tmpU,   K);
-    STENCILV3D(tmpV,   K);
+//    STENCILU3D(u,   K);
+//    STENCILV3D(v,   K);
+//
+//    STENCILU3D(tmpU,   K);
+//    STENCILV3D(tmpV,   K);
 
 
     // ξ-direction.
     // TODO: remember tempU
-    createVertViscousOpMatrix<ntU, isUNode>(i, K, cff, Δt, lambda, &velEq, _Hz, _Akv, _z_r, _tmpU, ru);
+    createVertViscousOpMatrix<ntU, isUNode>(i, cff, Δt, lambda, &velEq, _Hz, _Akv, _z_r, _tmpU, ru);
 
 
     solveTri(i, velEq, AK, _z_r, _u);
@@ -687,11 +699,13 @@ void step3d_UV(double *_u, double *_v, const double *ru, const double *rv, const
 
     // η-direction.
 
-    createVertViscousOpMatrix<ntV, isVNode>(i, K, cff, Δt, lambda, &velEq, _Hz, _Akv, _z_r, _tmpV, rv);
+    createVertViscousOpMatrix<ntV, isVNode>(i, cff, Δt, lambda, &velEq, _Hz, _Akv, _z_r, _tmpV, rv);
 
     solveTri(i, velEq, AK, _z_r, _v);
 
     correctBaroclinicMeanVel<ntV, isVNode>(i, _v, _Hz, DV_avg1, _om_v, _tmpV);
+
+
 
 
     applyPointSources();
@@ -700,7 +714,7 @@ void step3d_UV(double *_u, double *_v, const double *ru, const double *rv, const
     // Couple 2D and 3D momentum equations.
     // -----------------------------------------------------------------------
 
-    adjustBarotropicVelocity(i, _Hz, _u, _v, DU_avg1, DV_avg1, _tmpU, _tmpV);
+//    adjustBarotropicVelocity(i, _Hz, _u, _v, DU_avg1, DV_avg1, _tmpU, _tmpV);
 
 
 

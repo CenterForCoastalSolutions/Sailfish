@@ -12,6 +12,8 @@
 #define STENCILV(var)      class Expr<double, void, opStencil2D, ntV>  const var((double *)(_##var + i))
 #define STENCILV3D(var, K) class Expr<double, void, opStencil3D, ntV>  const var((double *)(_##var + i), K)
 
+#define STENCILW3D(var, K) class Expr<double, void, opStencil3D, ntW>  const var((double *)(_##var + i), K)
+
 
 
 
@@ -27,23 +29,26 @@
 //                    template<> decltype(RtoV(*this)) to<ntV>() const { if constexpr(nt == ntR) return RtoV(*this);  }
 
 
-#define TO_ACCESS   template<NodeType ntTo> auto to() const { if constexpr((nt == ntR) && (ntTo == ntU)) return RtoU(*this); \
-                                                              if constexpr((nt == ntR) && (ntTo == ntV)) return RtoV(*this); \
-                                                              else printf("IIIIIIIIII\n");  }
+#define TO_ACCESS   template<NodeType ntTo> auto to() const { if constexpr((nt == ntR) && (ntTo == ntU))  return RtoU(*this); \
+                                                              else if constexpr((nt == ntR) && (ntTo == ntV))  return RtoV(*this); \
+                                                              else if constexpr((nt == ntW) && (ntTo == ntUW)) return WtoUW(*this); \
+                                                              else if constexpr((nt == ntW) && (ntTo == ntVW)) return WtoVW(*this); \
+                                                              else {printf("Error Here: %i   %i\n ", int(nt), int(ntTo)); return Expr<double, void, opStencil2D, ntAny>  ((double *)(0));} }
+//                                                              static_assert(false, "Member function to() undefined for this choice of nodes");  }
 
 
 int sz2D, sz3D, szI, szJ, szK;
 double *_on_u, *_om_v, *_pm, *_pn;
 
-enum Op  {opValue, opStencil2D, opStencil3D, opUnaryMinus, opSum, opSub, opMul, opDiv, opRtoU, opRtoV,
+enum Op  {opValue, opStencil2D, opStencil3D, opUnaryMinus, opSum, opSub, opMul, opDiv, opRtoU, opRtoV, opWtoUW, opWtoVW,
           opUtoR, opVtoR, opUtoP, opVtoP, opUpwindUtoR, opUpwindVtoR, opUpwindUtoP, opUpwindVtoP,
           opRtoU_4th, opRtoV_4th, opRtoW_4th,
           opDxRtoU, opDyRtoV, opdivUVtoR,
           opDXUtoR, opDEVtoR,
           opDXXcentered, opDEEcentered, opDX, opDE,
-          opDsigWtoR, opDsigR };
+          opDsigWtoR, opDsigRtoW };
 
-enum NodeType {ntR, ntU, ntV, ntW, ntP, ntUW, ntVW, ntAny, ntInvalid};
+enum NodeType {ntR = 1, ntU = 2, ntV = 4, ntW = 8, ntP = 16, ntUW = 2+8, ntVW = 4+8, ntAny=0, ntInvalid=32};
 
 
 constexpr bool checkNodeTypes(NodeType const n1, NodeType const n2) { return (n1 == ntAny) || (n2 == ntAny) || (n1 == n2); };
@@ -502,6 +507,70 @@ public:
 };
 
 
+
+template<typename L>
+class Expr<L, void, opWtoUW, ntUW>
+{
+    L &expr;
+    static_assert((L::nt == ntW) || (L::nt == ntAny));
+
+public:
+    typedef decltype(zeroOf(expr)*zeroOf(expr)) ResType;
+    static const NodeType nt = ntUW;
+
+    Expr(L _expr): expr(_expr)
+    {
+    }
+
+    OPERATOR_ACCESS
+    TO_ACCESS
+
+    ResType Eval(int const j, int const i) const
+    {
+        return (expr.Eval(j,i) + expr.Eval(j,i-1))*0.5;
+    }
+
+    ResType Eval(int const k, int const j, int const i) const
+    {
+        return (expr.Eval(k,j,i) + expr.Eval(k,j,i-1))*0.5;
+    }
+
+    ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
+};
+
+
+template<typename L>
+class Expr<L, void, opWtoVW, ntVW>
+{
+    L &expr;
+    static_assert((L::nt == ntW) || (L::nt == ntAny));
+
+public:
+    typedef decltype(zeroOf(expr)*zeroOf(expr)) ResType;
+    static const NodeType nt = ntVW;
+
+    Expr(L _expr): expr(_expr)
+    {
+    }
+
+    OPERATOR_ACCESS
+    TO_ACCESS
+
+    ResType Eval(int const j, int const i) const
+    {
+        return (expr.Eval(j,i) + expr.Eval(j-1,i))*0.5;
+    }
+
+    ResType Eval(int const k, int const j, int const i) const
+    {
+        return (expr.Eval(k,j,i) + expr.Eval(k,j-1,i))*0.5;
+    }
+
+    ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
+};
+
+
+
 template<typename L>
 class Expr<L, void, opRtoV, ntV>
 {
@@ -921,14 +990,14 @@ public:
 };
 
 template<typename L>
-class Expr<L, void, opDsigR, ntR>
+class Expr<L, void, opDsigRtoW, ntR>
 {
     L &expr;
 
 //    static_assert(L::nt == ntR || L::nt == ntAny);
 
 public:
-    static const NodeType nt = ntR;
+    static const NodeType nt = ntW;
     typedef decltype(zeroOf(expr)*zeroOf(expr)) ResType;
 
     Expr(L _expr): expr(_expr)
@@ -939,7 +1008,7 @@ public:
 
     ResType Eval(int const k, int const j, int const i) const
     {
-        return expr.Eval(k+1,j,i) - expr.Eval(k,j,i);
+        return expr.Eval(k,j,i) - expr.Eval(k-1,j,i);
     }
 
     ResType zero(void) const { return ResType(0.0); }  // This is mostly a trick to get a number with the appropriate type;
@@ -1275,6 +1344,18 @@ auto RtoV(const T &R)
 
 
 template<typename T>
+auto WtoUW(const T &W) {
+    return Expr<T, void, opWtoUW, ntUW>(W);
+}
+
+template<typename T>
+auto WtoVW(const T &W) {
+    return Expr<T, void, opWtoVW, ntVW>(W);
+}
+
+
+
+template<typename T>
 auto RtoW_4th(const T &R) {
     return Expr<T, void, opRtoW_4th, ntW>(R);
 }
@@ -1406,7 +1487,7 @@ auto DsigWtoR(const T &W) { return Expr<T, void, opDsigWtoR, ntR>(W); }
 
 
 template<typename T>
-auto DsigR(const T &W) { return Expr<T, void, opDsigR, ntR>(W); }
+auto DsigRtoW(const T &W) { return Expr<T, void, opDsigRtoW, ntR>(W); }
 
 
 // ---------------------------------------------------------------

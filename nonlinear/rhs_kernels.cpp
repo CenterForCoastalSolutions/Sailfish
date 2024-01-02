@@ -180,8 +180,12 @@ void verticalAdvection(double const *_u, double const *_v, double const *_W, dou
     ru[0]   = 0.0;
     rv[0]   = 0.0;
 
+ru[N-2] = ru[N-3].Eval(0,0); //0.0;
+rv[N-2] = rv[N-3].Eval(0,0); //0.0;
     ru[N-1] = ru[N-2].Eval(0,0); //0.0;
     rv[N-1] = rv[N-2].Eval(0,0); //0.0;
+ru[N] = ru[N-2].Eval(0,0); //0.0;
+rv[N] = rv[N-2].Eval(0,0); //0.0;
 
 }
 

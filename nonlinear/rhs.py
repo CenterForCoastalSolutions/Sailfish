@@ -106,9 +106,10 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
         verticalAdvection((grsz[0]*2,), (bksz[0]//2,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.W, OCEAN.ru_t2, OCEAN.rv_t2, BC))
 
           # TODO: remember
-    OCEAN.u_t2.reshape(17,402,402)[:,:,0] = OCEAN.u_t2.reshape(17,402,402)[:,:,2]
-    OCEAN.u_t2.reshape(17,402,402)[:,:,1] = OCEAN.u_t2.reshape(17,402,402)[:,:,2]
-    OCEAN.rv_t2[:] = 0.0
+    shp = (GRID.N+1,GRID.M+1,GRID.L+1)
+    # OCEAN.u_t2.reshape(shp)[:,:,0] = OCEAN.u_t2.reshape(shp)[:,:,2]
+    # OCEAN.u_t2.reshape(shp)[:,:,1] = OCEAN.u_t2.reshape(shp)[:,:,2]
+    # OCEAN.rv_t2[:] = 0.0
     # OCEAN.ru_t2.reshape(17,402,402)[:,0,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
     # OCEAN.ru_t2.reshape(17,402,402)[:,1,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
     # OCEAN.ru_t2.reshape(17,402,402)[:,2,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
@@ -122,10 +123,10 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
     # OCEAN.u_t2.reshape(17,402,402)[:,3,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
     # OCEAN.u_t2.reshape(17,402,402)[:,4,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
     # OCEAN.u_t2.reshape(17,402,402)[:,5,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
-    OCEAN.u_t2.reshape(17,402,402)[-1,:,:] = OCEAN.u_t2.reshape(17,402,402)[-2,:,:]
-    OCEAN.ru_t2.reshape(17,402,402)[-1,:,:] = OCEAN.ru_t2.reshape(17,402,402)[-2,:,:]
-    # XXXXX
-    OCEAN.ru_t2.reshape(17,402,402)[0,:,:] = OCEAN.ru_t2.reshape(17,402,402)[1,:,:]
+    # OCEAN.u_t2.reshape(shp)[-1,:,:] = OCEAN.u_t2.reshape(shp)[-2,:,:]
+    # OCEAN.ru_t2.reshape(shp)[-1,:,:] = OCEAN.ru_t2.reshape(shp)[-2,:,:]
+    # # XXXXX
+    # OCEAN.ru_t2.reshape(shp)[0,:,:] = OCEAN.ru_t2.reshape(shp)[1,:,:]
     # OCEAN.ru_t2.reshape(17,402,402)[1,:,:] = OCEAN.ru_t2.reshape(17,402,402)[6,:,:]
     # OCEAN.ru_t2.reshape(17,402,402)[2,:,:] = OCEAN.ru_t2.reshape(17,402,402)[6,:,:]
     # OCEAN.ru_t2.reshape(17,402,402)[3,:,:] = OCEAN.ru_t2.reshape(17,402,402)[6,:,:]

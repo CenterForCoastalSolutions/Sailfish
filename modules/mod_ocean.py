@@ -88,7 +88,9 @@ class T_OCEAN:
 
         # Turbulence.
         # TODO: This needs to be filled somewhere.
-        self.AKv  = 0.01 + cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64)
+        self.AKv  = 0.00001 + cp.zeros((N + 1, M + 1, L + 1), dtype = cp.float64)
+        for i in range(GRID.N-2):
+            self.AKv[i:,:,:] = 0.1*(GRID.z_r[i])/(GRID.z_r[GRID.N-1])
         self.AK   = 0.00001
 
 

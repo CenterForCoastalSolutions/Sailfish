@@ -183,13 +183,13 @@ class Boundary:
         bcIdx2 = cp.array(bcIdx2, dtype = int)
         LBC    = cp.array(LBC,    dtype = int)
 
-        # Sorts the indices to improve cache access.
-        sortIdx = cp.argsort(bcIdx.flatten())
+        # Sorts the indices to improve cache access. TODO: Recover?
+        # sortIdx = cp.argsort(bcIdx.flatten())
 
-        bcIdx  = bcIdx [sortIdx]
-        bcIdx1 = bcIdx1[sortIdx]
-        bcIdx2 = bcIdx2[sortIdx]
-        LBC    = LBC   [sortIdx]
+        # bcIdx  = bcIdx [sortIdx]
+        # bcIdx1 = bcIdx1[sortIdx]
+        # bcIdx2 = bcIdx2[sortIdx]
+        # LBC    = LBC   [sortIdx]
 
         bcIdxFieldIdx2 = -cp.ones(shp, cp.int32)
         bcIdxFieldType = -cp.ones(shp, cp.int32)
