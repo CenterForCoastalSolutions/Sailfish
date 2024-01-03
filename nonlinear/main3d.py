@@ -7,7 +7,7 @@ import cupy as cp
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-# mpl.use("TkAgg")
+mpl.use("TkAgg")
 
 
 def output():
@@ -247,7 +247,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
 
         # Time-step 3D momentum equations and couple with vertically integrated equations.
-        λ = 1.0  # REDO: Use the right value
+        λ = 1.0  # TODO: Use the right value
 
         # TODO: Remember I did this:
         tmpU[:] = OCEAN.u_t2
@@ -279,10 +279,12 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         # TODO: recover
         # OCEAN.u_t2[:] = tmpU
         # OCEAN.v_t2[:] = 0.0
-        # OCEAN.u_t2 .reshape(17,402,402)[GRID.N:,:,:]=OCEAN.u_t2 .reshape(17,402,402)[GRID.N-2,:,:]
-        # OCEAN.u_t2 .reshape(17,402,402)[GRID.N-1:,:,:]= OCEAN.u_t2 .reshape(17,402,402)[GRID.N-2,:,:]
         shp = (GRID.N+1,GRID.M+1,GRID.L+1)
         shp2D = (GRID.M+1,GRID.L+1)
+        OCEAN.u_t2 .reshape(shp)[GRID.N  :,:,:] = OCEAN.u_t2.reshape(shp)[GRID.N-3,:,:]
+        OCEAN.u_t2 .reshape(shp)[GRID.N-1:,:,:] = OCEAN.u_t2.reshape(shp)[GRID.N-3,:,:]
+        OCEAN.u_t2 .reshape(shp)[GRID.N-2:,:,:] = OCEAN.u_t2.reshape(shp)[GRID.N-3,:,:]
+
         OCEAN.u_t2 .reshape(shp)[:,0,:]=OCEAN.u_t2.reshape(shp)[:,2,:]
         OCEAN.u_t2 .reshape(shp)[:,1,:]=OCEAN.u_t2.reshape(shp)[:,2,:]
         # OCEAN.u_t2 .reshape(17,402,402)[:,1,:]=OCEAN.u_t2.reshape(17,402,402)[:,13,:]
