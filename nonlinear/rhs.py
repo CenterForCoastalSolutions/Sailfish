@@ -42,22 +42,17 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
         addCoriolis(grsz, bksz, (GRID.fomn, OCEAN.u_t2, OCEAN.v_t2, OCEAN.ru_t2, OCEAN.rv_t2, GRID.Hz))   # TODO: Check that all must be _t2.
 
 
-
-
-
-    # if defined CURVGRID && defined UV_ADV
     # These are the terms (u*d_xi(1/n) - v*d_eta(1/m))*Hz*u  and  (v*d_xi(1/n) - u*d_eta(1/m))*Hz*v
     # Where u is computed using an upwind interpolation.
-    if CURVGRID:
+    if CURVGRID and UV_ADV:
         # Add in curvilinear transformation terms. (for the advection terms only)
         addCurvedGridTerms()
 
 
 
-
-
     pass
     # TODO: Add in nudging towards 3D momentum climatology.
+
 
 
     # Compute horizontal advection of momentum.
@@ -66,76 +61,16 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
     horizontalAdvection((grsz[0]*2,), (bksz[0]//2,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.Huon.ravel(), OCEAN.Hvom.ravel(), OCEAN.ru_t2, OCEAN.rv_t2, BC))
 
 
-    # pass
-        # mod_ocean.T_OCEAN.,  const double *_v, const double *_Huon, const double *_Hvom,
-        #                  const double *_ru, const double *_rv, const int N)
 
-    # uξξ  = Dξξ(   u[nrhs,:,:,:], BC)
-    # Huξξ = Dξξ(Huon[nrhs,:,:,:], BC)
-    # # DO j=Jstr,Jend
-    # #   DO i=IstrUm1,Iendp1
-    # #     uξξ(i,j)  = u(i-1,j,k,nrhs) - 2.0*u(i,j,k,nrhs) + u(i+1,j,k,nrhs)
-    # #     Huξξ(i,j) = Huon(i-1,j,k)   - 2.0*Huon(i,j,k)   + Huon(i+1,j,k)
-    # #   END DO
-    # # END DO
-    # #
-    # #
-    # # # BC's for 2nd derivatives
-    # # IF (DOMAIN(ng)%Western_Edge(tile)) THEN
-    # #     DO j=Jstr,Jend
-    # #       uξξ (Istr,j) = uξξ (Istr+1,j)
-    # #       Huξξ(Istr,j) = Huξξ(Istr+1,j)
-    # #     END DO
-    # # END IF
-    # #
-    # #
-    # # IF (DOMAIN(ng)%Eastern_Edge(tile)) THEN
-    # #     DO j=Jstr,Jend
-    # #       uξξ (Iend+1,j) = uξξ (Iend,j)
-    # #       Huξξ(Iend+1,j) = Huξξ(Iend,j)
-    # #     END DO
-    # # END IF
-
-
-
-    if UV_ADV:
+    # if UV_ADV:
 
         # Add in vertical advection.
         # -----------------------------------------------------------------------
 
-        verticalAdvection((grsz[0]*2,), (bksz[0]//2,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.W, OCEAN.ru_t2, OCEAN.rv_t2, BC))
+        # verticalAdvection((grsz[0]*2,), (bksz[0]//2,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.W, OCEAN.ru_t2, OCEAN.rv_t2, BC))
 
           # TODO: remember
-    shp = (GRID.N+1,GRID.M+1,GRID.L+1)
-    # OCEAN.u_t2.reshape(shp)[:,:,0] = OCEAN.u_t2.reshape(shp)[:,:,2]
-    # OCEAN.u_t2.reshape(shp)[:,:,1] = OCEAN.u_t2.reshape(shp)[:,:,2]
-    # OCEAN.rv_t2[:] = 0.0
-    # OCEAN.ru_t2.reshape(17,402,402)[:,0,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
-    # OCEAN.ru_t2.reshape(17,402,402)[:,1,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
-    # OCEAN.ru_t2.reshape(17,402,402)[:,2,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
-    # OCEAN.ru_t2.reshape(17,402,402)[:,3,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
-    # OCEAN.ru_t2.reshape(17,402,402)[:,4,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
-    # OCEAN.ru_t2.reshape(17,402,402)[:,5,:] = OCEAN.ru_t2.reshape(17,402,402)[:,6,:]
-    # # OCEAN.ru_t2.reshape(17,402,402)[:,2:6,:] = 0.0
-    # OCEAN.u_t2.reshape(17,402,402)[:,0,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
-    # OCEAN.u_t2.reshape(17,402,402)[:,1,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
-    # OCEAN.u_t2.reshape(17,402,402)[:,2,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
-    # OCEAN.u_t2.reshape(17,402,402)[:,3,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
-    # OCEAN.u_t2.reshape(17,402,402)[:,4,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
-    # OCEAN.u_t2.reshape(17,402,402)[:,5,:] = OCEAN.u_t2.reshape(17,402,402)[:,6,:]
-    # OCEAN.u_t2.reshape(shp)[-1,:,:] = OCEAN.u_t2.reshape(shp)[-2,:,:]
-    # OCEAN.ru_t2.reshape(shp)[-1,:,:] = OCEAN.ru_t2.reshape(shp)[-2,:,:]
-    # # XXXXX
-    # OCEAN.ru_t2.reshape(shp)[0,:,:] = OCEAN.ru_t2.reshape(shp)[1,:,:]
-    # OCEAN.ru_t2.reshape(17,402,402)[1,:,:] = OCEAN.ru_t2.reshape(17,402,402)[6,:,:]
-    # OCEAN.ru_t2.reshape(17,402,402)[2,:,:] = OCEAN.ru_t2.reshape(17,402,402)[6,:,:]
-    # OCEAN.ru_t2.reshape(17,402,402)[3,:,:] = OCEAN.ru_t2.reshape(17,402,402)[6,:,:]
-    # OCEAN.ru_t2.reshape(17,402,402)[4,:,:] = OCEAN.ru_t2.reshape(17,402,402)[6,:,:]
-    # OCEAN.ru_t2.reshape(17,402,402)[5,:,:] = OCEAN.ru_t2.reshape(17,402,402)[6,:,:]
-    # OCEAN.u_t2.reshape(17,402,402)[0,:,:] = 0.0
-    # OCEAN.u_t2.reshape(17,402,402)[1,:,:] = OCEAN.u_t2.reshape(17,402,402)[3,:,:]
-    # OCEAN.u_t2.reshape(17,402,402)[2,:,:] = OCEAN.u_t2.reshape(17,402,402)[3,:,:]
-    # OCEAN.u_t2.reshape(17,402,402)[:,2:6,:] = 0.0
+
 
         # Compute forcing term for the 2D momentum equations.
         # -----------------------------------------------------------------------

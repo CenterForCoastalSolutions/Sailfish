@@ -142,6 +142,7 @@ void verticalAdvection(double const *_u, double const *_v, double const *_W, dou
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
     const int N = szK;
 
+
 //    if (((i % szI) == 0 || ((i % szI) >= (szI - 2) || (i/szI) == 0) || (i/szI) >= (szJ - 2)) || i >= sz2D) return;
 
     if (i >= sz2D || BC[i] >= 0)
@@ -169,16 +170,25 @@ void verticalAdvection(double const *_u, double const *_v, double const *_W, dou
         rv -= DσVWtoV(FsigmaVW);
     }
 
-    K = 0;
+    K = 1;
     // vertical boundary conditions (TODO: can it be done inside DσVWtoV?, also revise.
-    ru[1]   -= (9.0/16.0)*(FsigmaUW.Eval(  0,0,0) + FsigmaUW.Eval(  1,0,0)) - (1.0/16.0)*(FsigmaUW.Eval(  0,0,0) + FsigmaUW.Eval(  2,0,0));
+//    ru[1]   -= (9.0/16.0)*(FsigmaUW.Eval(  0,0,0) + FsigmaUW.Eval(  1,0,0)) - (1.0/16.0)*(FsigmaUW.Eval(  0,0,0) + FsigmaUW.Eval(  2,0,0));
     rv[1]   -= (9.0/16.0)*(FsigmaVW.Eval(  0,0,0) + FsigmaVW.Eval(  1,0,0)) - (1.0/16.0)*(FsigmaVW.Eval(  0,0,0) + FsigmaVW.Eval(  2,0,0));
-
+    double uuu = ((9.0/16.0)*(u.Eval(  -1,0,0) + u.Eval(  0,0,0)) - (1.0/16.0)*(0 + u.Eval(  1,0,0)))*WtoUW_4th(W).Eval(0,0,0);
+    double uuu2 = ((9.0/16.0)*(0 + u.Eval(  -1,0,0)) - (1.0/16.0)*(0 + u.Eval(  0,0,0)))*WtoUW_4th(W).Eval(-1,0,0);
+    ru[1] -= (FsigmaUW.Eval(1,0,0) - uuu);
+    ru[0] -= (uuu - uuu2);
+//    expr.Eval(k+1,j,i) - expr.Eval(k,j,i)
+    K = 0;
     ru[N-2] -= (9.0/16.0)*(FsigmaUW.Eval(N-1,0,0) + FsigmaUW.Eval(N-2,0,0)) - (1.0/16.0)*(FsigmaUW.Eval(N-1,0,0) + FsigmaUW.Eval(N-3,0,0));
     rv[N-2] -= (9.0/16.0)*(FsigmaVW.Eval(N-1,0,0) + FsigmaVW.Eval(N-2,0,0)) - (1.0/16.0)*(FsigmaVW.Eval(N-1,0,0) + FsigmaVW.Eval(N-3,0,0));
 
-    ru[0]   = 0.0;
-    rv[0]   = 0.0;
+//    ru[0]   = ru[1].Eval(  0,0,0);
+    rv[0]   = rv[1].Eval(  0,0,0);
+
+//    if (i == 73408) printf(":#### %i %i  %g   %g  %g  (%g,  %g)\n", i, K, ru[0].Eval(0,0,0), ru[1].Eval(0,0,0), ru[2].Eval(0,0), FsigmaUW.Eval(1,0,0), uuu);
+
+
 
 ru[N-2] = ru[N-3].Eval(0,0); //0.0;
 rv[N-2] = rv[N-3].Eval(0,0); //0.0;

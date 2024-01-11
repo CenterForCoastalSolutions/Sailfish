@@ -609,41 +609,36 @@ void createVertViscousOpMatrix(int i, double cff, double Δt, double lambda, Ver
     const auto pmnU = pmU*pnU;
     const auto cΔt_mn = cff*Δt*pmnU;
 
-
-
-    FC[0] = 0.0;
     FC[N-1] = 0.0;
     K = 0;
     BC[0] = HzU.Eval(0,0,0);
     RHS[0] = (HzU*(u + cΔt_mn*ru)).Eval(0,0,0);
-    for (K=1; K < N-1; K++)
+
+    // Δz is the vertical distance between two U nodes.
+    auto Δz = DσRtoW(z_r).to<ntUW>();  // FC are located at W point
+    for (K=0; K < N-1; K++)
     {
-        // Δz is the vertical distance between two U nodes.
-        auto Δz = DσRtoW(z_r).to<ntUW>();  // FC are located at W point
-
         // Off-diagonal elements
-        FC = -lambda*Δt*AKvU/Δz;
-
+        FC = -lambda*Δt*AKvU/Δz.Eval(1,0,0);
     }
 
-    for (K=0; K < N; K++)
+    for (K=1; K < N; K++)
     {
-
         RHS = HzU*(u + cΔt_mn*ru);
 
         //Diagonal elements.
         BC = HzU.Eval(0,0,0) - FC.Eval(0,0,0) - FC.Eval(-1,0,0);
-
-//        if (i == 73408 && K<N-1) printf("##### %i %i (%g) %g  %g  %g  %g {%g,%g}\n", i, K, AKvU.Eval(0,0,0), cΔt_mn.Eval(0,0,0), RHS.Eval(0,0,0), FC.Eval(0,0,0) , BC.Eval(0,0,0), u.Eval(0,0,0), ru.Eval(0,0,0));
     }
     K = N-1;
-
-////    FC[N-1] = -1.0;
-//    BC = FC[N-2];
     RHS = RHS.Eval(-1,0,0);
     BC = HzU.Eval(0,0,0) - FC.Eval(-1,0,0);
 
-//    if (i == 73408) printf(":#### %i %i (%g) %g  [%g,%g]  %g  %g {%g,%g}\n", i, K, AKvU.Eval(0,0,0), cΔt_mn.Eval(0,0,0), RHS[N-1].Eval(0,0),RHS[N-4].Eval(0,0), FC.Eval(0,0,0) , BC.Eval(0,0,0), u.Eval(0,0,0), ru.Eval(0,0,0));
+    K = 0;
+    FC = (-lambda*Δt*AKvU).Eval(0,0,0)/Δz.Eval(1,0,0);  // TODO: do this more correctly.
+    BC = HzU.Eval(0,0,0) - FC.Eval(0,0,0);
+
+
+//    if (i == 73408) printf(":#### %i  {%g,%g}\n", i, HzU.Eval(0,0,0), FC.Eval(0,0,0));
 
 
 //    BC = HzU.Eval(0,0,0) - FC.Eval(0,0,0) - FC.Eval(-1,0,0);
