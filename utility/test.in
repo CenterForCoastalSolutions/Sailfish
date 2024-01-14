@@ -91,8 +91,8 @@ GridsInLayer =  1
 ! Grid dimension parameters. See notes below in the Glossary for how to set
 ! these parameters correctly.
 
-          Lm == 732          ! Number of I-direction INTERIOR RHO-points
-          Mm == 732          ! Number of J-direction INTERIOR RHO-points
+          Lm == 1464          ! Number of I-direction INTERIOR RHO-points
+          Mm == 1464          ! Number of J-direction INTERIOR RHO-points
            N == 24            ! Number of vertical levels
 
 
