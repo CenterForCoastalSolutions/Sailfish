@@ -7,7 +7,7 @@ import cupy as cp
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-mpl.use("TkAgg")
+# mpl.use("TkAgg")
 
 
 def output():

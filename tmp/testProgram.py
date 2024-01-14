@@ -1,3 +1,4 @@
+import datetime
 import sys
 import cupy as cp
 
@@ -76,7 +77,10 @@ OCEAN.AKv[:,:,:] =+0.001
 
 # rhs3d(GRID, OCEAN, BOUNDARY)
 
+t0 = datetime.datetime.now()
 main3d(compTimes, GRID, OCEAN, BOUNDARY)
+t1 = datetime.datetime.now()
+print('clock time = %.3f s' %(t1-t0).seconds)
 main2d(compTimes, GRID, OCEAN, BOUNDARY)
 
 # cProfile.run('main2d(compTimes,  GRID, OCEAN, BOUNDARY)')
