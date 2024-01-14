@@ -280,6 +280,7 @@ void set_depth(const int Vtransform, const double *_Zt_avg1, const double *_z_w,
 
             z_w = Zt_avg1 + (Zt_avg1 + h)*cff2_w;
             z_r = Zt_avg1 + (Zt_avg1 + h)*cff2_r;
+
         }
 
         for (K=0; K<N; K++)
@@ -462,7 +463,6 @@ void adjustBarotropicVelocity(const unsigned int i, const double *_Hz, const dou
     // Update new solution.
     for (K=0; K<=N; K++)
     {
-//        TODO: THis has a sweeping error. uUpdate depends on adyacent u's.
         tmpU -= uUpdate;
         tmpV -= vUpdate;
     }
@@ -538,9 +538,9 @@ void solveTri(const unsigned int i, const VerticalVelEq &velEq, double AK, const
         double &operator[](const unsigned int k) const { return *(p + k*sz2D); };
     };
 
-    VertArray a(velEq.SD   + i);
+    VertArray a(velEq.SD   + i - sz2D);
     VertArray b(velEq.D    + i);
-    VertArray c(velEq.SD   + i + sz2D);
+    VertArray c(velEq.SD   + i);
     VertArray d(velEq.RHS  + i);
     VertArray u(_u + i);
 
@@ -553,11 +553,9 @@ void solveTri(const unsigned int i, const VerticalVelEq &velEq, double AK, const
         b[k] -= w*c[k-1];
 
         d[k] -= w*d[k-1];
-//        printf("@@@@2 %g   %g  %g\n", w, d[k], b[k]);
     }
 
 
-//    if (fabs(d[N-1])>0.0001) printf("@@@@2 %i   %g  %g\n", i, d[N-1], b[N-1]);
     u[N-1] = d[N-1]/b[N-1];
 
     for (int k=N-2; k>=0; k--)
@@ -565,7 +563,6 @@ void solveTri(const unsigned int i, const VerticalVelEq &velEq, double AK, const
         // Forward substitution
         u[k] = (d[k] - c[k]*u[k+1])/b[k];
     }
-//    u[N] = u[N-1];
 
 }
 
@@ -630,15 +627,19 @@ void createVertViscousOpMatrix(int i, double cff, double Δt, double lambda, Ver
         BC = HzU.Eval(0,0,0) - FC.Eval(0,0,0) - FC.Eval(-1,0,0);
     }
     K = N-1;
-    RHS = RHS.Eval(-1,0,0);
+//    RHS = RHS.Eval(-1,0,0);
     BC = HzU.Eval(0,0,0) - FC.Eval(-1,0,0);
+//    if (i == 73408) printf(":#### %i  {%g,%g}\n", i, HzU.Eval(0,0,0), FC.Eval(-1,0,0));
+
+//    K = N-2;
+//    if (i == 73408) printf(":2#### %i  {%g,%g}\n", i, HzU.Eval(0,0,0), FC.Eval(-1,0,0));
 
     K = 0;
     FC = (-lambda*Δt*AKvU).Eval(0,0,0)/Δz.Eval(1,0,0);  // TODO: do this more correctly.
-    BC = HzU.Eval(0,0,0) - FC.Eval(0,0,0);
+    BC = HzU.Eval(0,0,0) - 2.0*FC.Eval(0,0,0);
 
 
-//    if (i == 73408) printf(":#### %i  {%g,%g}\n", i, HzU.Eval(0,0,0), FC.Eval(0,0,0));
+
 
 
 //    BC = HzU.Eval(0,0,0) - FC.Eval(0,0,0) - FC.Eval(-1,0,0);
@@ -711,6 +712,38 @@ void step3d_UV(double *_u, double *_v, const double *ru, const double *rv, const
 
 //    adjustBarotropicVelocity(i, _Hz, _u, _v, DU_avg1, DV_avg1, _tmpU, _tmpV);
 
+
+
+}
+
+
+extern "C"  __global__
+void step3d_UV_test(double *_u, double *_v, const double *ru, const double *rv, const double *ubar_t2, const double *vbar_t2,
+               const double *_Hz, const double *_Akv, const double *_z_r, const double *DU_avg1, const double *DV_avg1,
+               const double *_tmpU, const double *_tmpV,
+               int iic, int ntfirst, double lambda, double AK, double Dt)
+{
+    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
+    const int N = szK;
+
+    // Time step momentum equations
+    // ----------------------------
+    double cff;
+    if (iic == ntfirst)           cff = 1.0;
+    else if (iic == ntfirst + 1)  cff = 3.0/2.0;
+    else                          cff = 23.0/12.0;
+
+    int K = 0;
+
+
+
+    // ξ-direction.
+    createVertViscousOpMatrix<ntU, isUNode>(i, cff, Δt, lambda, &velEq, _Hz, _Akv, _z_r, _tmpU, ru);
+    solveTri(i, velEq, AK, _z_r, _u);
+    if (i == 73408)
+    {
+        for (int k=0; k<N; k++) printf(":#### %i  {%g}\n", k, _u[i+k*sz2D]);
+    }
 
 
 }

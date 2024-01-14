@@ -9,7 +9,7 @@ ANA_PSOURCE_2D = True
 
 
 def apply_sources(SOURCES):
-    #seperate 2D and 3D as a 3D source could be in the intermediate layers of the water
+    #separate 2D and 3D as a 3D source could be in the intermediate layers of the water
     if ANA_PSOURCE_2D:
         SOURCES.Isrc
 

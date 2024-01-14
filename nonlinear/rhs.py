@@ -62,12 +62,12 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
 
 
 
-    # if UV_ADV:
+    if UV_ADV:
 
         # Add in vertical advection.
         # -----------------------------------------------------------------------
 
-        # verticalAdvection((grsz[0]*2,), (bksz[0]//2,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.W, OCEAN.ru_t2, OCEAN.rv_t2, BC))
+        verticalAdvection((grsz[0]*2,), (bksz[0]//2,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.W, OCEAN.ru_t2, OCEAN.rv_t2, BC))
 
           # TODO: remember
 

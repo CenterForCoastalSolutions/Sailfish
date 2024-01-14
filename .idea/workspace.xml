@@ -10,13 +10,13 @@
   <component name="ChangeListManager">
     <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="...">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_ocean.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_ocean.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_comptimes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_comptimes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_operators.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_operators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_sources.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_sources.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/main3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main3d.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/rhs.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/rhs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/rhs_kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/rhs_kernels.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/step3D_uv.kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step3D_uv.kernels.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tmp/testProgram.py" beforeDir="false" afterPath="$PROJECT_DIR$/tmp/testProgram.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utility/test.in" beforeDir="false" afterPath="$PROJECT_DIR$/utility/test.in" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -200,7 +200,7 @@
       <workItem from="1697808491144" duration="51436000" />
       <workItem from="1698255457335" duration="348722000" />
       <workItem from="1703106751106" duration="35218000" />
-      <workItem from="1703253566604" duration="178230000" />
+      <workItem from="1703253566604" duration="198497000" />
     </task>
     <task id="LOCAL-00190" summary="...">
       <created>1688759100667</created>
@@ -545,7 +545,7 @@
       <option name="project" value="LOCAL" />
       <updated>1702492420687</updated>
     </task>
-    <option name="localTasksCounter" value="256" />
+    <option name="localTasksCounter" value="257" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -644,6 +644,6 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/oceangpu$testProgram.coverage" NAME="testProgram Coverage Results" MODIFIED="1704983847105" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp" />
+    <SUITE FILE_PATH="coverage/oceangpu$testProgram.coverage" NAME="testProgram Coverage Results" MODIFIED="1705010082883" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp" />
   </component>
 </project>

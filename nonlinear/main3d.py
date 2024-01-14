@@ -160,7 +160,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
             step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY)
 
-            if compTimes.iic % 100==10 and compTimes.iif == 1:
+            if compTimes.iic % 100==-10 and compTimes.iif == 1:
                 # plt.close(True)
                 try:
                     fig.clf()
