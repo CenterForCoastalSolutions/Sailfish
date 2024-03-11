@@ -627,23 +627,14 @@ void createVertViscousOpMatrix(int i, double cff, double Δt, double lambda, Ver
         BC = HzU.Eval(0,0,0) - FC.Eval(0,0,0) - FC.Eval(-1,0,0);
     }
     K = N-1;
-//    RHS = RHS.Eval(-1,0,0);
-    BC = HzU.Eval(0,0,0) - FC.Eval(-1,0,0);
-//    if (i == 73408) printf(":#### %i  {%g,%g}\n", i, HzU.Eval(0,0,0), FC.Eval(-1,0,0));
 
-//    K = N-2;
-//    if (i == 73408) printf(":2#### %i  {%g,%g}\n", i, HzU.Eval(0,0,0), FC.Eval(-1,0,0));
+    BC = HzU.Eval(0,0,0) - FC.Eval(-1,0,0);
+
 
     K = 0;
     FC = (-lambda*Δt*AKvU).Eval(0,0,0)/Δz.Eval(1,0,0);  // TODO: do this more correctly.
     BC = HzU.Eval(0,0,0) - 2.0*FC.Eval(0,0,0);
 
-
-
-
-
-//    BC = HzU.Eval(0,0,0) - FC.Eval(0,0,0) - FC.Eval(-1,0,0);
-//    RHS = (HzU*(u + cΔt_mn*ru)).Eval(0,0,0);
 
 
     // At this point, RHS contains the RHS, BC is the main diagonal and FC[1:-1], FC[:,-2] the other two diagonals.
@@ -674,15 +665,8 @@ void step3d_UV(double *_u, double *_v, const double *ru, const double *rv, const
 
 
 
-//    STENCILU3D(u,   K);
-//    STENCILV3D(v,   K);
-//
-//    STENCILU3D(tmpU,   K);
-//    STENCILV3D(tmpV,   K);
-
-
     // ξ-direction.
-    // TODO: remember tempU
+
     createVertViscousOpMatrix<ntU, isUNode>(i, cff, Δt, lambda, &velEq, _Hz, _Akv, _z_r, _tmpU, ru);
 
 
