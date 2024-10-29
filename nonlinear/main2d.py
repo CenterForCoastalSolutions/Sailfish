@@ -67,7 +67,7 @@ def main2d(compTimes, GRID, OCEAN, BOUNDARY):
         # ==============   predictor scheme.
         step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY)
 
-        if compTimes.iif % 50000 == 0:
+        if compTimes.iif % 500 == 0:
             plt.clf()
             plt.imshow(OCEAN.zeta_t2.reshape(GRID.M+1, GRID.M+1).get())
             plt.colorbar()

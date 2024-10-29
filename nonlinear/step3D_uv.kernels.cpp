@@ -249,21 +249,17 @@ void set_depth(const int Vtransform, const double *_Zt_avg1, const double *_z_w,
     //        z_w(x,y,s,t)  =  Zo_w  +  zeta(x,y,t) * [1.0 + Zo_w / h(x,y)]
     //                Zo_w  =  hc * [s(k) - C(k)]  +  C(k) * h(x,y)
     {
-        z_w[N] = 0.0;
+
 
         for (K=0; K<N; K++) // TODO: Is it K=1..N or 1..N-1?
         {
             double z_r0 = (hc*(sc_r[K] - Cs_r[K]) + Cs_r[K]*h).Eval(0,0,0);
             double z_w0 = (hc*(sc_w[K] - Cs_w[K]) + Cs_w[K]*h).Eval(0,0,0);
 
-            z_w =        Zt_avg1*(1.0 + z_w0/h);
+            z_w = z_w0 + Zt_avg1*(1.0 + z_w0/h);
             z_r = z_r0 + Zt_avg1*(1.0 + z_r0/h);
         }
-
-        for (K=0; K<N; K++)
-        {
-            Hz = DσWtoR(z_w);
-        }
+        z_w[N] = Zt_avg1;
 
     }
     else if (Vtransform == 2)
@@ -282,12 +278,14 @@ void set_depth(const int Vtransform, const double *_Zt_avg1, const double *_z_w,
             z_r = Zt_avg1 + (Zt_avg1 + h)*cff2_r;
 
         }
+        z_w[N] = Zt_avg1;
 
-        for (K=0; K<N; K++)
-        {
-            Hz = DσWtoR(z_w);
-        }
+    }
 
+
+    for (K=0; K<N; K++)
+    {
+        Hz = DσWtoR(z_w);
     }
 
 }
@@ -338,7 +336,7 @@ void setLateralUVBCs(double t, double *u, double *v, const int *bcUIdxFieldIdx2,
         else if ((bcUType & bcClamped) != 0)
         {
             double omega = 0.0002;
-            double val = 0.01*sin(t*omega) ; ///min(t*omega,1.0)*.1; //0.4*sin(t*omega);
+            double val = 0.005*sin(t*omega) ; ///min(t*omega,1.0)*.1; //0.4*sin(t*omega);
 
             for (int k = 0; k < N; k++) u[i + k*sz2D] = val; //*((2.0*k)/(N-1));
             // TODO: Remember, this is a fake clamped BC just for tests.
@@ -408,7 +406,8 @@ void set_maxflux(const double *_u, const double *_v, const double *_Huon, const 
 
 //extern "C"  __global__
 void adjustBarotropicVelocity(const unsigned int i, const double *_Hz, const double *_u, const double *_v,
-                              const double *_DU_avg1, const double *_DV_avg1, const double *_tmpU, const double *_tmpV)
+                              const double *_DU_avg1, const double *_DV_avg1,
+                              const double *_ubar1, const double *_vbar1, const double *_ubar2, const double *_vbar2, const double *_h)
 // Replace INTERIOR POINTS? incorrect vertical mean velocity with more accurate barotropic component, ubar=DU_avg1/(D*om_u)
 // and vbar=DV_avg1/(D*om_v).
 //
@@ -420,7 +419,7 @@ void adjustBarotropicVelocity(const unsigned int i, const double *_Hz, const dou
     int K = 0;   // This variable is used by all stencils to define the level they act upon.
 
 
-//TODO: Only Bounday POINTS????!!!!
+
 //TODO: should include V.
     if (!isUNode(i)) return;
 
@@ -431,14 +430,18 @@ void adjustBarotropicVelocity(const unsigned int i, const double *_Hz, const dou
     STENCIL(om_v);
     STENCIL(DU_avg1);
     STENCIL(DV_avg1);
-    STENCILU3D(tmpU,       K);
-    STENCILV3D(tmpV,       K);
+    STENCILU(ubar1);
+    STENCILV(vbar1);
+    STENCILU(ubar2);
+    STENCILV(vbar2);
+    STENCIL(h);
 
     auto HzU = RtoU(Hz);
     auto HzV = RtoV(Hz);
 
     double HU  = 0.0, HV  = 0.0;
     double HuU = 0.0, HvV = 0.0;
+
 
     for (K = 0; K < N; K++)
     {
@@ -448,9 +451,6 @@ void adjustBarotropicVelocity(const unsigned int i, const double *_Hz, const dou
         HuU += (HzU*u).Eval(0,0,0);
         HvV += (HzV*v).Eval(0,0,0);
 
-        tmpU = 0.0;
-        tmpV = 0.0;
-
     }
 
 
@@ -458,18 +458,22 @@ void adjustBarotropicVelocity(const unsigned int i, const double *_Hz, const dou
     double uUpdate = ((HuU - DU_avg1/on_u)/HU).Eval(0,0);
     double vUpdate = ((HvV - DV_avg1/om_v)/HV).Eval(0,0);
 
+    // Update baroclinic velocities
+//    u += uUpdate;
+//    v += vUpdate;
 
 
-    // Update new solution.
-    for (K=0; K<=N; K++)
-    {
-        tmpU -= uUpdate;
-        tmpV -= vUpdate;
-    }
+    // Update barotropic velocities.
+    ubar2 = DU_avg1/on_u/HU + uUpdate;
+    vbar2 = DV_avg1/om_v/HV + vUpdate;
+    ubar1 = ubar2;
+    vbar1 = vbar2;
+
 }
 
 
 //template<typename RtoU, typename isUNode>
+
 
 template<NodeType nt, decltype(isUNode) isNode>
 void correctBaroclinicMeanVel(const unsigned int i, double *_u, const double *_Hz, const double *_DU_avg1, double *_on_u, const double *_tmpU)
@@ -510,8 +514,6 @@ void correctBaroclinicMeanVel(const unsigned int i, double *_u, const double *_H
     // Couple and update new solution.
     for (K=0; K<N; K++)
     {
-            // recursive  ???
-
         u -= udiff;
     }
 
@@ -523,11 +525,10 @@ void solveTri(const unsigned int i, const VerticalVelEq &velEq, double AK, const
 // -------------------------
 {
 
-//    printf(">aaaasaaa> %i \n",i);
     if (!isUNode(i)) return; // TODO: remember V
 
     // See https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm.
-    // These structs are here just to make the code more consistent with the algorithm in Wikipedia.
+    // These structs are defined here just to make the code more consistent with the algorithm in Wikipedia.
     // Hopefully, the compiler will optimize them away.
     struct VertArray
     {
@@ -609,7 +610,7 @@ void createVertViscousOpMatrix(int i, double cff, double Δt, double lambda, Ver
     FC[N-1] = 0.0;
     K = 0;
     BC[0] = HzU.Eval(0,0,0);
-    RHS[0] = (HzU*(u + cΔt_mn*ru)).Eval(0,0,0);
+    RHS[0] = 0.0; //(HzU*(u + cΔt_mn*ru)).Eval(0,0,0);
 
     // Δz is the vertical distance between two U nodes.
     auto Δz = DσRtoW(z_r).to<ntUW>();  // FC are located at W point
@@ -646,9 +647,10 @@ void createVertViscousOpMatrix(int i, double cff, double Δt, double lambda, Ver
 // This subroutine time-steps the nonlinear  horizontal  momentum equations.
 // The vertical viscosity terms are time-stepped using an implicit algorithm.
 extern "C"  __global__
-void step3d_UV(double *_u, double *_v, const double *ru, const double *rv, const double *ubar_t2, const double *vbar_t2,
+void step3d_UV(double *_u, double *_v, const double *ru, const double *rv,
+               const double *ubar_t1, const double *vbar_t1, const double *ubar_t2, const double *vbar_t2,
                const double *_Hz, const double *_Akv, const double *_z_r, const double *DU_avg1, const double *DV_avg1,
-               const double *_tmpU, const double *_tmpV,
+               const double *_tmpU, const double *_tmpV, const double *_h,
                int iic, int ntfirst, double lambda, double AK, double Dt)
 {
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
@@ -662,6 +664,7 @@ void step3d_UV(double *_u, double *_v, const double *ru, const double *rv, const
     else                          cff = 23.0/12.0;
 
     int K = 0;
+
 
 
 
@@ -694,7 +697,8 @@ void step3d_UV(double *_u, double *_v, const double *ru, const double *rv, const
     // Couple 2D and 3D momentum equations.
     // -----------------------------------------------------------------------
 
-//    adjustBarotropicVelocity(i, _Hz, _u, _v, DU_avg1, DV_avg1, _tmpU, _tmpV);
+
+    adjustBarotropicVelocity(i, _Hz, _u, _v, DU_avg1, DV_avg1, ubar_t1, vbar_t1, ubar_t2, vbar_t2, _h);
 
 
 

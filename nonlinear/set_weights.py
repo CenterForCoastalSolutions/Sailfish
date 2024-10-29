@@ -198,7 +198,7 @@ def set_weights(compTimes):
 
     # Report weights.
     if LwrtInfo:
-        msgInfo('Time Splitting Weights. ndtfast = %i, nfast = %i')
+        msgInfo('Time Splitting Weights. ndtfast = %i, nfast = %i' % (ndtfast, compTimes.nfast))
         msgInfo('==================================')
         msgInfo('Primary      Secondary     Accumulated to Current Step')
 

@@ -247,11 +247,11 @@ class Boundary:
 
         self.GRID = GRID
 
-        self.zetaBC = self.buildLBC(input.getVal('LBC(isFsur)').split(), 1, 1)
-        self.ubarBC = self.buildLBC(input.getVal('LBC(isUbar)').split(), 2, 1)
-        self.vbarBC = self.buildLBC(input.getVal('LBC(isVbar)').split(), 1, 2)
-        self.uvelBC = self.buildLBC(input.getVal('LBC(isUvel)').split(), 2, 1)
-        self.vvelBC = self.buildLBC(input.getVal('LBC(isVvel)').split(), 1, 2)
+        self.zetaBC = self.buildLBC(input.getVal('LBC(isFsur)').split(), 0, 0)
+        self.ubarBC = self.buildLBC(input.getVal('LBC(isUbar)').split(), 1, 0)
+        self.vbarBC = self.buildLBC(input.getVal('LBC(isVbar)').split(), 0, 1)
+        self.uvelBC = self.buildLBC(input.getVal('LBC(isUvel)').split(), 1, 0)
+        self.vvelBC = self.buildLBC(input.getVal('LBC(isVvel)').split(), 0, 1)
 
         # Performs some adjustments
         # When Flather or Shchepetkin conditions are used for the velocities, we will need to "acquire"

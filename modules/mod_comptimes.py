@@ -47,11 +47,6 @@ class CompTimes:
         self.time_code = ''  # Model time clock (string, YYYY-MM-DD hh:mm:ss.ss).
 
 
-
-        self.knew = 1        # Barotropic (fast) time-step index corresponding to the newest values for 2D primitive equation variables.
-        self.krhs = 1        # Barotropic (fast) time-step index used to compute the right-hand-terms of 2D primitive equation variables.
-        self.kstp = 1        # Barotropic (fast) time-step index to which the current changes are added to compute new 2D primitive equation variables.
-
         # Time-step counter for current execution time-window.
         self.step_counter = 0.0
 
@@ -59,7 +54,7 @@ class CompTimes:
         # First, starting, and ending timestepping parameters
         self.ntfirst = 0      # Forward-Euler step
         self.ntstart = 0      # Start step
-        self.ntend   = 1440      # End step  TODO: READ this from the file
+        self.ntend   = 50*1440      # End step  TODO: READ this from the file
 
 
         # Weights for time filtering.

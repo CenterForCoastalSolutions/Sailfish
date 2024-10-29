@@ -68,7 +68,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
 
 
     #compute right-hand-side for the 2D momentum equations
-    computeMomentumRHSPred(grsz, bksz, (h, rubar_t1, rvbar_t1, zeta_t1, zeta_t2, g, wGzeta))
+    computeMomentumRHSPred(grsz, bksz, (h, rubar_t1, rvbar_t1, zeta_t0, zeta_t2, g, wGzeta))
 
 
     # During the first time-step, the predictor step is Forward-Euler
@@ -117,7 +117,6 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
 
 
     #compute right-hand-side for the 2D momentum equations
-
     computeMomentumRHSCorr(grsz, bksz, (h, rubar_t2, rvbar_t2, zeta_t0, zeta_t1, zeta_t2, g))
 
 
