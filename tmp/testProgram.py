@@ -2,7 +2,6 @@ import datetime
 import sys
 import cupy as cp
 
-cp.set_debug_mode(True)
 
 # import mod_operators
 
