@@ -10,9 +10,7 @@
   <component name="ChangeListManager">
     <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="&#10;...">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/main3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main3d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/rhs.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/rhs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/step2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_comptimes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_comptimes.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -201,13 +199,6 @@
       <workItem from="1722620637648" duration="1018857000" />
       <workItem from="1725909527570" duration="30000" />
       <workItem from="1727460868133" duration="124000" />
-    </task>
-    <task id="LOCAL-00205" summary="Most optimized version achived. Now I have to clean up the code.">
-      <created>1689355825531</created>
-      <option name="number" value="00205" />
-      <option name="presentableId" value="LOCAL-00205" />
-      <option name="project" value="LOCAL" />
-      <updated>1689355825531</updated>
     </task>
     <task id="LOCAL-00206" summary="Most optimized version achived. Now I have to clean up the code.">
       <created>1689359767864</created>
@@ -545,7 +536,14 @@
       <option name="project" value="LOCAL" />
       <updated>1730748083185</updated>
     </task>
-    <option name="localTasksCounter" value="288" />
+    <task id="LOCAL-00288" summary="&#10;...">
+      <created>1730750162703</created>
+      <option name="number" value="00288" />
+      <option name="presentableId" value="LOCAL-00288" />
+      <option name="project" value="LOCAL" />
+      <updated>1730750162703</updated>
+    </task>
+    <option name="localTasksCounter" value="289" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
