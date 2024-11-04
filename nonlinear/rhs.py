@@ -58,7 +58,7 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
     # Compute horizontal advection of momentum.
     # -----------------------------------------------------------------------
     # TODO: I had to reduce the number of threads because an error related to GPU's limited resources. This has to be done in a better way.
-    horizontalAdvection((grsz[0]*2,), (bksz[0]//2,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.Huon.ravel(), OCEAN.Hvom.ravel(), OCEAN.ru_t2, OCEAN.rv_t2, BC))
+    horizontalAdvection((grsz[0]*GPUMUL,), (bksz[0]//GPUMUL,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.Huon.ravel(), OCEAN.Hvom.ravel(), OCEAN.ru_t2, OCEAN.rv_t2, BC))
 
 
 
@@ -67,7 +67,7 @@ def rhs3d(GRID, OCEAN, BOUNDARY):
         # Add in vertical advection.
         # -----------------------------------------------------------------------
 
-        verticalAdvection((grsz[0]*2,), (bksz[0]//2,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.W, OCEAN.ru_t2, OCEAN.rv_t2, BC))
+        verticalAdvection((grsz[0]*GPUMUL,), (bksz[0]//GPUMUL,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.W, OCEAN.ru_t2, OCEAN.rv_t2, BC))
 
           # TODO: remember
 

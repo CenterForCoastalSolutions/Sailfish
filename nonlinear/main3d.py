@@ -316,7 +316,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         shp = (GRID.N+1,GRID.M+1,GRID.L+1)
         shp2D = (GRID.M+1,GRID.L+1)
 
-        step3d_UV((grsz[0]*2,), (bksz[0]//2,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.ru_t2, OCEAN.rv_t2, OCEAN.ubar_t1, OCEAN.vbar_t1,
+        step3d_UV((grsz[0]*GPUMUL,), (bksz[0]//GPUMUL,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.ru_t2, OCEAN.rv_t2, OCEAN.ubar_t1, OCEAN.vbar_t1,
                                                 OCEAN.ubar_t2, OCEAN.vbar_t2, GRID.Hz, OCEAN.AKv, GRID.z_r, OCEAN.DU_avg1, OCEAN.DV_avg1, tmpU, tmpV, GRID.h,
                                                 compTimes.iic, compTimes.ntfirst, λ, OCEAN.AK, compTimes.dt))
 
@@ -327,7 +327,6 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
 
 
-        print(f'HHH>>> {shp}, {OCEAN.u_t2.shape}')
         OCEAN.u_t2 .reshape(shp)[:,0,:]=OCEAN.u_t2.reshape(shp)[:,2,:]
         OCEAN.u_t2 .reshape(shp)[:,1,:]=OCEAN.u_t2.reshape(shp)[:,2,:]
 

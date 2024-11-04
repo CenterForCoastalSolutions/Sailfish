@@ -7,6 +7,7 @@ import os
 
 # compilationOptions = ('-default-device', '--restrict', '--std=c++17', )
 compilationOptions = ('-default-device', '--restrict', '--std=c++17', )
+GPUMUL = 1
 
 LwrtInfo = True
 

@@ -41,7 +41,7 @@ def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     # =================================
 
     # During the first time-step, the predictor step is Forward-Euler. Otherwise, the predictor step is Leap-frog.
-    computeZetaRHS((grsz[0]*2,), (bksz[0]//2,), (zeta_t1, h, ubar_t1, vbar_t1, OCEAN.DU_avg1, OCEAN.DV_avg1, OCEAN.Zt_avg1, True, compTimes.weight1, compTimes.weight2, compTimes.iif, rzeta_t1))
+    computeZetaRHS((grsz[0]*GPUMUL,), (bksz[0]//GPUMUL,), (zeta_t1, h, ubar_t1, vbar_t1, OCEAN.DU_avg1, OCEAN.DV_avg1, OCEAN.Zt_avg1, True, compTimes.weight1, compTimes.weight2, compTimes.iif, rzeta_t1))
 
     if compTimes.isFirst2DStep():
         # The first time it performs a simple Euler time step. RHS is computed at tn and time derivatives are
@@ -104,7 +104,7 @@ def step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY):
     # Free-surface equation.
     # =================================
 
-    computeZetaRHS((grsz[0]*2,), (bksz[0]//2,), (zeta_t2, h, ubar_t2, vbar_t2, OCEAN.DU_avg1, OCEAN.DV_avg1, OCEAN.Zt_avg1, False,
+    computeZetaRHS((grsz[0]*GPUMUL,), (bksz[0]//GPUMUL,), (zeta_t2, h, ubar_t2, vbar_t2, OCEAN.DU_avg1, OCEAN.DV_avg1, OCEAN.Zt_avg1, False,
                                                  compTimes.weight1, compTimes.weight2, compTimes.iif, rzeta_t1))
 
 
