@@ -2,6 +2,8 @@ import datetime
 import sys
 import cupy as cp
 
+cupy.set_debug_mode(True)
+
 # import mod_operators
 
 sys.path.insert(0, '../modules')
