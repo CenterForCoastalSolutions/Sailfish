@@ -326,6 +326,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
 
 
+        print(f'HHH>>> {shp}, {OCEAN.u_t2.shape}')
         OCEAN.u_t2 .reshape(shp)[:,0,:]=OCEAN.u_t2.reshape(shp)[:,2,:]
         OCEAN.u_t2 .reshape(shp)[:,1,:]=OCEAN.u_t2.reshape(shp)[:,2,:]
 
