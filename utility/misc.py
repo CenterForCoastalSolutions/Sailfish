@@ -5,7 +5,8 @@ import os
 # exePath = r'D:\projects\src\oceangpu'
 # exePath = r'/home/jo.gonzalez/src/Sailfish'
 
-compilationOptions = ('-default-device', '--restrict', '--std=c++17', )
+# compilationOptions = ('-default-device', '--restrict', '--std=c++17', )
+compilationOptions = ('--restrict', '--std=c++17', )
 
 LwrtInfo = True
 
