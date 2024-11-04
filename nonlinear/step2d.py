@@ -16,7 +16,7 @@ pool = rmm.mr.PoolMemoryResource(
     maximum_pool_size=5*(2**30)
 )
 rmm.mr.set_current_device_resource(pool)
-cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
+# cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
 
 
 def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
