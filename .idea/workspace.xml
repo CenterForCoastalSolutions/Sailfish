@@ -9,7 +9,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="&#10;...">
-      <change beforePath="$PROJECT_DIR$/utility/misc.py" beforeDir="false" afterPath="$PROJECT_DIR$/utility/misc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/main3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main3d.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -198,13 +199,6 @@
       <workItem from="1722620637648" duration="1018857000" />
       <workItem from="1725909527570" duration="30000" />
       <workItem from="1727460868133" duration="124000" />
-    </task>
-    <task id="LOCAL-00195" summary="Most optimized version achived. Now I have to clean up the code.">
-      <created>1689354558225</created>
-      <option name="number" value="00195" />
-      <option name="presentableId" value="LOCAL-00195" />
-      <option name="project" value="LOCAL" />
-      <updated>1689354558225</updated>
     </task>
     <task id="LOCAL-00196" summary="Most optimized version achived. Now I have to clean up the code.">
       <created>1689354606454</created>
@@ -542,7 +536,14 @@
       <option name="project" value="LOCAL" />
       <updated>1730741911591</updated>
     </task>
-    <option name="localTasksCounter" value="278" />
+    <task id="LOCAL-00278" summary="&#10;...">
+      <created>1730742056790</created>
+      <option name="number" value="00278" />
+      <option name="presentableId" value="LOCAL-00278" />
+      <option name="project" value="LOCAL" />
+      <updated>1730742056790</updated>
+    </task>
+    <option name="localTasksCounter" value="279" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -611,12 +612,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/nonlinear/main3d.py</url>
-          <line>94</line>
+          <line>95</line>
           <option name="timeStamp" value="533" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/nonlinear/main3d.py</url>
-          <line>85</line>
+          <line>86</line>
           <option name="timeStamp" value="803" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -651,7 +652,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/nonlinear/main3d.py</url>
-          <line>24</line>
+          <line>25</line>
           <option name="timeStamp" value="852" />
         </line-breakpoint>
       </breakpoints>
