@@ -19,7 +19,7 @@ def barotropicVelocityBC(ubar, vbar, compTimes, BOUNDARY):
     # ubarKout[kout, idxuClampedBC] = BOUNDARY.ubar[idxuClampedBC]
     # vbarKout[kout, idxvClampedBC] = BOUNDARY.vbar[idxvClampedBC]
     omega = 0.0002  # s^-1
-    val = .005*math.sin(compTimes.time2D*omega)
+    val = .05*math.sin(compTimes.time2D*omega)
     mod_boundary.setBC((BOUNDARY.ubarClampedBCIdx1.size//blockSize + 1,), (blockSize,),
                        (ubar, BOUNDARY.ubarClampedBCIdx1, BOUNDARY.ubarClampedBCIdx1.size, val))
     # msgInfo('Implement the real Clamped BC, here I am using a fake one!!!')    # TODO: Remove

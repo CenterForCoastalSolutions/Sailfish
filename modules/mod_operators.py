@@ -134,7 +134,7 @@ code = code.replace('ξ', 'X')
 code = code.replace('Δ', 'D')
 code = code.replace('σ', 'sig')
 code = unicodedata.normalize('NFKD', code).encode('ascii', 'ignore').decode('ascii')
-moduleCPPKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--std=c++17', r'-I%s' % filePath))
+moduleCPPKernels = cp.RawModule(code=code, options=compilationOptions + (r'-I%s' % filePath, ))
 initializeCPPKernels = moduleCPPKernels.get_function('initialize')
 
 # computeMomentumRHS3 = moduleCPPKernels.get_function('computeMomentumRHS')
@@ -155,7 +155,7 @@ code = code.replace('ξ', 'X')
 code = code.replace('Δ', 'D')
 code = code.replace('σ', 'sig')
 code = unicodedata.normalize('NFKD', code).encode('ascii', 'ignore').decode('ascii')
-moduleRHSKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--std=c++17', r'-I%s' % filePath))
+moduleRHSKernels = cp.RawModule(code=code, options=compilationOptions + (r'-I%s' % filePath,))
 initializeRHSKernels = moduleRHSKernels.get_function('initialize')
 horizontalAdvection  = moduleRHSKernels.get_function('horizontalAdvection')
 verticalAdvection    = moduleRHSKernels.get_function('verticalAdvection')
@@ -171,7 +171,7 @@ code = code.replace('ξ', 'X')
 code = code.replace('Δ', 'D')
 code = code.replace('σ', 'sig')
 code = unicodedata.normalize('NFKD', code).encode('ascii', 'ignore').decode('ascii')
-moduleStep3DKernels = cp.RawModule(code=code, options=('-default-device', '--restrict', '--std=c++17', r'-I%s' % filePath))
+moduleStep3DKernels = cp.RawModule(code=code, options=compilationOptions + (r'-I%s' % filePath,))
 initializeStep3DKernels  = moduleStep3DKernels.get_function('initialize')
 # adjustBarotropicVelocity = moduleStep3DKernels.get_function('adjustBarotropicVelocity')
 # correctBaroclinicVel     = moduleStep3DKernels.get_function('correctBaroclinicVel')
@@ -210,7 +210,7 @@ RtoU_CUDA = cp.ElementwiseKernel(
 
        ''',
     name='RtoU_CUDA',
-    options=('-default-device',))
+    options=compilationOptions)
 
 
 
@@ -240,7 +240,7 @@ RtoV_CUDA = cp.ElementwiseKernel(
 
        ''',
     name='RtoV_CUDA',
-    options=('-default-device',))
+    options=compilationOptions)
 
 
 
@@ -275,7 +275,7 @@ divUVtoR_CUDA = cp.ElementwiseKernel(
 
        ''',
     name='RtoV_CUDA',
-    options=('-default-device',))
+    options=compilationOptions)
 
 import numba.cuda
 # @numba.cuda.jit
@@ -307,7 +307,7 @@ DξRtoU_CUDA = cp.ElementwiseKernel(
 
            ''',
     name = 'DNRtoU_CUDA',
-    options = ('-default-device',))
+    options=compilationOptions)
 
 
 
@@ -336,7 +336,7 @@ DξRtoU_CUDA = cp.ElementwiseKernel(
 
            ''',
     name = 'DERtoV_CUDA',
-    options = ('-default-device',))
+    options=compilationOptions)
 
 
 def DξRtoU(R):

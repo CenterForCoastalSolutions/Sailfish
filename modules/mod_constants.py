@@ -23,7 +23,7 @@ StefBo  = 5.67E-8        # Stefan-Boltzmann constant (W/m2/K4).
 emmiss  = 0.97           # Infrared emissivity (non dimensional)
 rhow    = 1000.0         # fresh water density (kg/m3).
 rho0    = 1025.0         # Mean density (Kg/m3) used when the Boussinesq approximation is inferred.
-g       = 9.81           # Acceleration due to gravity (m/s2).
+g       = 10.0           # Acceleration due to gravity (m/s2).
 gorho0  = g/rho0         # gravity divided by mean density anomaly. m4/s2/kg
 vonKar  = 0.41           # von Karman constant (non dimensional)
 

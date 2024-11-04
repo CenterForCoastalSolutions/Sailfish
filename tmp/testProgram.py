@@ -70,20 +70,15 @@ mod_operators.initModule(GRID)
 from mod_operators import grsz, bksz, set_depth
 set_depth(grsz, bksz, (GRID.Vtransform, OCEAN.Zt_avg1, GRID.z_w, GRID.z_r, GRID.h, GRID.hc, GRID.Hz,
                        GRID.sc_r,  GRID.sc_w, GRID.Cs_r, GRID.Cs_w))
-# OCEAN.AKv[:,:,:] =+0.001
 
 OCEAN.AKv[:,:,:] =  2.0e-3 + 8.0e-3*cp.exp(GRID.z_w/150)
-# for i in range(GRID.N-2):
-#     OCEAN.AKv[i,:,:] = -0.3*((GRID.z_r[i,:,:])/(GRID.z_r[0])**2)+0.00001
 
-
-# rhs3d(GRID, OCEAN, BOUNDARY)
 
 t0 = datetime.datetime.now()
 main3d(compTimes, GRID, OCEAN, BOUNDARY)
 t1 = datetime.datetime.now()
 print('clock time = %.3f s' %(t1-t0).seconds)
-main2d(compTimes, GRID, OCEAN, BOUNDARY)
+
 
 # cProfile.run('main2d(compTimes,  GRID, OCEAN, BOUNDARY)')
 pass

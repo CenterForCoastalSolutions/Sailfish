@@ -241,7 +241,7 @@ class Boundary:
         filename = os.path.join(exePath, r'modules/mod_BC.c')
         with open(filename, 'r') as file:
             code = file.read()
-        moduleBC = cp.RawModule(code=code, options=('-default-device',))
+        moduleBC = cp.RawModule(code=code, options=compilationOptions)
         setBC  = moduleBC.get_function('setBC')
         copyBC = moduleBC.get_function('copyBC')
 

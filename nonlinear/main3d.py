@@ -27,7 +27,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         from netCDF4 import date2num
         from datetime import datetime, timedelta
 
-        previousSaveTime = 0.0
+        previousSaveTime = None
         outputFile = create_roms_netcdf('output.nc', GRID.L+1, GRID.M+1, GRID.N)
         outputFile['x_rho'][:,:] = GRID.lonr.get()
         outputFile['y_rho'][:,:] = GRID.latr.get()
@@ -183,90 +183,13 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
             step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY)
 
-            if saveFIle and compTimes.time >= previousSaveTime + 30*60.0 and compTimes.iif == 1:
-                previousSaveTime += 30*60.0
-                try:
-                    idxTime += 1
-                except:
-                    idxTime = 0
 
-                outputFile['ocean_time'][idxTime] = date2num(timedelta(seconds=compTimes.time) + datetime(2001,1,1), units = "seconds since 2001-01-01 00:00:00")
-                outputFile['zeta'][idxTime,:,:] = OCEAN.zeta_t2.get()
-                outputFile['u'][idxTime,:,:,:] = OCEAN.u_t2.get().reshape(GRID.N+1, GRID.M+1, GRID.L+1)[:-1,:,:-1]
-                outputFile['v'][idxTime,:,:,:] = OCEAN.v_t2.get().reshape(GRID.N+1, GRID.M+1, GRID.L+1)[:-1,:-1,:]
-                outputFile['ubar'][idxTime,:,:] = OCEAN.ubar_t2.get().reshape(GRID.M+1, GRID.L+1)[:,:-1]
-                outputFile['vbar'][idxTime,:,:] = OCEAN.vbar_t2.get().reshape(GRID.M+1, GRID.L+1)[:-1,:]
-
-            if compTimes.iic % 100==10 and compTimes.iif == 1:
-                # plt.close(True)
-                try:
-                    fig.clf()
-                except:
-                    # fig = plt.figure(figsize=(20,12))
-                    fig = plt.figure(figsize=(16,10))
-                ax1 = fig.add_subplot(221)
-                fig.suptitle('time = %.1f s' % compTimes.time)
-
-
-                # cmap = mpl.cm.RdBu
-                # norm = mpl.colors.Normalize(vmin=-.03, vmax=.03)
-                # ax1.imshow(OCEAN.zeta_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.03, vmax = 0.03)
-                # ax1.pcolormesh(GRID.xr[0,:].get()/1000, GRID.yr[:,0].get()/1000, OCEAN.zeta_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.03, vmax = 0.03)
-                # ax1.title.set_text('Free surface (m)')
-                # # plt.imshow(OCEAN.u_t2.get().reshape(17,402,402)[0,:,:])
-                # fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax1)
-                # plt.pause(1)
-                # print('.... %.2f s   ' % (compTimes.time))
-
-
-                ax1.title.set_text('zeta (m) x-transect')
-                ax1.plot(GRID.xp[0,2:].get(), -OCEAN.zeta_t2.reshape(GRID.M+1, GRID.M+1)[300,2:].get())
-                ax1.set_ylim((-.013,0.013))
-
-                # ax2 = fig.add_subplot(222)
-                # cmap = mpl.cm.RdBu
-                # norm = mpl.colors.Normalize(vmin=-.03, vmax=.03)
-                # # ax2.imshow(OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.02, vmax = 0.02)
-                # ax2.pcolormesh(GRID.xr[0,:].get()/1000, GRID.yr[:,0].get()/1000, OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.03, vmax = 0.03)
-                # ax2.title.set_text('barotropic u (m/s)')
-                # # plt.imshow(OCEAN.u_t2.get().reshape(17,402,402)[0,:,:])
-                # fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax2)
-
-
-                ax3 = fig.add_subplot(223)
-                ax3.title.set_text('barotropic u (m/s) x-transect')
-                ax3.plot(GRID.xp[0,2:].get(), OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1)[300,2:].get())
-                ax3.set_ylim((-.01,0.01))
-
-                ax4 = fig.add_subplot(224)
-                ax4.title.set_text('u  (m/s) z-profile')
-                ax4.plot(OCEAN.u_t2.reshape(GRID.N+1, GRID.M+1, GRID.M+1)[:-1,200,10].get(), GRID.z_w[:-1,0,0].get())
-                ax4.plot(OCEAN.u_t2.reshape(GRID.N+1, GRID.M+1, GRID.M+1)[:-1,200,20].get(), GRID.z_w[:-1,0,0].get())
-                ax4.plot(OCEAN.u_t2.reshape(GRID.N+1, GRID.M+1, GRID.M+1)[:-1,200,30].get(), GRID.z_w[:-1,0,0].get())
-                ax4.plot(OCEAN.u_t2.reshape(GRID.N+1, GRID.M+1, GRID.M+1)[:-1,200,100].get(), GRID.z_w[:-1,0,0].get())
-                ax4.plot(OCEAN.u_t2.reshape(GRID.N+1, GRID.M+1, GRID.M+1)[:-1,200,200].get(), GRID.z_w[:-1,0,0].get())
-                ax4.plot(OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1)[200,200].get() + 0*GRID.z_w[:-1,0,0].get(), GRID.z_w[:-1,0,0].get())
-                ax4.legend(['x=%.3f' % (GRID.xr[0,10].get()/1000), 'x=%.3f' % (GRID.xr[0,20].get()/1000), 'x=%.3f' % (GRID.xr[0,30].get()/1000),
-                                        'x=%.3f' % (GRID.xr[0,100].get()/1000), 'x=%.3f' % (GRID.xr[0,200].get()/1000)])
-
-                ax4.set_xlim((-.05,0.05))
-
-                aaaa += 1
-
-                # plt.subplot(1,2,1)
-                # plt.imshow((OCEAN.u_t2).reshape(GRID.N+1,GRID.M+1,GRID.L+1)[-2,:190,:190].get())
-                # plt.subplot(1,2,2)
-                # plt.imshow((OCEAN.v_t2).reshape(GRID.N+1,GRID.M+1,GRID.L+1)[-2,:190,:190].get())
-
-                plt.savefig(r'D:\projects\src\oceangpu\img%.4i' % aaaa)
-
-                plt.pause(3)
-                plt.ion()
-                print('.... %.2f s    %.2f' % (compTimes.time, OCEAN.zeta_t2.sum()))
 
             # Corrector step - Apply 2D time-step corrector scheme.  XXXX-> Notice that there is not need for a corrector step
             # during the auxiliary (nfast+1) time-step.
             step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY)
+
+            # TODO: Necessary??? This was to avoid problems in example.
             OCEAN.vbar_t2[:]=0.0
             OCEAN.DV_avg1[:]=0.0
 
@@ -282,7 +205,88 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
  #            END IF
  #
 
+        if saveFIle and (previousSaveTime is None or compTimes.time >= previousSaveTime + 30*60.0 -1e-4):
+            if previousSaveTime is None:
+                previousSaveTime = 0.0
+            previousSaveTime += 30*60.0
+            try:
+                idxTime += 1
+            except:
+                idxTime = 0
 
+            outputFile['ocean_time'][idxTime] = date2num(timedelta(seconds=compTimes.time) + datetime(2001,1,1), units = "seconds since 2001-01-01 00:00:00")
+            outputFile['zeta'][idxTime,:,:] = OCEAN.zeta_t2.get()
+            outputFile['u'][idxTime,:,:,:] = OCEAN.u_t2.get().reshape(GRID.N+1, GRID.M+1, GRID.L+1)[:-1,:,:-1]
+            outputFile['v'][idxTime,:,:,:] = OCEAN.v_t2.get().reshape(GRID.N+1, GRID.M+1, GRID.L+1)[:-1,:-1,:]
+            outputFile['ubar'][idxTime,:,:] = OCEAN.ubar_t2.get().reshape(GRID.M+1, GRID.L+1)[:,:-1]
+            outputFile['vbar'][idxTime,:,:] = OCEAN.vbar_t2.get().reshape(GRID.M+1, GRID.L+1)[:-1,:]
+
+        if compTimes.iic % 1000==10:
+            # plt.close(True)
+            try:
+                fig.clf()
+            except:
+                # fig = plt.figure(figsize=(20,12))
+                fig = plt.figure(figsize=(16,10))
+            ax1 = fig.add_subplot(221)
+            fig.suptitle('time = %.1f s' % compTimes.time)
+
+
+            # cmap = mpl.cm.RdBu
+            # norm = mpl.colors.Normalize(vmin=-.03, vmax=.03)
+            # ax1.imshow(OCEAN.zeta_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.03, vmax = 0.03)
+            # ax1.pcolormesh(GRID.xr[0,:].get()/1000, GRID.yr[:,0].get()/1000, OCEAN.zeta_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.03, vmax = 0.03)
+            # ax1.title.set_text('Free surface (m)')
+            # # plt.imshow(OCEAN.u_t2.get().reshape(17,402,402)[0,:,:])
+            # fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax1)
+            # plt.pause(1)
+            # print('.... %.2f s   ' % (compTimes.time))
+
+
+            ax1.title.set_text('zeta (m) x-transect')
+            ax1.plot(GRID.xp[0,2:].get(), -OCEAN.zeta_t2.reshape(GRID.M+1, GRID.M+1)[100,2:].get())
+            ax1.set_ylim((-.013,0.013))
+
+            # ax2 = fig.add_subplot(222)
+            # cmap = mpl.cm.RdBu
+            # norm = mpl.colors.Normalize(vmin=-.03, vmax=.03)
+            # # ax2.imshow(OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.02, vmax = 0.02)
+            # ax2.pcolormesh(GRID.xr[0,:].get()/1000, GRID.yr[:,0].get()/1000, OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.03, vmax = 0.03)
+            # ax2.title.set_text('barotropic u (m/s)')
+            # # plt.imshow(OCEAN.u_t2.get().reshape(17,402,402)[0,:,:])
+            # fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax2)
+
+
+            ax3 = fig.add_subplot(223)
+            ax3.title.set_text('barotropic u (m/s) x-transect')
+            ax3.plot(GRID.xp[0,2:].get(), OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1)[100,2:].get())
+            ax3.set_ylim((-.01,0.01))
+
+            ax4 = fig.add_subplot(224)
+            ax4.title.set_text('u  (m/s) z-profile')
+            ax4.plot(OCEAN.u_t2.reshape(GRID.N+1, GRID.M+1, GRID.M+1)[:-1,100,10].get(), GRID.z_w[:-1,0,0].get())
+            ax4.plot(OCEAN.u_t2.reshape(GRID.N+1, GRID.M+1, GRID.M+1)[:-1,100,20].get(), GRID.z_w[:-1,0,0].get())
+            ax4.plot(OCEAN.u_t2.reshape(GRID.N+1, GRID.M+1, GRID.M+1)[:-1,100,30].get(), GRID.z_w[:-1,0,0].get())
+            ax4.plot(OCEAN.u_t2.reshape(GRID.N+1, GRID.M+1, GRID.M+1)[:-1,100,100].get(), GRID.z_w[:-1,0,0].get())
+            ax4.plot(OCEAN.u_t2.reshape(GRID.N+1, GRID.M+1, GRID.M+1)[:-1,100,200].get(), GRID.z_w[:-1,0,0].get())
+            ax4.plot(OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1)[100,100].get() + 0*GRID.z_w[:-1,0,0].get(), GRID.z_w[:-1,0,0].get())
+            ax4.legend(['x=%.3f' % (GRID.xr[0,10].get()/1000), 'x=%.3f' % (GRID.xr[0,20].get()/1000), 'x=%.3f' % (GRID.xr[0,30].get()/1000),
+                                    'x=%.3f' % (GRID.xr[0,100].get()/1000), 'x=%.3f' % (GRID.xr[0,200].get()/1000)])
+
+            ax4.set_xlim((-.05,0.05))
+
+            aaaa += 1
+
+            # plt.subplot(1,2,1)
+            # plt.imshow((OCEAN.u_t2).reshape(GRID.N+1,GRID.M+1,GRID.L+1)[-2,:190,:190].get())
+            # plt.subplot(1,2,2)
+            # plt.imshow((OCEAN.v_t2).reshape(GRID.N+1,GRID.M+1,GRID.L+1)[-2,:190,:190].get())
+
+            plt.savefig(r'D:\projects\src\oceangpu\img%.4i' % aaaa)
+
+            plt.pause(3)
+            plt.ion()
+            print('.... %.2f s    %.2f' % (compTimes.time, OCEAN.zeta_t2.sum()))
 
 
         # Recompute depths and thicknesses using the new time filtered free-surface.

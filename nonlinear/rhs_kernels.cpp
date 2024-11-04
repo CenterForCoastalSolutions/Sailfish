@@ -83,7 +83,6 @@ void horizontalAdvection(const double *_u,  const double *_v, const double *_Huo
     STENCILU3D(ru,   K);
     STENCILV3D(rv,   K);
 
-
     if (i >= sz2D) // || BC[i] > 0)  // REDO: recover
     {
         ru = 0.0;
@@ -91,15 +90,11 @@ void horizontalAdvection(const double *_u,  const double *_v, const double *_Huo
         return;
     };
 
-//    if (((i % szI) == 0 || ((i % szI) == (szI - 1) || (i/szI) == 0) || (i/szI) == (szJ - 1)) || i >= sz2D) return;
-
-
-
-
-
     for (K=0; K<N; K++)
+    // loop over vertical nodes
     {
 
+        // Interpolate variables to other points
         auto uR = UtoR(u);
         auto uP = UtoP(u);
         auto vR = VtoR(v);
@@ -110,6 +105,7 @@ void horizontalAdvection(const double *_u,  const double *_v, const double *_Huo
         auto HvomP = VtoP(Hvom);
         auto HvomR = VtoR(Hvom);
 
+        // Upwind derivatives use the second parameter as "upwind direction".
         auto uξξR = upwindUtoR(DξξUtoU(u), uR);
         auto uηηP = upwindUtoP(DηηUtoU(u), HvomP);
         auto vξξP = upwindVtoP(DξξVtoV(v), HuonP);
@@ -125,7 +121,7 @@ void horizontalAdvection(const double *_u,  const double *_v, const double *_Huo
         auto UFξR = (uR + Gadv*uξξR*(HuonR + Gadv*HuξξR));
         auto UFηP = (uP + Gadv*uηηP*(HvomP + Gadv*HvξξP));
 
-        auto VFξP = (vP + Gadv*uηηP*(HuonP + Gadv*HuηηP));  // TODO: CHECK all ξξ and ηη, (also adv)
+        auto VFξP = (vP + Gadv*uηηP*(HuonP + Gadv*HuηηP));
         auto VFηR = (vR + Gadv*uξξR*(HvomR + Gadv*HvηηR));
 
         // Add horizontal advection of momentum to the RHS vector.

@@ -8,20 +8,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="...">
-      <change afterPath="$PROJECT_DIR$/nonlinear/adhocNetcdfOutput.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="&#10;...">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/mod_boundary.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_boundary.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_comptimes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_comptimes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/mod_cppkernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_cppkernels.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_constants.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/mod_operators.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/mod_operators.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/barotropicVelocityBC.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/barotropicVelocityBC.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/main2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main2d.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/main3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/main3d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/set_weights.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/set_weights.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nonlinear/step2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nonlinear/rhs_kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/rhs_kernels.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/step3D_uv.kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step3D_uv.kernels.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tmp/testProgram.py" beforeDir="false" afterPath="$PROJECT_DIR$/tmp/testProgram.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utility/misc.py" beforeDir="false" afterPath="$PROJECT_DIR$/utility/misc.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utility/test.in" beforeDir="false" afterPath="$PROJECT_DIR$/utility/test.in" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -211,13 +208,6 @@
       <workItem from="1722620637648" duration="1018857000" />
       <workItem from="1725909527570" duration="30000" />
       <workItem from="1727460868133" duration="124000" />
-    </task>
-    <task id="LOCAL-00193" summary="Most optimized version achived. Now I have to clean up the code.">
-      <created>1689178918800</created>
-      <option name="number" value="00193" />
-      <option name="presentableId" value="LOCAL-00193" />
-      <option name="project" value="LOCAL" />
-      <updated>1689178918800</updated>
     </task>
     <task id="LOCAL-00194" summary="Most optimized version achived. Now I have to clean up the code.">
       <created>1689354275330</created>
@@ -555,7 +545,14 @@
       <option name="project" value="LOCAL" />
       <updated>1720542800484</updated>
     </task>
-    <option name="localTasksCounter" value="276" />
+    <task id="LOCAL-00276" summary="&#10;...">
+      <created>1730218600521</created>
+      <option name="number" value="00276" />
+      <option name="presentableId" value="LOCAL-00276" />
+      <option name="project" value="LOCAL" />
+      <updated>1730218600521</updated>
+    </task>
+    <option name="localTasksCounter" value="277" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -577,7 +574,6 @@
     <MESSAGE value="Some tests" />
     <MESSAGE value="Working on step2d.py.&#10;mod_physical_params.py created." />
     <MESSAGE value="Working on step2d.py." />
-    <MESSAGE value="&#10;..." />
     <MESSAGE value="2D working after some cleaning up" />
     <MESSAGE value="µ" />
     <MESSAGE value="BC's changed to raw kernels." />
@@ -587,7 +583,8 @@
     <MESSAGE value="Working on the 3D kernels" />
     <MESSAGE value="Starting 3D" />
     <MESSAGE value="..." />
-    <option name="LAST_COMMIT_MESSAGE" value="..." />
+    <MESSAGE value="&#10;..." />
+    <option name="LAST_COMMIT_MESSAGE" value="&#10;..." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -656,6 +653,16 @@
           <url>file://$PROJECT_DIR$/tmp/testProgram.py</url>
           <line>48</line>
           <option name="timeStamp" value="850" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tmp/testProgram.py</url>
+          <line>73</line>
+          <option name="timeStamp" value="851" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/nonlinear/main3d.py</url>
+          <line>24</line>
+          <option name="timeStamp" value="852" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

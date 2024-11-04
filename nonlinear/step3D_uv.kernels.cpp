@@ -336,7 +336,7 @@ void setLateralUVBCs(double t, double *u, double *v, const int *bcUIdxFieldIdx2,
         else if ((bcUType & bcClamped) != 0)
         {
             double omega = 0.0002;
-            double val = 0.005*sin(t*omega) ; ///min(t*omega,1.0)*.1; //0.4*sin(t*omega);
+            double val = 0.05*sin(t*omega) ; ///min(t*omega,1.0)*.1; //0.4*sin(t*omega);
 
             for (int k = 0; k < N; k++) u[i + k*sz2D] = val; //*((2.0*k)/(N-1));
             // TODO: Remember, this is a fake clamped BC just for tests.
@@ -442,7 +442,6 @@ void adjustBarotropicVelocity(const unsigned int i, const double *_Hz, const dou
     double HU  = 0.0, HV  = 0.0;
     double HuU = 0.0, HvV = 0.0;
 
-
     for (K = 0; K < N; K++)
     {
         HU  += (HzU  ).Eval(0,0,0);
@@ -452,8 +451,6 @@ void adjustBarotropicVelocity(const unsigned int i, const double *_Hz, const dou
         HvV += (HzV*v).Eval(0,0,0);
 
     }
-
-
 
     double uUpdate = ((HuU - DU_avg1/on_u)/HU).Eval(0,0);
     double vUpdate = ((HvV - DV_avg1/om_v)/HV).Eval(0,0);
@@ -482,7 +479,7 @@ void correctBaroclinicMeanVel(const unsigned int i, double *_u, const double *_H
     // Recall that, D=CF(:,0).
     //
     // NOTE:  Only the BOUNDARY POINTS need to be replaced. Avoid redundant update in the interior again for computational purposes
-    //        which will not affect the nonlinear code.
+    //        which will not affect the nonlinear code. [Not sure what this comment, from the original code, meant]
 //    const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
     const int N = szK;
     int K = 0;
