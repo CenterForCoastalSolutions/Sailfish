@@ -4,6 +4,7 @@ from rhs import rhs3d
 from step2d import step2dPredictor, step2dCorrector
 from mod_operators import step3d_UV, set_maxflux, omega, set_zeta, set_depth, setVerticalVelEq, setLateralUVBCs
 import cupy as cp
+from misc import *
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
