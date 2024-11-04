@@ -7,12 +7,13 @@ import cupy as cp
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from netCDF4 import Dataset
 # mpl.use("TkAgg")
 
 doSaveFIle = False
 doPlot = False
 
+if doSaveFIle:
+    from netCDF4 import Dataset
 
 
 def output():
