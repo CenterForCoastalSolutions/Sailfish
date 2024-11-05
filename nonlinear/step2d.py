@@ -12,8 +12,8 @@ import time
 import rmm
 pool = rmm.mr.PoolMemoryResource(
     rmm.mr.ManagedMemoryResource(),
-    initial_pool_size=25*(2**30),
-    maximum_pool_size=25*(2**30)
+    initial_pool_size=55*(2**30),
+    maximum_pool_size=55*(2**30)
 )
 rmm.mr.set_current_device_resource(pool)
 cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
