@@ -10,10 +10,10 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 # mpl.use("TkAgg")
 
-doSaveFIle = False
+doSaveFile = False
 doPlot = False
 
-if doSaveFIle:
+if doSaveFile:
     from netCDF4 import Dataset
 
 
@@ -25,7 +25,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
     model only.
     """
 
-    if doSaveFIle:
+    if doSaveFile:
         from adhocNetcdfOutput import create_roms_netcdf
         from netCDF4 import date2num
         from datetime import datetime, timedelta
@@ -208,7 +208,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
  #            END IF
  #
 
-        if doSaveFIle and (previousSaveTime is None or compTimes.time >= previousSaveTime + 30*60.0 -1e-4):
+        if doSaveFile and (previousSaveTime is None or compTimes.time >= previousSaveTime + 30*60.0 -1e-4):
             if previousSaveTime is None:
                 previousSaveTime = 0.0
             previousSaveTime += 30*60.0
@@ -224,7 +224,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
             outputFile['ubar'][idxTime,:,:] = OCEAN.ubar_t2.get().reshape(GRID.M+1, GRID.L+1)[:,:-1]
             outputFile['vbar'][idxTime,:,:] = OCEAN.vbar_t2.get().reshape(GRID.M+1, GRID.L+1)[:-1,:]
 
-        if doPlot and compTimes.iic % 1000==10:
+        if doPlot and (compTimes.iic % 1000==10):
             # plt.close(True)
             try:
                 fig.clf()
