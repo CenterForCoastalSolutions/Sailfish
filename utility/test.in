@@ -224,8 +224,8 @@ ad_VolCons(north) ==  F                            ! northern boundary
 
 ! Time-Stepping parameters.
 
-      NTIMES == 10000
-          DT == 5.0
+      NTIMES == 100
+          DT == 30.0
      NDTFAST == 30
 
 ! Number of timesteps for computing observation impacts during the

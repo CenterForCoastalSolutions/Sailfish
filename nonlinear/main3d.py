@@ -81,7 +81,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         # # Initialize other state variables.
         # ini_fields()
 
-    aaaa = 0
+    imgIdx = 0
 
     while not compTimes.isFinalTimeStep():
 
@@ -278,14 +278,14 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
             ax4.set_xlim((-.05,0.05))
 
-            aaaa += 1
+            imgIdx += 1
 
             # plt.subplot(1,2,1)
             # plt.imshow((OCEAN.u_t2).reshape(GRID.N+1,GRID.M+1,GRID.L+1)[-2,:190,:190].get())
             # plt.subplot(1,2,2)
             # plt.imshow((OCEAN.v_t2).reshape(GRID.N+1,GRID.M+1,GRID.L+1)[-2,:190,:190].get())
 
-            plt.savefig(r'D:\projects\src\oceangpu\img%.4i' % aaaa)
+            plt.savefig(r'D:\projects\src\oceangpu\img%.4i' % imgIdx)
 
             plt.pause(3)
             plt.ion()
@@ -304,14 +304,8 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         tmpU[:] = OCEAN.u_t2
         tmpV[:] = OCEAN.v_t2
 
-        # OCEAN.u_t2 .reshape(17,402,402)[-1,:,:]=OCEAN.u_t2 .reshape(17,402,402)[-4,:,:]
-        # OCEAN.u_t2 .reshape(17,402,402)[-2,:,:]=OCEAN.u_t2 .reshape(17,402,402)[-4,:,:]
-        # OCEAN.u_t2 .reshape(17,402,402)[-3,:,:]=OCEAN.u_t2 .reshape(17,402,402)[-4,:,:]
-        # OCEAN.ru_t2 .reshape(17,402,402)[-3,:,:]=OCEAN.ru_t2 .reshape(17,402,402)[-4,:,:]
-        # OCEAN.ru_t2 .reshape(17,402,402)[-2,:,:]=OCEAN.ru_t2 .reshape(17,402,402)[-4,:,:]
-        # OCEAN.ru_t2 .reshape(17,402,402)[-1,:,:]=OCEAN.ru_t2 .reshape(17,402,402)[-4,:,:]
 
-        # OCEAN.u_t2 .reshape(17,402,402)[GRID.N:,:,:]=OCEAN.u_t2 .reshape(17,402,402)[GRID.N-2,:,:]
+
         # TODO: I had to reduce the number of threads because an error related to GPU's limited resources. This has to be done in a better way.
 
         shp = (GRID.N+1,GRID.M+1,GRID.L+1)
