@@ -142,9 +142,8 @@ void computeZetaPred(const double Dt, const double *_zeta_t0, const double *_zet
     STENCIL(zeta_t1);
     STENCIL(zeta_t2);
     STENCIL(rzeta_t1);
-//    STENCIL(pn);
-//    STENCIL(pm);
 
+    // XXX Shouldn't it be 2*Dt?
     zeta_t2 = zeta_t0(0,0) + Dt*rzeta_t1(0,0); // Leapfrog
 
 

@@ -11,7 +11,7 @@ import matplotlib as mpl
 # mpl.use("TkAgg")
 
 doSaveFile = False
-doPlot = False
+doPlot = True
 
 if doSaveFile:
     from netCDF4 import Dataset
@@ -50,9 +50,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
     tmpV   = cp.zeros(OCEAN.v_t2.shape, dtype = cp.float64)
     from mod_operators import grsz, bksz
 
-    # TODO: Check this BC
     BC = BOUNDARY.zetaBC.bcIdxFieldIdx2
-
 
     # Initialize the arrays for the matrix equations.
     setVerticalVelEq((1,), (1,), (eqSD, eqD, eqRHS))
@@ -99,13 +97,6 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
         # OCEAN.cycleTimes3D()
 
-#         iic += 1
-#         nstp(ng)=1+MOD(iic(ng)-ntstart(ng),2)
-#         nnew(ng)=3-nstp(ng)
-#         nrhs(ng)=nstp(ng)
-# !       time(ng)=time(ng)+dt(ng)
-#               tdays(ng)=time(ng)*sec2day
-#               IF (step_counter(ng).eq.Rsteps) Time_Step=.FALSE.
 
 
         # Read in required data, if any, from input NetCDF files.
@@ -187,26 +178,18 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
             step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY)
 
 
-
-            # Corrector step - Apply 2D time-step corrector scheme.  XXXX-> Notice that there is not need for a corrector step
-            # during the auxiliary (nfast+1) time-step.
+            # Corrector step - Apply 2D time-step corrector scheme.
+            # Original Fortran code says: Notice that there is not need for a corrector step during the auxiliary (nfast+1) time-step.
             step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY)
 
-            # TODO: Necessary??? This was to avoid problems in example.
-            OCEAN.vbar_t2[:]=0.0
-            OCEAN.DV_avg1[:]=0.0
 
- # TODO: THIS*****
+
+ # TODO: I'm not sure if I have done this correctly.
  #            # Predictor step - Advance barotropic equations using 2D time-step
  #            # ==============   predictor scheme.  No actual time-stepping is
  #            # performed during the auxiliary (nfast+1) time-step. It is needed
  #            # to finalize the fast-time averaging of 2D fields, if any, and
  #            # compute the new time-evolving depths.
- #
- #            IF (my_iif.le.(nfast(ng)+1)) THEN
- #                CALL step2d()
- #            END IF
- #
 
         if doSaveFile and (previousSaveTime is None or compTimes.time >= previousSaveTime + 30*60.0 -1e-4):
             if previousSaveTime is None:
@@ -248,22 +231,22 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
             ax1.title.set_text('zeta (m) x-transect')
             ax1.plot(GRID.xp[0,2:].get(), -OCEAN.zeta_t2.reshape(GRID.M+1, GRID.M+1)[100,2:].get())
-            ax1.set_ylim((-.013,0.013))
+            ax1.set_ylim((-.13,0.13))
 
-            # ax2 = fig.add_subplot(222)
-            # cmap = mpl.cm.RdBu
-            # norm = mpl.colors.Normalize(vmin=-.03, vmax=.03)
-            # # ax2.imshow(OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.02, vmax = 0.02)
-            # ax2.pcolormesh(GRID.xr[0,:].get()/1000, GRID.yr[:,0].get()/1000, OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.03, vmax = 0.03)
-            # ax2.title.set_text('barotropic u (m/s)')
-            # # plt.imshow(OCEAN.u_t2.get().reshape(17,402,402)[0,:,:])
-            # fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax2)
+            ax2 = fig.add_subplot(222)
+            cmap = mpl.cm.RdBu
+            norm = mpl.colors.Normalize(vmin=-.03, vmax=.03)
+            # ax2.imshow(OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.02, vmax = 0.02)
+            ax2.pcolormesh(GRID.xr[0,:].get()/1000, GRID.yr[:,0].get()/1000, OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1).get(), cmap = cmap, vmin = -.03, vmax = 0.03)
+            ax2.title.set_text('barotropic u (m/s)')
+            # plt.imshow(OCEAN.u_t2.get().reshape(17,402,402)[0,:,:])
+            fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),ax=ax2)
 
 
             ax3 = fig.add_subplot(223)
             ax3.title.set_text('barotropic u (m/s) x-transect')
             ax3.plot(GRID.xp[0,2:].get(), OCEAN.ubar_t2.reshape(GRID.M+1, GRID.M+1)[100,2:].get())
-            ax3.set_ylim((-.01,0.01))
+            ax3.set_ylim((-.1,0.1))
 
             ax4 = fig.add_subplot(224)
             ax4.title.set_text('u  (m/s) z-profile')
@@ -300,39 +283,16 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         # Time-step 3D momentum equations and couple with vertically integrated equations.
         λ = 1.0
 
-        # TODO: Remember I did this:
+        # TODO: Explain this better. This is to avoid a "sweep" error:
         tmpU[:] = OCEAN.u_t2
         tmpV[:] = OCEAN.v_t2
 
 
 
-        # TODO: I had to reduce the number of threads because an error related to GPU's limited resources. This has to be done in a better way.
-
-        shp = (GRID.N+1,GRID.M+1,GRID.L+1)
-        shp2D = (GRID.M+1,GRID.L+1)
-
+        # XXX: I had to reduce the number of threads because an error related to GPU's limited resources. This has to be done in a better way.
         step3d_UV((grsz[0]*GPUMUL,), (bksz[0]//GPUMUL,), (OCEAN.u_t2, OCEAN.v_t2, OCEAN.ru_t2, OCEAN.rv_t2, OCEAN.ubar_t1, OCEAN.vbar_t1,
                                                 OCEAN.ubar_t2, OCEAN.vbar_t2, GRID.Hz, OCEAN.AKv, GRID.z_r, OCEAN.DU_avg1, OCEAN.DV_avg1, tmpU, tmpV, GRID.h,
                                                 compTimes.iic, compTimes.ntfirst, λ, OCEAN.AK, compTimes.dt))
-
-
-        # TODO: recover
-        # OCEAN.u_t2[:] = tmpU
-        # OCEAN.v_t2[:] = 0.0
-
-
-
-        OCEAN.u_t2 .reshape(shp)[:,0,:]=OCEAN.u_t2.reshape(shp)[:,2,:]
-        OCEAN.u_t2 .reshape(shp)[:,1,:]=OCEAN.u_t2.reshape(shp)[:,2,:]
-
-        OCEAN.vbar_t2 .reshape(shp2D)[7,:]=OCEAN.vbar_t2.reshape(shp2D)[13,:]
-        OCEAN.vbar_t2 .reshape(shp2D)[6,:]=OCEAN.vbar_t2.reshape(shp2D)[13,:]
-        OCEAN.vbar_t2 .reshape(shp2D)[5,:]=OCEAN.vbar_t2.reshape(shp2D)[13,:]
-        OCEAN.vbar_t2 .reshape(shp2D)[4,:]=OCEAN.vbar_t2.reshape(shp2D)[13,:]
-        OCEAN.vbar_t2 .reshape(shp2D)[3,:]=OCEAN.vbar_t2.reshape(shp2D)[13,:]
-        OCEAN.vbar_t2 .reshape(shp2D)[2,:]=OCEAN.vbar_t2.reshape(shp2D)[13,:]
-        OCEAN.vbar_t2 .reshape(shp2D)[1,:]=OCEAN.vbar_t2.reshape(shp2D)[13,:]
-        OCEAN.vbar_t2 .reshape(shp2D)[0,:]=OCEAN.vbar_t2.reshape(shp2D)[13,:]
 
 
 
@@ -343,7 +303,6 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         omega(grsz, bksz, (OCEAN.W, OCEAN.u_t2, OCEAN.v_t2, OCEAN.Huon, OCEAN.Hvom, GRID.z_w, BC))
         # bc_w3d()
 
-        # OCEAN.cycleTimes3D()
         compTimes.nextTimeStep()
         print('time: %.2f s' % compTimes.time)
 
