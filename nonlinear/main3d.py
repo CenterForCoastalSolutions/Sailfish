@@ -283,7 +283,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         # Time-step 3D momentum equations and couple with vertically integrated equations.
         λ = 1.0
 
-        # TODO: Explain this better. This is to avoid a "sweep" error:
+        # TODO: Explain this better. This is to avoid a "sweeingp" error:
         tmpU[:] = OCEAN.u_t2
         tmpV[:] = OCEAN.v_t2
 
