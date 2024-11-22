@@ -117,10 +117,6 @@ class T_OCEAN:
 
 
 
-
-
-
-
     def cycleTimes2D(self):
         # Cycle the variables that contain the previous times. In reality this is a shift, where variables are moved
         # one barotropic time-step in such a way that t2 always point to time = t + 2Δt and so on.
@@ -185,13 +181,6 @@ class T_OCEAN:
         self.rv_t2 = temp
 
 
-    def getVars(self):
-        return (self.zeta_t2, self.zeta_t1, self.zeta_t0,
-                self.ubar_t2, self.ubar_t1, self.ubar_t0,
-                self.vbar_t2, self.vbar_t1, self.vbar_t0,
-                self.rzeta_t1, self.rzeta_t0,
-                self.rubar_t1, self.rubar_t0,
-                self.rvbar_t1, self.rvbar_t0)
 
 
 

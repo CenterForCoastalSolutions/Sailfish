@@ -13,6 +13,7 @@ import matplotlib as mpl
 doSaveFile = False
 doPlot = False
 
+
 if doSaveFile:
     from netCDF4 import Dataset
 
@@ -80,6 +81,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         # ini_fields()
 
     imgIdx = 0
+    elapsed2d = 0.0
 
     while not compTimes.isFinalTimeStep():
 
@@ -161,7 +163,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         # -----------------------------------------------------------------------
 
         compTimes.first2DTimeStep()
-
+        t2d_1 = time.time()
         for iif in range(compTimes.nfast+1):     # WARNING: Used to be +1 ??
 
             if compTimes.isFirst2DStep():
@@ -182,7 +184,8 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
             # Original Fortran code says: Notice that there is not need for a corrector step during the auxiliary (nfast+1) time-step.
             step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY)
 
-
+        t2d_2 = time.time()
+        elapsed2d += t2d_2 - t2d_1
 
  # TODO: I'm not sure if I have done this correctly.
  #            # Predictor step - Advance barotropic equations using 2D time-step
@@ -275,6 +278,8 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
             print('.... %.2f s    %.2f' % (compTimes.time, OCEAN.zeta_t2.sum()))
 
 
+
+
         # Recompute depths and thicknesses using the new time filtered free-surface.
         set_depth(grsz, bksz, (GRID.Vtransform, OCEAN.Zt_avg1, GRID.z_w, GRID.z_r, GRID.h, GRID.hc, GRID.Hz,
                                GRID.sc_r,  GRID.sc_w, GRID.Cs_r, GRID.Cs_w))
@@ -306,4 +311,5 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         compTimes.nextTimeStep()
         print('time: %.2f s' % compTimes.time)
 
+    print('TIME 2D ', elapsed2d)
 
