@@ -4,6 +4,7 @@ from barotropicVelocityBC import barotropicVelocityBC
 from zetabc               import zetabc
 from mod_constants import *
 from misc          import *
+from numba import njit
 import time
 
 
@@ -19,6 +20,7 @@ import time
 # cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
 
 
+@njit
 def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
     from mod_operators import grsz, bksz
 
