@@ -19,10 +19,10 @@ import time
 # rmm.mr.set_current_device_resource(pool)
 # cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
 
-from mod_operators import grsz, bksz
+
 @njit
 def step2dPredictor(compTimes, GRID, OCEAN, BOUNDARY):
-
+    from mod_operators import grsz, bksz
 
     # Aliases
     zeta_t2, zeta_t1, zeta_t0 = (OCEAN.zeta_t2, OCEAN.zeta_t1, OCEAN.zeta_t0)

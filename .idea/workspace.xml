@@ -9,7 +9,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1c9b936c-3a70-4e21-889b-48cc9ebc7800" name="Changes" comment="&#10;...">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nonlinear/step2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/nonlinear/step2d.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -199,20 +198,6 @@
       <workItem from="1722620637648" duration="1018857000" />
       <workItem from="1725909527570" duration="30000" />
       <workItem from="1727460868133" duration="124000" />
-    </task>
-    <task id="LOCAL-00239" summary="...">
-      <created>1702486671482</created>
-      <option name="number" value="00239" />
-      <option name="presentableId" value="LOCAL-00239" />
-      <option name="project" value="LOCAL" />
-      <updated>1702486671482</updated>
-    </task>
-    <task id="LOCAL-00240" summary="...">
-      <created>1702486790920</created>
-      <option name="number" value="00240" />
-      <option name="presentableId" value="LOCAL-00240" />
-      <option name="project" value="LOCAL" />
-      <updated>1702486790921</updated>
     </task>
     <task id="LOCAL-00241" summary="...">
       <created>1702486925951</created>
@@ -543,7 +528,21 @@
       <option name="project" value="LOCAL" />
       <updated>1732138974511</updated>
     </task>
-    <option name="localTasksCounter" value="313" />
+    <task id="LOCAL-00313" summary="&#10;...">
+      <created>1732290769185</created>
+      <option name="number" value="00313" />
+      <option name="presentableId" value="LOCAL-00313" />
+      <option name="project" value="LOCAL" />
+      <updated>1732290769185</updated>
+    </task>
+    <task id="LOCAL-00314" summary="&#10;...">
+      <created>1732291239603</created>
+      <option name="number" value="00314" />
+      <option name="presentableId" value="LOCAL-00314" />
+      <option name="project" value="LOCAL" />
+      <updated>1732291239603</updated>
+    </task>
+    <option name="localTasksCounter" value="315" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
