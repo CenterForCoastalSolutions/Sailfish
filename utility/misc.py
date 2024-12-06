@@ -6,7 +6,7 @@ import os
 # exePath = r'/home/jo.gonzalez/src/Sailfish'
 
 # compilationOptions = ('-default-device', '--restrict', '--std=c++17', )
-compilationOptions = ('-default-device', '--restrict', '--std=c++17', )
+compilationOptions = ('-default-device', '--restrict', '--std=c++17')
 GPUMUL = 2
 
 LwrtInfo = True

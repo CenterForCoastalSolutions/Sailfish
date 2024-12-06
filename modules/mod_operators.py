@@ -35,7 +35,7 @@ def initModule(GRID):
     G = GRID
     on_u = G.on_u
     om_v = G.om_v
-    shp = G.on_u.shape   # I chosen on_u, but it could've been any other array.
+    shp = G.on_u.shape   # I chose on_u, but it could've been any other array.
     sz  = G.on_u.size
     bksz = (blockSize,)
     grsz = (sz//blockSize + 1,)

@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 # mpl.use("TkAgg")
 
-doSaveFile = False
+doSaveFile = True
 doPlot = False
 
 
