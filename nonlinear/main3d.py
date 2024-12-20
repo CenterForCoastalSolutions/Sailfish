@@ -33,7 +33,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
         from datetime import datetime, timedelta
 
         previousSaveTime = None
-        outputFile = create_roms_netcdf('output.nc', GRID.L+1, GRID.M+1, GRID.N)
+        outputFile = create_roms_netcdf('/blue/olabarrieta/jo.gonzalez/projects/sailfish/ROMS_tests/output.nc', GRID.L+1, GRID.M+1, GRID.N)
         outputFile['x_rho'][:,:] = GRID.lonr.get()
         outputFile['y_rho'][:,:] = GRID.latr.get()
         outputFile['x_u'  ][:,:] = GRID.lonu.get()[:,:-1]
