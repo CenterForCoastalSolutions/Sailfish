@@ -165,7 +165,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
         compTimes.first2DTimeStep()
         t2d_1 = time.time()
-        for iif in range(compTimes.nfast+1):     # WARNING: Used to be +1 ??
+        for iif in range(compTimes.nfast+1):
 
             if compTimes.isFirst2DStep():
                 OCEAN.Zt_avg1[:] = 0.0
@@ -184,6 +184,10 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
             # Corrector step - Apply 2D time-step corrector scheme.
             # Original Fortran code says: Notice that there is not need for a corrector step during the auxiliary (nfast+1) time-step.
             step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY)
+
+            # TODO: This seems to be necessary, but I'm not sure why. Maybe it is hiding a deeper bug?
+            OCEAN.vbar_t2[:]=0.0
+
 
         t2d_2 = time.time()
         elapsed2d += t2d_2 - t2d_1
@@ -211,7 +215,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
             outputFile['ubar'][idxTime,:,:] = OCEAN.ubar_t2.get().reshape(GRID.M+1, GRID.L+1)[:,:-1]
             outputFile['vbar'][idxTime,:,:] = OCEAN.vbar_t2.get().reshape(GRID.M+1, GRID.L+1)[:-1,:]
 
-        if doPlot and (compTimes.iic % 1000==10):
+        if doPlot and (compTimes.iic % 1000==0):
             # plt.close(True)
             try:
                 fig.clf()
@@ -302,8 +306,15 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
 
 
+
         setLateralUVBCs((grsz[0],), (bksz[0],), (compTimes.time, OCEAN.u_t2, OCEAN.v_t2, BOUNDARY.uvelBC.bcIdxFieldIdx2, BOUNDARY.vvelBC.bcIdxFieldIdx2, BOUNDARY.uvelBC.bcIdxFieldType, BOUNDARY.vvelBC.bcIdxFieldType))
 
+        # OCEAN.v[:,:,0,:] = 0.0
+        # OCEAN.vbar[:,0,:] = 0.0
+        # OCEAN.u[:,:,0,:] = OCEAN.u[:,:,2,:]
+        # OCEAN.ubar[:,0,:] = OCEAN.ubar[:,2,:]
+        # OCEAN.u[:,:,1,:] = OCEAN.u[:,:,2,:]
+        # OCEAN.ubar[:,1,:] = OCEAN.ubar[:,2,:]
 
         #   Time-step vertical mixing turbulent equations and passive tracer source and sink terms, if applicable.
         omega(grsz, bksz, (OCEAN.W, OCEAN.u_t2, OCEAN.v_t2, OCEAN.Huon, OCEAN.Hvom, GRID.z_w, BC))
