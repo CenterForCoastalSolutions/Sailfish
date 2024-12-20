@@ -325,3 +325,4 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
 
     print('TIME 2D ', elapsed2d)
 
+    outputFile.close()
