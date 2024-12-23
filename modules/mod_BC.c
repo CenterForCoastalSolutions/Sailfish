@@ -7,7 +7,9 @@ extern "C" {
     {
         const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
-        if ( i >= size) return;
+        if (i >= size) return;
+
+        printf("$$$$ %d\n", i)
 
         var[idx[i]] = val;
     }
