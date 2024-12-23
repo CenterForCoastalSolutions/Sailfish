@@ -186,7 +186,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
             step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY)
 
             # TODO: This seems to be necessary, but I'm not sure why. Maybe it is hiding a deeper bug?
-            OCEAN.vbar_t2[:]=0.0
+            # OCEAN.vbar_t2[:]=0.0
 
 
         t2d_2 = time.time()
