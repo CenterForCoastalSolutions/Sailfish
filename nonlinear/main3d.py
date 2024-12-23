@@ -186,7 +186,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
             step2dCorrector(compTimes, GRID, OCEAN, BOUNDARY)
 
             # TODO: This seems to be necessary, but I'm not sure why. Maybe it is hiding a deeper bug?
-            # OCEAN.vbar_t2[:]=0.0
+            OCEAN.vbar_t2[:]=0.0
 
 
         t2d_2 = time.time()
@@ -215,7 +215,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
             outputFile['ubar'][idxTime,:,:] = OCEAN.ubar_t2.get().reshape(GRID.M+1, GRID.L+1)[:,:-1]
             outputFile['vbar'][idxTime,:,:] = OCEAN.vbar_t2.get().reshape(GRID.M+1, GRID.L+1)[:-1,:]
 
-        if doPlot and (compTimes.iic % 1000==0):
+        if doPlot and (compTimes.iic % 10==0):
             # plt.close(True)
             try:
                 fig.clf()
