@@ -178,10 +178,10 @@ class Boundary:
         # LBC += [decodeLBC([val[iN], val[iW]])]
 
 
-        bcIdx  = cp.array(bcIdx , dtype = int)
-        bcIdx1 = cp.array(bcIdx1, dtype = int)
-        bcIdx2 = cp.array(bcIdx2, dtype = int)
-        LBC    = cp.array(LBC,    dtype = int)
+        bcIdx  = cp.array(bcIdx , dtype = cp.int32)
+        bcIdx1 = cp.array(bcIdx1, dtype = cp.int32)
+        bcIdx2 = cp.array(bcIdx2, dtype = cp.int32)
+        LBC    = cp.array(LBC,    dtype = cp.int32)
 
         # Sorts the indices to improve cache access. TODO: Recover?
         # sortIdx = cp.argsort(bcIdx.flatten())
