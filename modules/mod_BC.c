@@ -3,7 +3,7 @@
 extern "C" {
 
 
-    __global__ void setBC(double *var, const unsigned int *idx, const unsigned int size, const double val)
+    __global__ void setBC(double *var, const int *idx, const unsigned int size, const double val)
     {
         const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
