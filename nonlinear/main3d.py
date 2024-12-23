@@ -12,7 +12,7 @@ import matplotlib as mpl
 # mpl.use("TkAgg")
 
 doSaveFile = False
-doPlot = True
+doPlot = False
 
 
 if doSaveFile:
