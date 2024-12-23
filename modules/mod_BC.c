@@ -9,7 +9,7 @@ extern "C" {
 
         if (i >= size) return;
 
-        if (i==1001) printf("$$$$ %d\n", idx[i]);
+        if (size==1001) printf("$$$$ %d\n", idx[i]);
 
         var[idx[i]] = val;
     }
