@@ -78,7 +78,7 @@ OCEAN.AKv[:,:,:] =  2.0e-3 + 8.0e-3*cp.exp(GRID.z_w/150)
 t0 = datetime.datetime.now()
 main3d(compTimes, GRID, OCEAN, BOUNDARY)
 t1 = datetime.datetime.now()
-print('clock time = %.3f s' %(t1-t0).seconds)
+print('clock time = %.3f s' %(t1-t0).microseconds)
 
 
 # cProfile.run('main2d(compTimes,  GRID, OCEAN, BOUNDARY)')
