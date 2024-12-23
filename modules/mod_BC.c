@@ -9,8 +9,6 @@ extern "C" {
 
         if (i >= size) return;
 
-        if (size==1001) printf("$$$$ %p %d %d %d\n", var, (idx[i]-1)/1002, i, idx[i]);
-
         var[idx[i]] = val;
     }
 
