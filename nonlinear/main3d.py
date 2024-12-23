@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 # mpl.use("TkAgg")
 
-doSaveFile = True
-doPlot = False
+doSaveFile = False
+doPlot = True
 
 
 if doSaveFile:
@@ -276,7 +276,8 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
             # plt.subplot(1,2,2)
             # plt.imshow((OCEAN.v_t2).reshape(GRID.N+1,GRID.M+1,GRID.L+1)[-2,:190,:190].get())
 
-            plt.savefig(r'D:\projects\src\oceangpu\img%.4i' % imgIdx)
+            # plt.savefig(r'D:\projects\src\oceangpu\img%.4i' % imgIdx)
+            plt.savefig(r'img%.4i' % imgIdx)
 
             plt.pause(3)
             plt.ion()
