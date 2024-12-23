@@ -653,6 +653,9 @@ void step3d_UV(double *_u, double *_v, const double *ru, const double *rv,
     const unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
     const int N = szK;
 
+
+    printf("EEEE %d  - %d\n", sz2D, i)
+
     // Time step momentum equations
     // ----------------------------
     double cff;
