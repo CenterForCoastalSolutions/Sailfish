@@ -215,7 +215,7 @@ def main3d(compTimes, GRID, OCEAN, BOUNDARY):
             outputFile['ubar'][idxTime,:,:] = OCEAN.ubar_t2.get().reshape(GRID.M+1, GRID.L+1)[:,:-1]
             outputFile['vbar'][idxTime,:,:] = OCEAN.vbar_t2.get().reshape(GRID.M+1, GRID.L+1)[:-1,:]
 
-        if doPlot and (compTimes.iic % 10==0):
+        if doPlot and (compTimes.iic % 1000==0):
             # plt.close(True)
             try:
                 fig.clf()
